@@ -1,0 +1,21 @@
+{
+  "name": "tree-sitter-sigil",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for the Sigil language",
+  "main": "bindings/node",
+  "scripts": {
+    "test": "tree-sitter test"
+  },
+  "tree-sitter": [
+    {
+      "scope": "source.mako",
+      "file-types": ["sigil"],
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm",
+      "locals": "queries/locals.scm"
+    }
+  ],
+  "devDependencies": {
+    "tree-sitter-cli": "^0.26.0"
+  }
+}

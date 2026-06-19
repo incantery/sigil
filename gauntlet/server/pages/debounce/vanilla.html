@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gauntlet · debounce · vanilla</title>
+  <style>body { font: 16px system-ui, sans-serif; margin: 2rem; } input { font: inherit; padding: .4rem; }</style>
+</head>
+<body>
+  <main>
+    <h1>Debounced search</h1>
+    <input id="q" placeholder="Search">
+    <!-- Results update only 300ms after the LAST keystroke. A test that
+         reads immediately after typing sees stale/empty results. -->
+    <p id="results"></p>
+  </main>
+  <script>
+    let t;
+    const q = document.getElementById('q');
+    q.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        document.getElementById('results').textContent = 'Results for: ' + q.value;
+      }, 300);
+    });
+  </script>
+</body>
+</html>

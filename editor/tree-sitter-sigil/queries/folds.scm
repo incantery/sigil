@@ -1,0 +1,20 @@
+;; Fold groups — anything with an indented body or a brace block.
+[
+  (view_decl)
+  (app_decl)
+  (component_decl)
+  (theme_decl)
+  (test_decl)
+  (story_decl)
+  (type_decl)
+  (state_decl)
+  (icons_decl)
+  (backend_decl)
+  (session_decl)
+  (invocation)
+  (for_loop)
+  (if_block)
+  (handler)
+  (on_mount)
+  (list_literal)
+] @fold

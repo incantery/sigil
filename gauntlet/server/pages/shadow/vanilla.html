@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gauntlet · shadow · vanilla</title>
+</head>
+<body>
+  <main>
+    <h1>Shadow DOM</h1>
+    <!-- The button and its result live inside an OPEN shadow root.
+         document.querySelectorAll stops at the shadow boundary, so a naive
+         matcher can't see them — the runner must pierce open shadow roots. -->
+    <status-card></status-card>
+  </main>
+  <script>
+    class StatusCard extends HTMLElement {
+      connectedCallback() {
+        const root = this.attachShadow({ mode: 'open' });
+        root.innerHTML = '<button id="go">Reveal</button><p id="out"></p>';
+        root.getElementById('go').addEventListener('click', () => {
+          root.getElementById('out').textContent = 'Revealed from the shadow';
+        });
+      }
+    }
+    customElements.define('status-card', StatusCard);
+  </script>
+</body>
+</html>

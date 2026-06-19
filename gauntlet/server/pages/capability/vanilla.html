@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gauntlet · capability · vanilla</title>
+  <style>
+    body { font: 16px system-ui, sans-serif; margin: 2rem; }
+    ul { padding-left: 1.2rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Agents</h1>
+    <!-- A plain list with no Sigil and no cell map. The only way to assert
+         "there are three agents" against this page is to observe the
+         rendered DOM (expect-count) — there is no introspectable state. -->
+    <ul>
+      <li class="agent">Researcher</li>
+      <li class="agent">Summarizer</li>
+      <li class="agent">Router</li>
+    </ul>
+  </main>
+</body>
+</html>

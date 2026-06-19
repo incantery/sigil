@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gauntlet · branch · vanilla</title>
+  <style>
+    body { font: 16px system-ui, sans-serif; margin: 2rem; }
+    p { margin: .6rem 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Account</h1>
+    <!-- The page renders ONE of several states, chosen by ?plan=. The
+         plan name is in #plan; the banner depends on it. A robust scenario
+         branches on the observed plan and asserts the matching banner. -->
+    <p>Plan: <strong id="plan"></strong></p>
+    <p id="banner"></p>
+  </main>
+  <script>
+    const plan = new URLSearchParams(location.search).get('plan') || 'free';
+    document.getElementById('plan').textContent = plan;
+    const banners = {
+      pro:        'Pro features unlocked',
+      free:       'Upgrade to Pro',
+      enterprise: 'Contact your account manager',
+    };
+    document.getElementById('banner').textContent = banners[plan] || 'Unknown plan';
+  </script>
+</body>
+</html>

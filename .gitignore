@@ -1,0 +1,21 @@
+# Build output
+/bin/
+
+# macOS
+.DS_Store
+
+# Editor / scratch
+*.swp
+*.swo
+*~
+
+# Go caches that occasionally show up
+*.test
+*.out
+
+# Session artifacts from playwright-cli (per-session console/page logs)
+/.playwright-cli/
+
+# Python bytecode cache
+__pycache__/
+*.pyc

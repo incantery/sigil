@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gauntlet · race · vanilla</title>
+  <style>body { font: 16px system-ui, sans-serif; margin: 2rem; } button { font: inherit; padding: .4rem .9rem; }</style>
+</head>
+<body>
+  <main>
+    <h1>Racing updates</h1>
+    <p>Clicking Start kicks off two updates that land at different times.</p>
+    <button id="go">Start</button>
+    <!-- Two regions settle out of order: beta is slower than alpha. A test
+         must wait for whichever it asserts on, regardless of which lands
+         first. -->
+    <p id="a"></p>
+    <p id="b"></p>
+  </main>
+  <script>
+    document.getElementById('go').addEventListener('click', () => {
+      setTimeout(() => { document.getElementById('a').textContent = 'Alpha ready'; }, 200);
+      setTimeout(() => { document.getElementById('b').textContent = 'Beta ready'; }, 500);
+    });
+  </script>
+</body>
+</html>

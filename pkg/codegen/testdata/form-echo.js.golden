@@ -1,0 +1,17 @@
+(() => {
+  let c1 = "";
+  const n_1_value = document.querySelector('[data-sid="/1"]');
+  const n_2_text = document.querySelector('[data-sid="/2"]');
+  const update_c1 = () => {
+    { const v = String(c1); if (n_1_value.value !== v) n_1_value.value = v; }
+    n_2_text.textContent = "hello, " + String(c1);
+  };
+  document.querySelector('[data-sid="/1"]').oninput = (event) => {
+    c1 = event.target.value;
+    update_c1();
+  };
+  window.__sigil_cells = new Proxy({}, { get(_, p) {
+    if (p === "c1") return c1;
+    return undefined;
+  }});
+})();

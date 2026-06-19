@@ -1,0 +1,11 @@
+# Code generation for the sigil repo's own example apps — and the
+# living reference for the sigil.gen.yaml format (the buf.gen.yaml
+# analog: committed config, zero-flag `sigil gen`, identical output
+# on every machine).
+version: 1
+generate:
+  - target: go
+    package: examples/chat
+    out: examples/chat/gen
+    opts:
+      package: chatapi

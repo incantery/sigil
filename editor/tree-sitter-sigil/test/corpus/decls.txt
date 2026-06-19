@@ -1,0 +1,566 @@
+==================
+app with router
+==================
+
+app Studio =
+  router
+    route "/" home
+
+---
+
+(source_file
+  (app_decl
+    (identifier)
+    (invocation
+      (identifier)
+      (invocation
+        (identifier)
+        (string
+          (string_text))
+        (cell_ref
+          (identifier))))))
+
+==================
+record type with generics and optionals
+==================
+
+type Pokemon =
+  name : String
+  stats : types.Stats
+  tags : List<String>
+  nick : String?
+
+---
+
+(source_file
+  (type_decl
+    (identifier)
+    (field_decl
+      (identifier)
+      (type_ref
+        (identifier)))
+    (field_decl
+      (identifier)
+      (type_ref
+        (identifier)
+        (identifier)))
+    (field_decl
+      (identifier)
+      (type_ref
+        (identifier)
+        (type_ref
+          (identifier))))
+    (field_decl
+      (identifier)
+      (type_ref
+        (identifier)))))
+
+==================
+sum type
+==================
+
+type Status =
+  | idle
+  | running
+
+---
+
+(source_file
+  (type_decl
+    (identifier)
+    (variant_decl
+      (identifier))
+    (variant_decl
+      (identifier))))
+
+==================
+query command stream ops
+==================
+
+query FetchAll = List<Pokemon> backend Api
+command Save -> p : Pokemon = Bool backend Api invalidates FetchAll
+stream Chat -> prompt : String = ChatDelta
+
+---
+
+(source_file
+  (op_decl
+    (identifier)
+    (type_ref
+      (identifier)
+      (type_ref
+        (identifier)))
+    (backend_clause
+      (identifier)))
+  (op_decl
+    (identifier)
+    (op_param
+      (identifier)
+      (type_ref
+        (identifier)))
+    (type_ref
+      (identifier))
+    (backend_clause
+      (identifier))
+    (invalidates_clause
+      (identifier)))
+  (op_decl
+    (identifier)
+    (op_param
+      (identifier)
+      (type_ref
+        (identifier)))
+    (type_ref
+      (identifier))))
+
+==================
+import with alias
+==================
+
+import github.com/seth/pokedex/types as t
+
+view V =
+  text "ok"
+
+---
+
+(source_file
+  (import_decl
+    (module_path)
+    (identifier))
+  (view_decl
+    (identifier)
+    (invocation
+      (identifier)
+      (string
+        (string_text)))))
+
+==================
+icons and fonts
+==================
+
+icons lucide =
+  web "./icons/lucide"
+
+fonts google = "Inter" "Fraunces"
+
+---
+
+(source_file
+  (icons_decl
+    (identifier)
+    (icon_target
+      (identifier)
+      (string
+        (string_text))))
+  (fonts_decl
+    (identifier)
+    (string
+      (string_text))
+    (string
+      (string_text))))
+
+==================
+backend and session
+==================
+
+backend Api =
+  url same-origin
+  auth bearer
+  token from Auth.token
+
+session Auth =
+  state token = ""
+  state user : String
+
+---
+
+(source_file
+  (backend_decl
+    (identifier)
+    (backend_binding)
+    (backend_binding
+      (identifier))
+    (backend_binding
+      (cell_ref
+        (identifier)
+        (identifier))))
+  (session_decl
+    (identifier)
+    (state_decl
+      (identifier)
+      (string))
+    (state_decl
+      (identifier)
+      (type_ref
+        (identifier)))))
+
+==================
+on mount and stream assigns
+==================
+
+view Chat =
+  state reply = ""
+  on mount { reply <- Ask("hi") }
+  button "go" on click { (a, b) <- Ask("x"); Save(p) }
+
+---
+
+(source_file
+  (view_decl
+    (identifier)
+    (state_decl
+      (identifier)
+      (string))
+    (on_mount
+      (identifier)
+      (stream_assign
+        (cell_ref
+          (identifier))
+        (call
+          (cell_ref
+            (identifier))
+          (string
+            (string_text)))))
+    (invocation
+      (identifier)
+      (string
+        (string_text))
+      (handler
+        (identifier)
+        (tuple_stream_assign
+          (cell_ref
+            (identifier))
+          (cell_ref
+            (identifier))
+          (call
+            (cell_ref
+              (identifier))
+            (string
+              (string_text))))
+        (call_stmt
+          (call
+            (cell_ref
+              (identifier))
+            (cell_ref
+              (identifier))))))))
+
+==================
+structured list state with field block
+==================
+
+view Todos =
+  state todos = []
+    label : String = ""
+    done : Bool = false
+  for t in todos
+    text t.label
+
+---
+
+(source_file
+  (view_decl
+    (identifier)
+    (state_decl
+      (identifier)
+      (list_literal)
+      (field_decl
+        (identifier)
+        (type_ref
+          (identifier))
+        (string))
+      (field_decl
+        (identifier)
+        (type_ref
+          (identifier))
+        (cell_ref
+          (identifier))))
+    (for_loop
+      (identifier)
+      (cell_ref
+        (identifier))
+      (invocation
+        (identifier)
+        (cell_ref
+          (identifier)
+          (identifier))))))
+
+==================
+theme text scale and single-color binding
+==================
+
+theme brand extends light =
+  primary = "#ff6b35" on "#0a0a0a"
+  outline = "#22262e"
+  text wordmark = "Fraunces" italic caps 44 700 tracking 10
+
+---
+
+(source_file
+  (theme_decl
+    (identifier)
+    (identifier)
+    (tone_binding
+      (identifier)
+      (string
+        (string_text))
+      (string
+        (string_text)))
+    (tone_binding
+      (identifier)
+      (string
+        (string_text)))
+    (text_binding
+      (identifier)
+      (string
+        (string_text))
+      (integer)
+      (integer)
+      (integer))))
+
+==================
+test and story decls
+==================
+
+test "+ increments" =
+  scenario Counter
+  click "+"
+  expect count 1
+
+story "Empty card" = card
+  title "Nothing here"
+
+---
+
+(source_file
+  (test_decl
+    (string
+      (string_text))
+    (invocation
+      (identifier)
+      (cell_ref
+        (identifier)))
+    (invocation
+      (identifier)
+      (string
+        (string_text)))
+    (invocation
+      (identifier)
+      (cell_ref
+        (identifier))
+      (integer)))
+  (story_decl
+    (string
+      (string_text))
+    (identifier)
+    (invocation
+      (identifier)
+      (string
+        (string_text)))))
+
+==================
+typed component params
+==================
+
+component badge-row -> label : String -> *children =
+  stack horizontal
+    *children
+
+---
+
+(source_file
+  (component_decl
+    (identifier)
+    (param
+      (identifier)
+      (type_ref
+        (identifier)))
+    (param
+      (identifier))
+    (invocation
+      (identifier)
+      (cell_ref
+        (identifier))
+      (splice_line
+        (identifier)))))
+
+==================
+dotted kwarg values and args
+==================
+
+view P =
+  bar value=featured.hp max=255
+  text p.stats.hp
+
+---
+
+(source_file
+  (view_decl
+    (identifier)
+    (invocation
+      (identifier)
+      (kwarg
+        (identifier)
+        (cell_ref
+          (identifier)
+          (identifier)))
+      (kwarg
+        (identifier)
+        (integer)))
+    (invocation
+      (identifier)
+      (cell_ref
+        (identifier)
+        (identifier)
+        (identifier)))))
+
+==================
+discriminated union + match
+==================
+
+type Fetch =
+  | idle
+  | loaded : String
+
+view App =
+  state s : Fetch
+  match s
+    | idle
+      text "i"
+    | loaded as body
+      text body
+
+---
+
+(source_file
+  (type_decl
+    name: (identifier)
+    (variant_decl
+      name: (identifier))
+    (variant_decl
+      name: (identifier)
+      payload: (type_ref
+        name: (identifier))))
+  (view_decl
+    name: (identifier)
+    (state_decl
+      name: (identifier)
+      type: (type_ref
+        name: (identifier)))
+    (match_block
+      subject: (cell_ref
+        (identifier))
+      (match_arm
+        variant: (identifier)
+        (invocation
+          kind: (identifier)
+          (string
+            (string_text))))
+      (match_arm
+        variant: (identifier)
+        bind: (identifier)
+        (invocation
+          kind: (identifier)
+          (cell_ref
+            (identifier)))))))
+
+==================
+navigate action + then-navigate success hook
+==================
+
+view App =
+  button "in" on click { Login(e, p) then navigate "/" }
+  button "out" on click { navigate "/login" }
+
+---
+
+(source_file
+  (view_decl
+    name: (identifier)
+    (invocation
+      kind: (identifier)
+      (string
+        (string_text))
+      (handler
+        event: (identifier)
+        (call_stmt
+          (call
+            callee: (cell_ref
+              (identifier))
+            (cell_ref
+              (identifier))
+            (cell_ref
+              (identifier)))
+          then_path: (string
+            (string_text)))))
+    (invocation
+      kind: (identifier)
+      (string
+        (string_text))
+      (handler
+        event: (identifier)
+        (navigate_stmt
+          path: (string
+            (string_text)))))))
+
+==================
+scenario match on an observed value
+==================
+
+test "t" = scenario in App
+  match text-of "#plan"
+    | "pro"
+      expect-text "Pro"
+
+---
+
+(source_file
+  (test_decl
+    name: (string
+      (string_text))
+    kind: (identifier)
+    (cell_ref
+      (identifier))
+    (cell_ref
+      (identifier))
+    (match_block
+      subject: (match_source
+        selector: (string
+          (string_text)))
+      (match_arm
+        value: (string
+          (string_text))
+        (invocation
+          kind: (identifier)
+          (string
+            (string_text)))))))
+
+==================
+flow declaration with a param
+==================
+
+flow signIn -> email =
+  fill input "Email" email
+  click button "Go"
+
+---
+
+(source_file
+  (flow_decl
+    name: (identifier)
+    (param
+      name: (identifier))
+    (invocation
+      kind: (identifier)
+      (cell_ref
+        (identifier))
+      (string
+        (string_text))
+      (cell_ref
+        (identifier)))
+    (invocation
+      kind: (identifier)
+      (cell_ref
+        (identifier))
+      (string
+        (string_text)))))

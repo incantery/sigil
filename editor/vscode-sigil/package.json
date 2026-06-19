@@ -1,0 +1,50 @@
+{
+  "name": "sigil-lang",
+  "displayName": "Sigil",
+  "description": "Sigil language support: syntax highlighting, compiler diagnostics, symbols, and navigation via `sigil lsp`.",
+  "version": "0.1.0",
+  "publisher": "zilfi",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "languages": [
+      {
+        "id": "sigil",
+        "aliases": [
+          "Sigil"
+        ],
+        "extensions": [
+          ".mako"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sigil",
+        "scopeName": "source.mako",
+        "path": "./syntaxes/sigil.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "Sigil",
+      "properties": {
+        "sigil.serverPath": {
+          "type": "string",
+          "default": "sigil",
+          "description": "Path to the sigil binary used to launch `sigil lsp`."
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}

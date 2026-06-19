@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gauntlet · async-appear · vanilla</title>
+  <style>
+    body { font: 16px system-ui, sans-serif; margin: 2rem; }
+    button { font: inherit; padding: .4rem .9rem; }
+    #out { margin-top: 1rem; min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Async appear</h1>
+    <p>Clicking <em>Load</em> reveals the result after a deliberate delay —
+       no Sigil on this page, just plain DOM.</p>
+    <button id="load">Load</button>
+    <!-- The result lands here ~400ms after the click. A test that asserts
+         immediately must auto-wait; a one-shot read would race and fail. -->
+    <div id="out"></div>
+  </main>
+  <script>
+    document.getElementById('load').addEventListener('click', () => {
+      const out = document.getElementById('out');
+      out.textContent = 'Loading…';
+      setTimeout(() => { out.textContent = 'Done'; }, 400);
+    });
+  </script>
+</body>
+</html>

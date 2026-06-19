@@ -1,0 +1,125 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sigil",
+  "scopeName": "source.mako",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#string" },
+    { "include": "#declaration" },
+    { "include": "#import" },
+    { "include": "#handler" },
+    { "include": "#keywords" },
+    { "include": "#type-annotation" },
+    { "include": "#kwarg" },
+    { "include": "#builtin-component" },
+    { "include": "#number" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.double-slash.mako",
+      "match": "//.*$"
+    },
+    "string": {
+      "name": "string.quoted.double.mako",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.mako",
+          "match": "\\\\[\"\\\\nt]"
+        },
+        {
+          "name": "meta.embedded.interpolation.mako",
+          "match": "(\\$\\{)([A-Za-z_][A-Za-z0-9_-]*)(\\})",
+          "captures": {
+            "1": { "name": "punctuation.section.interpolation.begin.mako" },
+            "2": { "name": "variable.other.mako" },
+            "3": { "name": "punctuation.section.interpolation.end.mako" }
+          }
+        }
+      ]
+    },
+    "declaration": {
+      "match": "^\\s*(view|app|component|theme|type|query|command|stream|session|backend|icons|state)\\s+([A-Za-z_][A-Za-z0-9_-]*)",
+      "captures": {
+        "1": { "name": "storage.type.mako" },
+        "2": { "name": "entity.name.function.mako" }
+      }
+    },
+    "import": {
+      "match": "^\\s*(import)\\s+([A-Za-z0-9._/-]+)(?:\\s+(as)\\s+([A-Za-z_][A-Za-z0-9_-]*))?",
+      "captures": {
+        "1": { "name": "keyword.control.import.mako" },
+        "2": { "name": "entity.name.namespace.mako" },
+        "3": { "name": "keyword.control.import.mako" },
+        "4": { "name": "entity.name.namespace.mako" }
+      }
+    },
+    "handler": {
+      "match": "\\b(on)\\s+([A-Za-z_][A-Za-z0-9_-]*)\\s*(?=\\{)",
+      "captures": {
+        "1": { "name": "keyword.other.handler.mako" },
+        "2": { "name": "entity.name.function.event.mako" }
+      }
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.mako",
+          "match": "\\b(if|for|in)\\b"
+        },
+        {
+          "name": "storage.type.mako",
+          "match": "\\b(test|story|fonts)\\b"
+        },
+        {
+          "name": "keyword.other.mako",
+          "match": "\\b(extends|from|invalidates|backend|url|auth|token|same-origin|italic|caps|tracking|on|mount)\\b"
+        },
+        {
+          "name": "constant.language.boolean.mako",
+          "match": "\\b(true|false)\\b"
+        }
+      ]
+    },
+    "type-annotation": {
+      "match": "(:)\\s*([A-Za-z_][A-Za-z0-9_.-]*)",
+      "captures": {
+        "1": { "name": "punctuation.separator.type.mako" },
+        "2": { "name": "entity.name.type.mako" }
+      }
+    },
+    "kwarg": {
+      "match": "\\b([A-Za-z_][A-Za-z0-9_-]*)(=)(?=\\S)",
+      "captures": {
+        "1": { "name": "variable.other.property.mako" },
+        "2": { "name": "keyword.operator.assignment.mako" }
+      }
+    },
+    "builtin-component": {
+      "name": "support.function.builtin.mako",
+      "match": "\\b(badge|bar|button|card|container|divider|icon|iframe|input|modal|pulse|route|router|stack|text|title)\\b"
+    },
+    "number": {
+      "name": "constant.numeric.integer.mako",
+      "match": "(?<![A-Za-z0-9_-])-?\\d+\\b"
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.arrow.mako",
+          "match": "->|<-"
+        },
+        {
+          "name": "keyword.operator.assignment.mako",
+          "match": "\\+=|-=|="
+        },
+        {
+          "name": "keyword.operator.mako",
+          "match": "[!|?*]|\\+|-(?!\\d)"
+        }
+      ]
+    }
+  }
+}

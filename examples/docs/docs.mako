@@ -1,0 +1,248 @@
+// The Sigil documentation site — built with Sigil.
+//
+// A dark, developer-facing docs site for the Sigil UI language. It dogfoods
+// the `code` primitive heavily: every snippet below is a real verbatim `code`
+// block, captured raw by the compiler (braces and `${…}` survive untouched).
+//
+// Pure client-side: static content + hash routing, no backend.
+
+theme docs extends dark =
+  surface = "#13161a" on "#e6e9ee"
+  page    = "#0b0d10" on "#e6e9ee"
+  primary = "#38bdf8" on "#04121a"
+  accent  = "#38bdf8" on "#04121a"
+  success = "#34d399" on "#04140d"
+  warning = "#fbbf24" on "#1a1204"
+  danger  = "#f87171" on "#1a0606"
+
+// A documentation section: an h2 heading followed by an indented body of
+// prose, code blocks, and callouts.
+component doc-section -> heading -> *body =
+  stack vertical gap=3
+    title heading size=md
+    *body
+
+// A readable prose paragraph at body width.
+component para -> body =
+  text body tone=muted
+
+// A highlighted callout — a bordered card holding a single line.
+component note -> body =
+  card tone=surface
+    text body
+
+view Docs =
+  state page = "home"
+
+  // height=screen bounds the shell to the viewport so the sidebar and the
+  // content column scroll independently (scroll=y) instead of the page.
+  stack horizontal height=screen
+    // ───────────── Sidebar ─────────────
+    stack width=260 padding=md gap=3 tone=surface border=outline scroll=y
+      stack gap=1
+        title "Sigil" size=md
+        text "the agent-first UI language" tone=muted size=caption
+
+      stack gap=1
+        stack horizontal gap=2 padding=sm match=page when="home" on click { page = "home" }
+          text "Overview" size=body-strong
+        stack horizontal gap=2 padding=sm match=page when="start" on click { page = "start" }
+          text "Getting Started" tone=muted
+        stack horizontal gap=2 padding=sm match=page when="language" on click { page = "language" }
+          text "Language Reference" tone=muted
+        stack horizontal gap=2 padding=sm match=page when="primitives" on click { page = "primitives" }
+          text "Primitives" tone=muted
+
+      divider tone=muted
+      text "v1 · web target" tone=muted size=caption
+
+    // ───────────── Content ─────────────
+    router page
+      // ===== Overview / landing =====
+      route "home"
+        stack padding=xl gap=4 scroll=y
+          stack gap=2
+            title "Write UIs in Sigil. Ship SPA-grade apps with no npm." size=lg
+            text "Sigil is a Go-native UI application compiler. You write a small, declarative language; the compiler lowers it to a semantic IR and emits HTML plus a tiny runtime — no node, no bundler, no virtual DOM." tone=muted
+
+          note "Server owns truth. The browser is a thin patch-apply target. State lives in the session; reactivity is compiled, not interpreted."
+
+          doc-section "A counter, end to end"
+            para "This is a complete Sigil program. State is declared inline; handlers mutate cells; bound text re-renders on change."
+            code
+              view Counter =
+                state count = 0
+                card
+                  title "Counter"
+                  stack horizontal gap=1
+                    button "-" on click { count -= 1 }
+                    text "value: ${count}"
+                    button "+" on click { count += 1 }
+
+          doc-section "Why Sigil"
+            stack horizontal gap=3
+              card tone=surface
+                stack gap=1
+                  title "Agent-first" size=sm
+                  text "A small, closed vocabulary that an LLM can emit correctly. The compiler enforces intent; mistakes are diagnostics, not runtime surprises." tone=muted size=caption
+              card tone=surface
+                stack gap=1
+                  title "No npm, no node" size=sm
+                  text "The compiler emits HTML and a ~compiled runtime. There is no package manager, no bundler step, and no virtual DOM to reconcile." tone=muted size=caption
+              card tone=surface
+                stack gap=1
+                  title "One IR, many targets" size=sm
+                  text "Authoring lowers to a semantic IR. Web ships today; the same source is designed to target other renderers without a rewrite." tone=muted size=caption
+
+      // ===== Getting Started =====
+      route "start"
+        stack padding=xl gap=4 scroll=y
+          title "Getting Started" size=lg
+
+          doc-section "Install"
+            para "Build the compiler from source, then run a .sigil file. The dev loop re-reads the source on every request — edit and refresh."
+            code
+              go install github.com/incantery/mako/cmd/sigil@latest
+              sigil run app.sigil          # serves http://localhost:8080
+
+          doc-section "Your first view"
+            para "A view is the unit of a screen. Containers (stack, card) nest by indentation; leaves (title, text) carry content."
+            code
+              view Hello =
+                card
+                  title "Hello, Sigil"
+                  text "You are looking at a compiled UI."
+
+          doc-section "Add some state"
+            para "State cells are declared at the top of a view's body. Handlers run imperative blocks in { }, mutating cells by name. Interpolate a cell into text by writing its name in a dollar-brace, as in the snippet below."
+            code
+              view Greeter =
+                state name = ""
+                card
+                  input name placeholder="your name"
+                  text "Hello, ${name}!"
+
+          doc-section "Run it"
+            para "Point the compiler at your file. Use `sigil check` to validate without serving — diagnostics are addressable as file:line:col for editor jump-to."
+            code
+              sigil check app.sigil        # validate, exit nonzero on error
+              sigil run app.sigil          # compile + serve
+              sigil describe app.sigil     # print the lowered IR tree
+
+          note "Every diagnostic is agent-grade: unknown names suggest the closest cell, unknown kinds suggest the closest primitive."
+
+      // ===== Language Reference =====
+      route "language"
+        stack padding=xl gap=4 scroll=y
+          title "Language Reference" size=lg
+
+          doc-section "Views & components"
+            para "A view declares one screen. Components are reusable, parametric subtrees — declared with curried `->` params and inlined at each call site. A trailing *name captures the caller's children."
+            code
+              component labeled -> caption -> value =
+                stack vertical gap=1
+                  text caption tone=muted size=caption
+                  title value size=sm
+
+              view Dashboard =
+                stack horizontal gap=2
+                  labeled "Runs" "1,284"
+                  labeled "Success" "98.4%"
+
+          doc-section "State & handlers"
+            para "Cells hold typed values. Handlers attach to events with `on <event> { … }`. Assignment, compound assignment, and the `!` toggle all lower to declarative actions."
+            code
+              view Toggle =
+                state open = false
+                state count = 0
+                stack horizontal gap=1
+                  button "toggle" on click { open = !open }
+                  button "+5" on click { count += 5 }
+                  text "count: ${count}"
+
+          doc-section "Control flow"
+            para "`if <bool-cell>` reactively mounts a subtree. `for <name> in <list>` renders one row per element, with per-row handlers addressing the row's own cell."
+            code
+              view Todos =
+                state items = []
+                  label : String
+                  done : Bool = false
+                card
+                  for item in items
+                    stack horizontal gap=1
+                      button "x" on click { item.done = !item.done }
+                      text item.label
+
+          doc-section "The code primitive"
+            para "Everything on this page is built with `code`. It captures its indented body verbatim — no interpolation, no parsing — so it can hold any language, braces and interpolation markers included. Write it as a block, or inline:"
+            code
+              // block form: the indented body is captured raw
+              code
+                fn main() {
+                  let total = ${expr};
+                }
+
+              // inline form: a one-line literal
+              code "git commit -m 'ship it'"
+
+      // ===== Primitives =====
+      route "primitives"
+        stack padding=xl gap=4 scroll=y
+          title "Primitives" size=lg
+          para "Sigil ships a small, semantic vocabulary. Renderers map each kind to a concrete implementation — these names describe intent, not HTML."
+
+          doc-section "Layout"
+            para "`stack` is the flexbox primitive (horizontal or vertical, with gap, padding, width, scroll, columns). `card` is a bordered, padded surface."
+            code
+              stack horizontal gap=2 padding=md
+                card
+                  text "left"
+                card
+                  text "right"
+
+          doc-section "Content"
+            para "`title` (sizes lg/md/sm), `text` (body/body-strong/caption, tone, dollar-brace interpolation), `code`, `badge`, `divider`, and `icon` from a project icon set."
+            code
+              stack gap=1
+                title "Heading" size=md
+                text "A muted caption" tone=muted size=caption
+                badge "new"
+                divider
+
+          doc-section "Inputs"
+            para "`input` two-way binds to a string cell. `button` carries a tone and an `on click` handler. Stacks themselves are clickable for richer hit targets."
+            code
+              view Form =
+                state draft = ""
+                stack horizontal gap=1
+                  input draft placeholder="message"
+                  button "Send" tone=primary on click { draft = "" }
+
+          note "The vocabulary is intentionally closed. New capability is a new primitive in the compiler — not an open-ended prop soup."
+
+// ───────────── End-to-end scenarios ─────────────
+// Pure client-side, so each scenario serves the docs in an isolated browser.
+// `expect-text` matches an element's exact trimmed text, so these assert on
+// section headings (their own elements) to prove each route renders.
+
+test "overview route renders its sections" = scenario Docs
+  expect-text "A counter, end to end"
+  expect-text "Why Sigil"
+
+test "navigate to Getting Started" = scenario Docs
+  click text "Getting Started"
+  expect-text "Install"
+  expect-text "Your first view"
+  expect-text "Run it"
+
+test "navigate to Language Reference" = scenario Docs
+  click text "Language Reference"
+  expect-text "Views & components"
+  expect-text "The code primitive"
+  expect-text "Control flow"
+
+test "navigate to Primitives" = scenario Docs
+  click text "Primitives"
+  expect-text "Layout"
+  expect-text "Content"
+  expect-text "Inputs"

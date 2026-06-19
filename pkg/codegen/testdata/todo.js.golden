@@ -1,0 +1,66 @@
+(() => {
+  let c1 = [];
+  let c2 = "";
+  const cells_c1 = {};
+  const rows_c1 = Object.create(null);
+  let counter_c1 = 0;
+  const n_1_0_value = document.querySelector('[data-sid="/1/0"]');
+  const update_c2 = () => {
+    { const v = String(c2); if (n_1_0_value.value !== v) n_1_0_value.value = v; }
+  };
+  const mount__2 = (rowEl, cellId) => {
+    rows_c1[cellId] = rowEl;
+    let e_0_0 = rowEl.children[0].children[0];
+    let e_0_1 = rowEl.children[0].children[1];
+    let e_0_2 = rowEl.children[0].children[2];
+    let e_0_3 = rowEl.children[0].children[3];
+    e_0_2.textContent = String(cells_c1[cellId + ".label"]);
+    let if__0_1_mounted = !!cells_c1[cellId + ".done"];
+    const swap__0_1 = () => {
+      const want = !!cells_c1[cellId + ".done"];
+      if (want === if__0_1_mounted) return;
+      if (want) {
+        const live = document.createElement('div');
+        for (const a of e_0_1.attributes) live.setAttribute(a.name, a.value);
+        for (const node of e_0_1.content.childNodes) live.appendChild(node.cloneNode(true));
+        e_0_1.replaceWith(live);
+        e_0_1 = live;
+      } else {
+        const t = document.createElement('template');
+        for (const a of e_0_1.attributes) t.setAttribute(a.name, a.value);
+        while (e_0_1.firstChild) t.content.appendChild(e_0_1.firstChild);
+        e_0_1.replaceWith(t);
+        e_0_1 = t;
+      }
+      if__0_1_mounted = want;
+    };
+    e_0_0.onclick = (event) => { cells_c1[cellId + ".done"] = !cells_c1[cellId + ".done"]; swap__0_1(); };
+    e_0_3.onclick = (event) => { remove_c1(cellId); };
+  };
+  const tmpl__2 = document.querySelector('[data-sid="/2"] template[data-sigil-for-template]');
+  const append_struct_c1 = (fields) => {
+    const newId = 'r' + (++counter_c1);
+    for (const k of Object.keys(fields)) cells_c1[newId + '.' + k] = fields[k];
+    c1.push(newId);
+    const frag = tmpl__2.content.cloneNode(true);
+    const newRow = frag.firstElementChild;
+    newRow.setAttribute('data-sigil-for-item', newId);
+    tmpl__2.parentNode.insertBefore(newRow, tmpl__2);
+    mount__2(newRow, newId);
+  };
+  document.querySelector('[data-sid="/1/0"]').oninput = (event) => {
+    c2 = event.target.value;
+    update_c2();
+  };
+  document.querySelector('[data-sid="/1/1"]').onclick = (event) => {
+    append_struct_c1({ "done": false, "label": c2 });
+    c2 = "";
+    update_c2();
+  };
+  window.__sigil_cells = new Proxy({}, { get(_, p) {
+    if (p === "c1") return c1;
+    if (p === "c2") return c2;
+    if (p in cells_c1) return cells_c1[p];
+    return undefined;
+  }});
+})();

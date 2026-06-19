@@ -1,0 +1,253 @@
+==================
+hello view
+==================
+
+view Hello =
+  card
+    title "Hi"
+
+---
+
+(source_file
+  (view_decl
+    name: (identifier)
+    (invocation
+      kind: (identifier)
+      (invocation
+        kind: (identifier)
+        (string
+          (string_text))))))
+
+==================
+state + handler
+==================
+
+view Counter =
+  state count = 0
+  button "+" on click { count += 1 }
+
+---
+
+(source_file
+  (view_decl
+    name: (identifier)
+    (state_decl
+      name: (identifier)
+      value: (integer))
+    (invocation
+      kind: (identifier)
+      (string
+        (string_text))
+      (handler
+        event: (identifier)
+        (assignment
+          target: (cell_ref
+            (identifier))
+          value: (integer))))))
+
+==================
+component with variadic param
+==================
+
+component my-card -> heading -> *body =
+  *body
+
+---
+
+(source_file
+  (component_decl
+    name: (identifier)
+    (param
+      name: (identifier))
+    (param
+      name: (identifier))
+    (splice_line
+      name: (identifier))))
+
+==================
+for loop + method call
+==================
+
+view L =
+  state items = [0, 0]
+  for item in items
+    button "x" on click { items.remove(item) }
+
+---
+
+(source_file
+  (view_decl
+    name: (identifier)
+    (state_decl
+      name: (identifier)
+      value: (list_literal
+        (integer)
+        (integer)))
+    (for_loop
+      var: (identifier)
+      list: (cell_ref
+        (identifier))
+      (invocation
+        kind: (identifier)
+        (string
+          (string_text))
+        (handler
+          event: (identifier)
+          (call_stmt
+            (call
+              callee: (cell_ref
+                (identifier)
+                (identifier))
+              (cell_ref
+                (identifier)))))))))
+
+==================
+theme with tone bindings
+==================
+
+theme dawn extends light =
+  primary = "#ff6b35" on "#0a0a0a"
+
+---
+
+(source_file
+  (theme_decl
+    name: (identifier)
+    base: (identifier)
+    (tone_binding
+      tone: (identifier)
+      bg: (string
+        (string_text))
+      fg: (string
+        (string_text)))))
+
+==================
+string interpolation
+==================
+
+view E =
+  state name = "alice"
+  text "hi, ${name}"
+
+---
+
+(source_file
+  (view_decl
+    name: (identifier)
+    (state_decl
+      name: (identifier)
+      value: (string
+        (string_text)))
+    (invocation
+      kind: (identifier)
+      (string
+        (string_text)
+        (interpolation
+          expr: (identifier))))))
+
+==================
+end-of-line comments are preserved
+==================
+
+view Hello = // trailing
+  text "ok"  // explainer
+
+---
+
+(source_file
+  (view_decl
+    name: (identifier)
+    (comment)
+    (invocation
+      kind: (identifier)
+      (string
+        (string_text))
+      (comment))))
+
+==================
+if block with unary not
+==================
+
+view D =
+  state expanded = false
+  button "toggle" on click { expanded = !expanded }
+  if expanded
+    text "shown"
+
+---
+
+(source_file
+  (view_decl
+    name: (identifier)
+    (state_decl
+      name: (identifier)
+      value: (cell_ref
+        (identifier)))
+    (invocation
+      kind: (identifier)
+      (string
+        (string_text))
+      (handler
+        event: (identifier)
+        (assignment
+          target: (cell_ref
+            (identifier))
+          value: (unary_not
+            (cell_ref
+              (identifier))))))
+    (if_block
+      condition: (cell_ref
+        (identifier))
+      (invocation
+        kind: (identifier)
+        (string
+          (string_text))))))
+
+================================================================================
+package-qualified invocation head
+================================================================================
+
+import example.com/proj/ui/components
+
+view App =
+  components.Pill "hello"
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_decl
+    path: (module_path))
+  (view_decl
+    name: (identifier)
+    (invocation
+      kind: (qualified_head
+        package: (identifier)
+        name: (identifier))
+      (string
+        (string_text)))))
+
+==================
+code block (verbatim body + inline form)
+==================
+
+view Docs =
+  text "Example:"
+  code
+    state count = 0
+    button "+" on click { count += 1 }
+  code "inline"
+
+---
+
+(source_file
+  (view_decl
+    name: (identifier)
+    (invocation
+      kind: (identifier)
+      (string
+        (string_text)))
+    (code_block
+      (raw_block))
+    (code_block
+      inline: (string
+        (string_text)))))

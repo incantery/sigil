@@ -1,0 +1,80 @@
+# Grafana's all-in-one LGTM image (Loki, Grafana, Tempo, Mimir) plus an
+# OTLP receiver, with Grafana's datasources pre-provisioned. This is what
+# `sigil test --otlp` pushes scenario traces to; Tilt port-forwards it to
+# localhost (see the Tiltfile), which works even with a remote docker host
+# or a remote cluster — kubectl port-forward goes through the k8s API, not
+# docker's published ports.
+#
+# Mirrors dora's local-k8s/lgtm.yaml so it behaves identically to the rest
+# of the Zilfi dev stack.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lgtm
+  labels:
+    app: lgtm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lgtm
+  template:
+    metadata:
+      labels:
+        app: lgtm
+    spec:
+      containers:
+        - name: lgtm
+          image: grafana/otel-lgtm:latest
+          ports:
+            - containerPort: 3000
+              name: grafana
+            - containerPort: 4317
+              name: otlp-grpc
+            - containerPort: 4318
+              name: otlp-http
+            - containerPort: 3200
+              name: tempo
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lgtm
+  labels:
+    app: lgtm
+spec:
+  selector:
+    app: lgtm
+  ports:
+    - name: grafana
+      port: 3000
+      targetPort: 3000
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+    - name: tempo
+      port: 3200
+      targetPort: 3200
+  type: ClusterIP
