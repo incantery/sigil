@@ -5,6 +5,10 @@
 //
 // -root is the module root that holds std/ (default "."). The bundle is rebuilt
 // on every request, so editing the source and refreshing is the dev loop.
+//
+// Superseded by `mako serve` (core/cli). This binary — and its copy of the
+// `shell` page template, now also in core/cli/compile.go — should be removed
+// when the old kernel goes.
 package main
 
 import (
