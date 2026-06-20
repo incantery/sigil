@@ -1,10 +1,10 @@
-# Sigil Makefile
+# Mako Makefile
 #
 # Common targets — run `make` (or `make help`) to see them.
 
-BIN_NAME := sigil
-CMD_PATH := ./cmd/sigil
-PKG      := github.com/incantery/mako/internal/cli
+BIN_NAME := mako
+CMD_PATH := ./core/cmd/mako
+PKG      := github.com/incantery/mako/core/cli
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.0.1-dev)
 LDFLAGS  := -X $(PKG).Version=$(VERSION)
 
@@ -65,23 +65,23 @@ GRAFANA_URL   ?= http://localhost:3000
 .PHONY: build install run test vet fmt tidy clean help tree-sitter tree-sitter-test tree-sitter-verify nvim-parser nvim-install vscode-ext studio-watch studio-run studio-stop docs-run docs-stop docs-test chat-watch chat-run chat-stop gauntlet-run gauntlet-stop gauntlet-test gauntlet-suite observability-up observability-down grafana-dashboard
 .DEFAULT_GOAL := help
 
-build: ## Build the sigil binary into bin/
+build: ## Build the mako binary into bin/
 	@mkdir -p bin
 	@go build -ldflags "$(LDFLAGS)" -o bin/$(BIN_NAME) $(CMD_PATH)
 	@echo "→ bin/$(BIN_NAME) ($(VERSION))"
 
-install: ## Install sigil to $GOBIN (or $GOPATH/bin)
+install: ## Install mako to $GOBIN (or $GOPATH/bin)
 	@go install -ldflags "$(LDFLAGS)" $(CMD_PATH)
 	@echo "→ $(INSTALL_DIR)/$(BIN_NAME) ($(VERSION))"
 
-run: ## Run sigil without installing
+run: ## Run mako without installing
 	@go run -ldflags "$(LDFLAGS)" $(CMD_PATH)
 
 test: ## Run all Go tests
 	@go test ./...
 
-gen: ## Run sigil gen (sigil.gen.yaml) + refresh the conformance fixture
-	@go run $(CMD_PATH) gen
+gen: ## Run sigil gen (sigil.gen.yaml) + refresh the conformance fixture [legacy kernel]
+	@go run ./cmd/sigil gen
 	@go test ./pkg/codegen/gogen/conformance -run UpToDate -update
 
 vet: ## Run go vet
