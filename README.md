@@ -66,6 +66,6 @@ with history and typed parameters, type-enforced auth guards, and data lists
 (fetch → decode → map → render) — is expressible entirely in Sigil library code
 over the kernel, and every layer is verified in a real browser.
 
-> `pkg/`, `internal/`, `cmd/`, and `editor/` hold a superseded earlier compiler
-> (the old "sigil" kernel) kept for reference, pending removal. The language
-> lives in `core/` and `std/`.
+> An earlier compiler (the old "sigil" kernel, formerly in `pkg/`, `internal/`,
+> `cmd/`, and `editor/`) has been removed; it lives on only in git history. The
+> language lives in `core/` and `std/`.

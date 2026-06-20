@@ -10,22 +10,25 @@ for the pitch and `docs/kernel-redesign.md` for the design.
   (there is **no** `core/go.mod`). Packages: `lex`, `token`, `ast`, `parse`,
   `types` (Hindley-Milner), `peval` (partial evaluator / compile-time CSS
   extraction), `emit` (JS emitter + runtime prelude), `load` (module loader +
-  linker). `core/cmd/serve` is the dev server. `core/examples/` holds runnable
+  linker). `core/cli` is the `sigil` CLI (`version`, `check`, `build`, `serve`),
+  wrapped by the `core/cmd/sigil` binary. `core/examples/` holds runnable
   `.sigil` apps.
 - **`std/`** — the standard library, in Sigil (`.sigil`): reactive, html, ui, style,
   router, http, result, list, string. Resolved by the loader against a `Root`
   dir; imports are Go-style strings, e.g. `import "std/ui" (card, button)`.
-- **`pkg/`, `internal/`, `cmd/`, `editor/`, `examples/`, `gauntlet/`** — the
-  **superseded old "sigil" kernel**, kept for reference, pending removal. It still
-  uses internal `sigil` naming and `__sigil_*`/`data-sigil-*` wire markers — do
-  not invest in it; the language is `core/` + `std/`.
+
+The old "sigil" kernel (`pkg/`, `internal/`, `cmd/`, `editor/`, `examples/`,
+`gauntlet/`, and the observability/Tilt scaffolding) has been **deleted** — it
+survives only in git history (removed after the mako→sigil rename, which made its
+`sigil` naming collide with the real toolchain). The language is `core/` + `std/`.
 
 ## Build / test / run
 
 ```sh
-go build ./...                       # whole repo (old + new) must stay green
-go test ./core/...                   # the language test suite (incl. headless-Chrome e2e)
-go run ./core/cmd/serve core/examples/counter/counter.sigil   # serves on :8099
+go build ./...                       # whole repo must stay green
+go test ./...                        # the language test suite (incl. headless-Chrome e2e)
+go run ./core/cmd/sigil serve core/examples/counter/counter.sigil   # serves on :8099
+make build                           # → bin/sigil (then: bin/sigil serve|build|check ENTRY.sigil)
 ```
 
 Browser tests use chromedp and **skip** if Chrome is absent. The dep
@@ -73,13 +76,18 @@ guarded by `core/load` `TestCounterExample`.
 
 ## What's next (rough priority)
 
-1. Delete or fully scrub the old `pkg/` kernel (it's the last "sigil" residue).
-2. More guarded boundaries: `localStorage` (persistence), time, random — same
+The old kernel is gone and the `sigil` CLI (`check`/`build`/`serve`) is in place,
+so the tree is now just `core/` + `std/`. Next:
+
+1. More guarded boundaries: `localStorage` (persistence), time, random — same
    total-decoder pattern, mostly synchronous.
-3. `std/list` round-out (foldl/reverse/zip); `std/each` keyed-by-fn; controlled
+2. `std/list` round-out (foldl/reverse/zip); `std/each` keyed-by-fn; controlled
    inputs (bind value back — needs property-vs-attribute handling).
-4. M4: a backend op-auth model → real server enforcement + the router's
+3. M4: a backend op-auth model → real server enforcement + the router's
    "no auth op under a public route" cross-check (check B).
+4. Editor/tooling for `core/`: an LSP and formatter (the old kernel had both —
+   `pkg/lang/lsp`, `pkg/lang/format` — in git history as reference, though built
+   on the superseded architecture).
 
 ## Gotchas (learned the hard way)
 
