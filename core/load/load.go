@@ -1,9 +1,9 @@
-// Package load resolves a mako core module's import graph, type-checks every
+// Package load resolves a sigil core module's import graph, type-checks every
 // module across boundaries, and links them into a single npm-free JS bundle.
 //
 // Imports use Go-style string paths (`import "std/ui" (card, stack)`); the path
 // is resolved to a file under a filesystem root, with an optional prefix (the
-// module's own path, e.g. "github.com/incantery/mako/") stripped first. Remote
+// module's own path, e.g. "github.com/incantery/sigil/") stripped first. Remote
 // fetching is not implemented yet — resolution is local.
 //
 // Modules are loaded depth-first with cycle detection, type-checked in
@@ -21,11 +21,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/core/ast"
-	"github.com/incantery/mako/core/emit"
-	"github.com/incantery/mako/core/parse"
-	"github.com/incantery/mako/core/peval"
-	"github.com/incantery/mako/core/types"
+	"github.com/incantery/sigil/core/ast"
+	"github.com/incantery/sigil/core/emit"
+	"github.com/incantery/sigil/core/parse"
+	"github.com/incantery/sigil/core/peval"
+	"github.com/incantery/sigil/core/types"
 )
 
 // Options configures import-path resolution.
@@ -147,7 +147,7 @@ func (l *loader) load(file, canonPath string) (*Module, error) {
 func (l *loader) resolve(path string) (string, error) {
 	p := strings.TrimPrefix(path, l.opts.Prefix)
 	p = strings.Trim(p, "/")
-	file := filepath.Join(l.opts.Root, filepath.FromSlash(p)) + ".mako"
+	file := filepath.Join(l.opts.Root, filepath.FromSlash(p)) + ".sigil"
 	if _, err := os.Stat(file); err != nil {
 		return "", fmt.Errorf("cannot resolve import %q (looked for %s)", path, file)
 	}
@@ -263,7 +263,7 @@ func exportNames(m *Module) []string {
 func (l *loader) mintID(canonPath, file string) string {
 	base := canonPath
 	if base == "" {
-		base = "entry_" + strings.TrimSuffix(filepath.Base(file), ".mako")
+		base = "entry_" + strings.TrimSuffix(filepath.Base(file), ".sigil")
 	}
 	var sb strings.Builder
 	for _, r := range base {

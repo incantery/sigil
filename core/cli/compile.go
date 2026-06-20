@@ -3,10 +3,10 @@ package cli
 import (
 	"fmt"
 
-	"github.com/incantery/mako/core/load"
+	"github.com/incantery/sigil/core/load"
 )
 
-// shell is the minimal HTML page that hosts a mako bundle.
+// shell is the minimal HTML page that hosts a sigil bundle.
 const shell = `<!doctype html>
 <html>
   <head><meta charset="utf-8"><title>%s</title></head>

@@ -8,7 +8,7 @@ import (
 
 func TestServeFailsFastOnBadEntry(t *testing.T) {
 	dir := t.TempDir()
-	bad := filepath.Join(dir, "bad.mako")
+	bad := filepath.Join(dir, "bad.sigil")
 	if err := os.WriteFile(bad, []byte("pub let x = (\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}

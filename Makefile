@@ -1,10 +1,10 @@
-# Mako Makefile
+# Sigil Makefile
 #
 # Common targets — run `make` (or `make help`) to see them.
 
-BIN_NAME := mako
-CMD_PATH := ./core/cmd/mako
-PKG      := github.com/incantery/mako/core/cli
+BIN_NAME := sigil
+CMD_PATH := ./core/cmd/sigil
+PKG      := github.com/incantery/sigil/core/cli
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.0.1-dev)
 LDFLAGS  := -X $(PKG).Version=$(VERSION)
 
@@ -28,7 +28,7 @@ endif
 # overridable so `make studio-watch STUDIO_SLOWMO=1200ms` slows the
 # playback further for a demo.
 STUDIO_PKG    := ./examples/studio
-STUDIO_SRC    := examples/studio/studio.mako
+STUDIO_SRC    := examples/studio/studio.sigil
 STUDIO_PORT   ?= 9090
 STUDIO_SLOWMO ?= 700ms
 STUDIO_HOLD   ?= 2s
@@ -36,7 +36,7 @@ STUDIO_PID    := /tmp/sigil-studio.pid
 STUDIO_LOG    := /tmp/sigil-studio.log
 
 DOCS_PKG      := ./examples/docs
-DOCS_SRC      := examples/docs/docs.mako
+DOCS_SRC      := examples/docs/docs.sigil
 DOCS_PORT     ?= 8088
 DOCS_PID      := /tmp/sigil-docs.pid
 DOCS_LOG      := /tmp/sigil-docs.log
@@ -44,7 +44,7 @@ DOCS_LOG      := /tmp/sigil-docs.log
 # Streaming chat demo: proves the `stream` op + `<-` arrow-into operator
 # (server-push tokens via fetch + ReadableStream).
 CHAT_PKG    := ./examples/chat
-CHAT_SRC    := examples/chat/chat.mako
+CHAT_SRC    := examples/chat/chat.sigil
 CHAT_PORT   ?= 8090
 CHAT_SLOWMO ?= 0
 CHAT_HOLD   ?= 3s
@@ -65,16 +65,16 @@ GRAFANA_URL   ?= http://localhost:3000
 .PHONY: build install run test vet fmt tidy clean help tree-sitter tree-sitter-test tree-sitter-verify nvim-parser nvim-install vscode-ext studio-watch studio-run studio-stop docs-run docs-stop docs-test chat-watch chat-run chat-stop gauntlet-run gauntlet-stop gauntlet-test gauntlet-suite observability-up observability-down grafana-dashboard
 .DEFAULT_GOAL := help
 
-build: ## Build the mako binary into bin/
+build: ## Build the sigil binary into bin/
 	@mkdir -p bin
 	@go build -ldflags "$(LDFLAGS)" -o bin/$(BIN_NAME) $(CMD_PATH)
 	@echo "→ bin/$(BIN_NAME) ($(VERSION))"
 
-install: ## Install mako to $GOBIN (or $GOPATH/bin)
+install: ## Install sigil to $GOBIN (or $GOPATH/bin)
 	@go install -ldflags "$(LDFLAGS)" $(CMD_PATH)
 	@echo "→ $(INSTALL_DIR)/$(BIN_NAME) ($(VERSION))"
 
-run: ## Run mako without installing
+run: ## Run sigil without installing
 	@go run -ldflags "$(LDFLAGS)" $(CMD_PATH)
 
 test: ## Run all Go tests
@@ -196,7 +196,7 @@ gauntlet-run: ## Start the gauntlet page server in the background (browse http:/
 	@nohup bin/gauntlet -addr :$(GAUNTLET_PORT) > $(GAUNTLET_LOG) 2>&1 & echo $$! > $(GAUNTLET_PID)
 	@sleep 1
 	@echo "→ Gauntlet pages at http://localhost:$(GAUNTLET_PORT) (pid $$(cat $(GAUNTLET_PID)), logs: $(GAUNTLET_LOG))"
-	@echo "  drive a challenge: sigil test gauntlet/<challenge>.mako. stop with: make gauntlet-stop"
+	@echo "  drive a challenge: sigil test gauntlet/<challenge>.sigil. stop with: make gauntlet-stop"
 
 gauntlet-stop: ## Stop the background gauntlet server started by gauntlet-run
 	@if [ -f $(GAUNTLET_PID) ]; then \
@@ -222,7 +222,7 @@ gauntlet-test: build ## Boot the gauntlet server, drive every challenge, tear do
 		if [ $$i -eq 50 ]; then echo; echo "server did not come up — see $(GAUNTLET_LOG)"; exit 1; fi; \
 	done; \
 	echo "→ driving every challenge (sigil test compiles the whole package)"; \
-	./bin/$(BIN_NAME) test $$(ls gauntlet/*.mako | head -1)
+	./bin/$(BIN_NAME) test $$(ls gauntlet/*.sigil | head -1)
 
 observability-up: ## Bring up the LGTM stack (Tilt + k8s; works with remote docker)
 	@echo "→ tilt up — wait for the 'lgtm' resource to go green, then 'make gauntlet-suite'"
@@ -252,7 +252,7 @@ gauntlet-suite: build ## Run the whole gauntlet, push traces to Tempo (if up), p
 	else \
 		echo "→ LGTM not reachable on :4318 — run 'make observability-up' (tilt up) first to review in Grafana"; \
 	fi; \
-	./bin/$(BIN_NAME) test $$(ls gauntlet/*.mako | head -1) --trace $(SUITE_TRACE) $$OTLP_ARGS; \
+	./bin/$(BIN_NAME) test $$(ls gauntlet/*.sigil | head -1) --trace $(SUITE_TRACE) $$OTLP_ARGS; \
 	RC=$$?; \
 	echo; \
 	echo "→ trace artifact: $(SUITE_TRACE)"; \
@@ -279,7 +279,7 @@ tree-sitter-test: ## Run tree-sitter corpus tests + query validation
 	@cd $(TS_DIR) && $(TS_CLI) test
 
 tree-sitter-verify: ## Drift guard: parse every example app; fail on ERROR nodes
-	@cd $(TS_DIR) && find ../../examples -name '*.mako' -print0 | \
+	@cd $(TS_DIR) && find ../../examples -name '*.sigil' -print0 | \
 		xargs -0 $(TS_CLI) parse --quiet --stat > /tmp/sigil-ts-verify.txt; \
 	tr -d '\r' < /tmp/sigil-ts-verify.txt | tail -1; \
 	grep -q 'failed parses: 0;' /tmp/sigil-ts-verify.txt \

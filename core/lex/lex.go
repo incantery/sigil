@@ -1,4 +1,4 @@
-// Package lex turns mako core source into a token stream.
+// Package lex turns sigil core source into a token stream.
 //
 // It implements the offside rule from core/grammar.md: indentation is compiled
 // into NEWLINE / INDENT / DEDENT tokens. Inside brackets ( ) [ ] { } layout is
@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/incantery/mako/core/token"
+	"github.com/incantery/sigil/core/token"
 )
 
 // Error is a lexical error with 1-based source position.

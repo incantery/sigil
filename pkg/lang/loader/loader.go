@@ -3,7 +3,7 @@
 // every package it transitively imports, parses each file, and
 // returns a Program ready for lowering.
 //
-// A Package corresponds to one directory of .mako files. All files
+// A Package corresponds to one directory of .sigil files. All files
 // in a package share top-level scope (Go-style); each file has its
 // own import list (also Go-style — different files in the same
 // package can import the same module under different aliases).
@@ -26,13 +26,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/pkg/lang/ast"
-	"github.com/incantery/mako/pkg/lang/diag"
-	"github.com/incantery/mako/pkg/lang/parser"
-	"github.com/incantery/mako/pkg/lang/sigilmod"
+	"github.com/incantery/sigil/pkg/lang/ast"
+	"github.com/incantery/sigil/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/lang/sigilmod"
 )
 
-// File is one parsed .mako file. Imports are extracted from the AST
+// File is one parsed .sigil file. Imports are extracted from the AST
 // so the lowerer can resolve dotted names without re-walking. The
 // original AST is preserved for lowering.
 type File struct {
@@ -41,7 +41,7 @@ type File struct {
 	Imports map[string]string // alias -> import path
 }
 
-// Package is one directory of .mako files, addressed by its import
+// Package is one directory of .sigil files, addressed by its import
 // path under the current module.
 type Package struct {
 	ImportPath string  // "github.com/seth/pokedex/types"
@@ -164,10 +164,10 @@ func loadPackage(prog *Program, importPath string, overlay map[string]string, vi
 	return nil
 }
 
-// readPackage walks dir for .mako files, parses each, and extracts
+// readPackage walks dir for .sigil files, parses each, and extracts
 // imports from the AST. Ignored: files starting with `_` (working
-// copies / scratch); anything not ending in `.mako`. The package's
-// existence requires at least one .mako file in the directory.
+// copies / scratch); anything not ending in `.sigil`. The package's
+// existence requires at least one .sigil file in the directory.
 func readPackage(importPath, dir string, overlay map[string]string) (*Package, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -182,7 +182,7 @@ func readPackage(importPath, dir string, overlay map[string]string) (*Package, e
 		if strings.HasPrefix(name, "_") || strings.HasPrefix(name, ".") {
 			continue
 		}
-		if !strings.HasSuffix(name, ".mako") {
+		if !strings.HasSuffix(name, ".sigil") {
 			continue
 		}
 		path := filepath.Join(dir, name)
@@ -212,7 +212,7 @@ func readPackage(importPath, dir string, overlay map[string]string) (*Package, e
 		})
 	}
 	if len(pkg.Files) == 0 {
-		return nil, fmt.Errorf("package %s: no .mako files in %s", importPath, dir)
+		return nil, fmt.Errorf("package %s: no .sigil files in %s", importPath, dir)
 	}
 	// Stable order — filename ascending.
 	sort.Slice(pkg.Files, func(i, j int) bool {

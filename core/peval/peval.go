@@ -1,4 +1,4 @@
-// Package peval is a partial evaluator (const-folder) for mako core
+// Package peval is a partial evaluator (const-folder) for sigil core
 // expressions. Given a set of top-level definitions, it reduces an expression as
 // far as it can — inlining calls to known pure functions, looking through value
 // bindings — and returns the residual expression. It never fails: anything it
@@ -14,7 +14,7 @@ package peval
 import (
 	"maps"
 
-	"github.com/incantery/mako/core/ast"
+	"github.com/incantery/sigil/core/ast"
 )
 
 // Env holds the top-level value/function definitions available for inlining,

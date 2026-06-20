@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/trace"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/trace"
 )
 
 // emitTrace serializes the recorded traces to OTLP/JSON and delivers them

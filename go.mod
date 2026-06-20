@@ -1,4 +1,4 @@
-module github.com/incantery/mako
+module github.com/incantery/sigil
 
 go 1.26
 

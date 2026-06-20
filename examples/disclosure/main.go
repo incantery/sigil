@@ -17,8 +17,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/incantery/mako/pkg/render/html"
-	"github.com/incantery/mako/pkg/ui"
+	"github.com/incantery/sigil/pkg/render/html"
+	"github.com/incantery/sigil/pkg/ui"
 )
 
 func App() ui.Component {

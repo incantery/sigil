@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/parser"
 )
 
 // emitSPAFromSource parses + lowers src and runs the production SPA

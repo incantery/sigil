@@ -12,8 +12,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 var (
@@ -29,9 +29,9 @@ var (
 )
 
 var testCmd = &cobra.Command{
-	Use:   "test <file.mako>",
+	Use:   "test <file.sigil>",
 	Short: "Run Sigil-authored tests against a real browser",
-	Long: `Compiles a .mako source, then runs each declared test in headless
+	Long: `Compiles a .sigil source, then runs each declared test in headless
 Chromium via the Chrome DevTools Protocol. Each test spins up its own
 isolated HTTP server + browser context — there is no shared state across
 tests.

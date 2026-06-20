@@ -1,6 +1,6 @@
 package style
 
-import "github.com/incantery/mako/pkg/ir"
+import "github.com/incantery/sigil/pkg/ir"
 
 // SpecFor returns the Spec for one IR node, applying per-primitive
 // defaults and then overlaying any author kwargs (tone, size,

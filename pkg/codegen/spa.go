@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // EmitSPA generates a self-contained JS application that builds its DOM

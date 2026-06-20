@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/incantery/mako/internal/cli"
+	"github.com/incantery/sigil/internal/cli"
 )
 
 func main() {

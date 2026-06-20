@@ -15,8 +15,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/incantery/mako/pkg/lang/ast"
-	"github.com/incantery/mako/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/ast"
+	"github.com/incantery/sigil/pkg/lang/diag"
 )
 
 // Run walks the AST and returns a slice of warnings. The root may be a

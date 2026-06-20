@@ -7,15 +7,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 var runAddr string
 
 var runCmd = &cobra.Command{
-	Use:   "run <file.mako>",
+	Use:   "run <file.sigil>",
 	Short: "Compile a Sigil source file and serve it over HTTP",
-	Long: `Compiles a .mako source file and serves the rendered HTML at the
+	Long: `Compiles a .sigil source file and serves the rendered HTML at the
 given address. The file is re-read and re-compiled on every request, so the
 dev loop is: edit, save, refresh browser.`,
 	Args: cobra.ExactArgs(1),

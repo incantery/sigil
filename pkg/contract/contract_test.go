@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/parser"
 )
 
 func compile(t *testing.T, src string) ir.Document {

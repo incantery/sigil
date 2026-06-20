@@ -8,7 +8,7 @@
   },
   "tree-sitter": [
     {
-      "scope": "source.mako",
+      "scope": "source.sigil",
       "file-types": ["sigil"],
       "highlights": "queries/highlights.scm",
       "injections": "queries/injections.scm",

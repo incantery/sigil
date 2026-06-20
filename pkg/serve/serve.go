@@ -19,11 +19,11 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/incantery/mako/pkg/contract"
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/loader"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/pkg/contract"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/loader"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 // responseKey is the private context key under which generated op

@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/theme"
+	"github.com/incantery/sigil/pkg/theme"
 )
 
 var tokensTheme string
@@ -19,7 +19,7 @@ var tokensCmd = &cobra.Command{
 	Short: "List the design tokens available in a Sigil theme",
 	Long: `Prints every spacing, color, text, radius, and border token in the
 named theme. Use this to remind yourself what scale to compose
-from before editing a .mako source — Sigil intentionally has a
+from before editing a .sigil source — Sigil intentionally has a
 small closed set of tokens; this is how you see all of them at
 once.
 

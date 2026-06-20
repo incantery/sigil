@@ -1,37 +1,37 @@
-# Mako CLI Skeleton — Implementation Plan
+# Sigil CLI Skeleton — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build an installable `mako` CLI binary (cobra-based) with `serve`, `build`, `check`, and `version` subcommands over the new `core/` kernel, and repoint the Makefile to install `mako` instead of `sigil`.
+**Goal:** Build an installable `sigil` CLI binary (cobra-based) with `serve`, `build`, `check`, and `version` subcommands over the new `core/` kernel, and repoint the Makefile to install `sigil` instead of `sigil`.
 
-**Architecture:** Mirror the existing `cmd/sigil` (thin binary) → `internal/cli` (testable command surface) split, rebound onto `core/`. A new `core/cli` package holds the cobra command tree; `core/cmd/mako/main.go` is a thin wrapper. Each subcommand is built by a constructor function (`newXCmd()`) closing over local flag vars, so every invocation and every test gets fresh flag state. Commands are thin wrappers over `core/load`: `load.Load(entry, Options{Root})` for type-checking and `prog.Bundle()` for emitting JS.
+**Architecture:** Mirror the existing `cmd/sigil` (thin binary) → `internal/cli` (testable command surface) split, rebound onto `core/`. A new `core/cli` package holds the cobra command tree; `core/cmd/sigil/main.go` is a thin wrapper. Each subcommand is built by a constructor function (`newXCmd()`) closing over local flag vars, so every invocation and every test gets fresh flag state. Commands are thin wrappers over `core/load`: `load.Load(entry, Options{Root})` for type-checking and `prog.Bundle()` for emitting JS.
 
 **Tech Stack:** Go, cobra v1.10.2 (already in `go.mod`), `core/load`, `core/emit` (via Bundle).
 
 ## Global Constraints
 
-- Module path: `github.com/incantery/mako`. New packages: `core/cli` and `core/cmd/mako`.
+- Module path: `github.com/incantery/sigil`. New packages: `core/cli` and `core/cmd/sigil`.
 - No new dependencies. cobra (`github.com/spf13/cobra` v1.10.2) is already required.
 - Do NOT use viper/config or bubbletea in this phase.
 - `go build ./...` and `go test ./core/...` must stay green after every task.
-- All file-taking commands take exactly one `.mako` entry path (`cobra.ExactArgs(1)`); the `--root` flag defaults to `"."`.
-- `Version` is set via `-ldflags "-X github.com/incantery/mako/core/cli.Version=…"`.
+- All file-taking commands take exactly one `.sigil` entry path (`cobra.ExactArgs(1)`); the `--root` flag defaults to `"."`.
+- `Version` is set via `-ldflags "-X github.com/incantery/sigil/core/cli.Version=…"`.
 - Commands write user output via `cmd.OutOrStdout()` / `cmd.ErrOrStderr()` (never bare `fmt.Println`/`os.Stdout`) so tests can capture it.
 - `check`'s JSON shapes: success `{"ok":true,"file":"<path>"}`, failure `{"ok":false,"file":"<path>","error":"<msg>"}`. On any check failure return `ErrSilent`.
-- Leave sigil-era Makefile targets (studio, docs, chat, gauntlet, tree-sitter, nvim, vscode, gen) working against the old kernel; only repoint the core toolchain targets (build/install/run) to mako.
+- Leave sigil-era Makefile targets (studio, docs, chat, gauntlet, tree-sitter, nvim, vscode, gen) working against the old kernel; only repoint the core toolchain targets (build/install/run) to sigil.
 
 ---
 
 ### Task 1: Package scaffold — root, version, binary wrapper
 
-Establishes the `core/cli` package (cobra root, `Execute`, `ErrSilent`, `Version`), the `version` subcommand, the shared test helper, and the `core/cmd/mako` binary. Deliverable: `mako version` and bare `mako` (help) work.
+Establishes the `core/cli` package (cobra root, `Execute`, `ErrSilent`, `Version`), the `version` subcommand, the shared test helper, and the `core/cmd/sigil` binary. Deliverable: `sigil version` and bare `sigil` (help) work.
 
 **Files:**
 - Create: `core/cli/root.go`
 - Create: `core/cli/version.go`
 - Create: `core/cli/cli_test.go` (shared test helpers)
 - Create: `core/cli/version_test.go`
-- Create: `core/cmd/mako/main.go`
+- Create: `core/cmd/sigil/main.go`
 
 **Interfaces:**
 - Produces: `cli.Execute() error`; `cli.ErrSilent error`; `cli.Version string`; unexported `newRootCmd() *cobra.Command`; unexported test helper `run(args ...string) (stdout, stderr string, err error)`; unexported test consts `repoRoot` and helper `counterEntry() string`.
@@ -55,10 +55,10 @@ const repoRoot = "../.."
 
 // counterEntry is the path to the committed counter example.
 func counterEntry() string {
-	return filepath.Join(repoRoot, "core", "examples", "counter", "counter.mako")
+	return filepath.Join(repoRoot, "core", "examples", "counter", "counter.sigil")
 }
 
-// run executes the mako command tree with args, capturing stdout and stderr.
+// run executes the sigil command tree with args, capturing stdout and stderr.
 // A fresh command tree per call keeps flag state isolated between tests.
 func run(args ...string) (string, string, error) {
 	root := newRootCmd()
@@ -88,8 +88,8 @@ func TestVersion(t *testing.T) {
 	if err != nil {
 		t.Fatalf("version: %v", err)
 	}
-	if !strings.HasPrefix(out, "mako ") {
-		t.Errorf("version output = %q, want prefix %q", out, "mako ")
+	if !strings.HasPrefix(out, "sigil ") {
+		t.Errorf("version output = %q, want prefix %q", out, "sigil ")
 	}
 }
 ```
@@ -104,9 +104,9 @@ Expected: FAIL to compile — `undefined: newRootCmd`.
 Create `core/cli/root.go`:
 
 ```go
-// Package cli implements the mako command-line interface: a cobra command tree
+// Package cli implements the sigil command-line interface: a cobra command tree
 // over the core kernel (core/load + core/emit). Subcommands live in sibling
-// files; core/cmd/mako is a thin binary wrapper around Execute.
+// files; core/cmd/sigil is a thin binary wrapper around Execute.
 package cli
 
 import (
@@ -116,22 +116,22 @@ import (
 )
 
 // Version is overridden at build time via
-// -ldflags "-X github.com/incantery/mako/core/cli.Version=…".
+// -ldflags "-X github.com/incantery/sigil/core/cli.Version=…".
 var Version = "0.0.1-dev"
 
 // ErrSilent signals that a subcommand has already printed its own error output
-// (e.g. `mako check --json`). Returning it yields a nonzero exit without main's
+// (e.g. `sigil check --json`). Returning it yields a nonzero exit without main's
 // default stderr message.
 var ErrSilent = errors.New("silent")
 
-// newRootCmd builds the mako command tree. Using a constructor instead of a
+// newRootCmd builds the sigil command tree. Using a constructor instead of a
 // package-global command gives every invocation — and every test — fresh flag
 // state.
 func newRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:           "mako",
-		Short:         "The mako frontend-web language toolchain",
-		Long:          "mako compiles a typed reactive UI language to a single npm-free JS bundle.",
+		Use:           "sigil",
+		Short:         "The sigil frontend-web language toolchain",
+		Long:          "sigil compiles a typed reactive UI language to a single npm-free JS bundle.",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
@@ -139,7 +139,7 @@ func newRootCmd() *cobra.Command {
 	return root
 }
 
-// Execute runs the mako command tree. The binary wrapper surfaces the error.
+// Execute runs the sigil command tree. The binary wrapper surfaces the error.
 func Execute() error {
 	return newRootCmd().Execute()
 }
@@ -160,10 +160,10 @@ import (
 func newVersionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
-		Short: "Print the mako version",
+		Short: "Print the sigil version",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, _ []string) {
-			fmt.Fprintf(cmd.OutOrStdout(), "mako %s (%s/%s, go %s)\n",
+			fmt.Fprintf(cmd.OutOrStdout(), "sigil %s (%s/%s, go %s)\n",
 				Version, runtime.GOOS, runtime.GOARCH, runtime.Version())
 		},
 	}
@@ -185,7 +185,7 @@ import (
 const repoRoot = "../.."
 
 func counterEntry() string {
-	return filepath.Join(repoRoot, "core", "examples", "counter", "counter.mako")
+	return filepath.Join(repoRoot, "core", "examples", "counter", "counter.sigil")
 }
 
 func run(args ...string) (string, string, error) {
@@ -199,10 +199,10 @@ func run(args ...string) (string, string, error) {
 }
 ```
 
-Create `core/cmd/mako/main.go`:
+Create `core/cmd/sigil/main.go`:
 
 ```go
-// Command mako is the mako toolchain CLI. The command surface lives in
+// Command sigil is the sigil toolchain CLI. The command surface lives in
 // core/cli so it can be tested independently of this binary wrapper.
 package main
 
@@ -211,13 +211,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/incantery/mako/core/cli"
+	"github.com/incantery/sigil/core/cli"
 )
 
 func main() {
 	if err := cli.Execute(); err != nil {
 		// Subcommands that already printed their own diagnostic (e.g.
-		// `mako check --json`) return cli.ErrSilent — exit nonzero without a
+		// `sigil check --json`) return cli.ErrSilent — exit nonzero without a
 		// duplicate stderr message.
 		if !errors.Is(err, cli.ErrSilent) {
 			fmt.Fprintln(os.Stderr, err)
@@ -235,15 +235,15 @@ Expected: PASS; build succeeds (produces no output).
 - [ ] **Step 5: Commit**
 
 ```bash
-git add core/cli/root.go core/cli/version.go core/cli/cli_test.go core/cli/version_test.go core/cmd/mako/main.go
-git commit -m "feat(cli): scaffold mako CLI package with version command"
+git add core/cli/root.go core/cli/version.go core/cli/cli_test.go core/cli/version_test.go core/cmd/sigil/main.go
+git commit -m "feat(cli): scaffold sigil CLI package with version command"
 ```
 
 ---
 
 ### Task 2: `check` command
 
-Adds `mako check ENTRY.mako [--root DIR] [--json]` — type-check only, no bundling.
+Adds `sigil check ENTRY.sigil [--root DIR] [--json]` — type-check only, no bundling.
 
 **Files:**
 - Create: `core/cli/check.go`
@@ -290,7 +290,7 @@ func TestCheckJSONOK(t *testing.T) {
 
 func TestCheckBroken(t *testing.T) {
 	dir := t.TempDir()
-	bad := filepath.Join(dir, "bad.mako")
+	bad := filepath.Join(dir, "bad.sigil")
 	if err := os.WriteFile(bad, []byte("pub let x = (\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -322,7 +322,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/core/load"
+	"github.com/incantery/sigil/core/load"
 )
 
 func newCheckCmd() *cobra.Command {
@@ -331,8 +331,8 @@ func newCheckCmd() *cobra.Command {
 		asJSON bool
 	)
 	cmd := &cobra.Command{
-		Use:   "check ENTRY.mako",
-		Short: "Type-check a mako module without bundling or running it",
+		Use:   "check ENTRY.sigil",
+		Short: "Type-check a sigil module without bundling or running it",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			entry := args[0]
@@ -394,14 +394,14 @@ Expected: PASS; build succeeds.
 
 ```bash
 git add core/cli/check.go core/cli/check_test.go core/cli/root.go
-git commit -m "feat(cli): add mako check (type-check only)"
+git commit -m "feat(cli): add sigil check (type-check only)"
 ```
 
 ---
 
 ### Task 3: shared compile helper + `build` command
 
-Adds `mako build ENTRY.mako [--root DIR] [-o FILE] [--html]` and the shared `bundle`/`htmlPage`/`shell` helpers used by both `build` and (next) `serve`.
+Adds `sigil build ENTRY.sigil [--root DIR] [-o FILE] [--html]` and the shared `bundle`/`htmlPage`/`shell` helpers used by both `build` and (next) `serve`.
 
 **Files:**
 - Create: `core/cli/compile.go`
@@ -482,10 +482,10 @@ package cli
 import (
 	"fmt"
 
-	"github.com/incantery/mako/core/load"
+	"github.com/incantery/sigil/core/load"
 )
 
-// shell is the minimal HTML page that hosts a mako bundle.
+// shell is the minimal HTML page that hosts a sigil bundle.
 const shell = `<!doctype html>
 <html>
   <head><meta charset="utf-8"><title>%s</title></head>
@@ -530,8 +530,8 @@ func newBuildCmd() *cobra.Command {
 		asHTML bool
 	)
 	cmd := &cobra.Command{
-		Use:   "build ENTRY.mako",
-		Short: "Compile a mako module to a JS bundle (or a full HTML page)",
+		Use:   "build ENTRY.sigil",
+		Short: "Compile a sigil module to a JS bundle (or a full HTML page)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			entry := args[0]
@@ -581,14 +581,14 @@ Expected: PASS; build succeeds.
 
 ```bash
 git add core/cli/compile.go core/cli/build.go core/cli/build_test.go core/cli/root.go
-git commit -m "feat(cli): add mako build with shared bundle/html helpers"
+git commit -m "feat(cli): add sigil build with shared bundle/html helpers"
 ```
 
 ---
 
 ### Task 4: `serve` command
 
-Adds `mako serve ENTRY.mako [--root DIR] [--port N]` — a rebuild-per-request dev server (the port of `core/cmd/serve`), reusing the Task 3 helpers.
+Adds `sigil serve ENTRY.sigil [--root DIR] [--port N]` — a rebuild-per-request dev server (the port of `core/cmd/serve`), reusing the Task 3 helpers.
 
 **Files:**
 - Create: `core/cli/serve.go`
@@ -614,7 +614,7 @@ import (
 
 func TestServeFailsFastOnBadEntry(t *testing.T) {
 	dir := t.TempDir()
-	bad := filepath.Join(dir, "bad.mako")
+	bad := filepath.Join(dir, "bad.sigil")
 	if err := os.WriteFile(bad, []byte("pub let x = (\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -653,8 +653,8 @@ func newServeCmd() *cobra.Command {
 		port string
 	)
 	cmd := &cobra.Command{
-		Use:   "serve ENTRY.mako",
-		Short: "Serve a mako module as a live-rebuilding dev page",
+		Use:   "serve ENTRY.sigil",
+		Short: "Serve a sigil module as a live-rebuilding dev page",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			entry := args[0]
@@ -712,21 +712,21 @@ Expected: PASS (all `core/cli` tests); build succeeds.
 
 ```bash
 git add core/cli/serve.go core/cli/serve_test.go core/cli/root.go
-git commit -m "feat(cli): add mako serve (rebuild-per-request dev server)"
+git commit -m "feat(cli): add sigil serve (rebuild-per-request dev server)"
 ```
 
 ---
 
-### Task 5: Repoint the Makefile to mako
+### Task 5: Repoint the Makefile to sigil
 
-Switch the core toolchain targets (build/install/run) to the `mako` binary; pin the sigil-era `gen` target to the old path so it keeps working.
+Switch the core toolchain targets (build/install/run) to the `sigil` binary; pin the sigil-era `gen` target to the old path so it keeps working.
 
 **Files:**
 - Modify: `Makefile:1`, `Makefile:5-7`, `Makefile:68`, `Makefile:73`, `Makefile:77`, `Makefile:83-84`
 
 **Interfaces:**
-- Consumes: `core/cmd/mako` (Task 1) and `core/cli.Version` (Task 1).
-- Produces: a `make build` that emits `bin/mako`; a `make install` that installs `mako`.
+- Consumes: `core/cmd/sigil` (Task 1) and `core/cli.Version` (Task 1).
+- Produces: a `make build` that emits `bin/sigil`; a `make install` that installs `sigil`.
 
 - [ ] **Step 1: Edit the header comment**
 
@@ -739,7 +739,7 @@ Change `Makefile:1`:
 to:
 
 ```makefile
-# Mako Makefile
+# Sigil Makefile
 ```
 
 - [ ] **Step 2: Repoint the binary variables**
@@ -749,15 +749,15 @@ Change `Makefile:5-7`:
 ```makefile
 BIN_NAME := sigil
 CMD_PATH := ./cmd/sigil
-PKG      := github.com/incantery/mako/internal/cli
+PKG      := github.com/incantery/sigil/internal/cli
 ```
 
 to:
 
 ```makefile
-BIN_NAME := mako
-CMD_PATH := ./core/cmd/mako
-PKG      := github.com/incantery/mako/core/cli
+BIN_NAME := sigil
+CMD_PATH := ./core/cmd/sigil
+PKG      := github.com/incantery/sigil/core/cli
 ```
 
 - [ ] **Step 3: Update the build/install/run help text**
@@ -771,7 +771,7 @@ build: ## Build the sigil binary into bin/
 to:
 
 ```makefile
-build: ## Build the mako binary into bin/
+build: ## Build the sigil binary into bin/
 ```
 
 Change `Makefile:73`:
@@ -783,7 +783,7 @@ install: ## Install sigil to $GOBIN (or $GOPATH/bin)
 to:
 
 ```makefile
-install: ## Install mako to $GOBIN (or $GOPATH/bin)
+install: ## Install sigil to $GOBIN (or $GOPATH/bin)
 ```
 
 Change `Makefile:77`:
@@ -795,12 +795,12 @@ run: ## Run sigil without installing
 to:
 
 ```makefile
-run: ## Run mako without installing
+run: ## Run sigil without installing
 ```
 
 - [ ] **Step 4: Pin the sigil-era `gen` target to the old path**
 
-The `gen` target reuses `$(CMD_PATH)`, which now points at mako (no `gen` subcommand). Pin it to the old sigil path so it keeps working. Change `Makefile:83-84`:
+The `gen` target reuses `$(CMD_PATH)`, which now points at sigil (no `gen` subcommand). Pin it to the old sigil path so it keeps working. Change `Makefile:83-84`:
 
 ```makefile
 gen: ## Run sigil gen (sigil.gen.yaml) + refresh the conformance fixture
@@ -814,18 +814,18 @@ gen: ## Run sigil gen (sigil.gen.yaml) + refresh the conformance fixture [legacy
 	@go run ./cmd/sigil gen
 ```
 
-- [ ] **Step 5: Verify the build target produces bin/mako**
+- [ ] **Step 5: Verify the build target produces bin/sigil**
 
 Run: `make build`
-Expected: prints `→ bin/mako (<version>)`; `bin/mako` exists.
+Expected: prints `→ bin/sigil (<version>)`; `bin/sigil` exists.
 
 Then sanity-check the binary:
 
-Run: `./bin/mako version`
-Expected: a line beginning with `mako `.
+Run: `./bin/sigil version`
+Expected: a line beginning with `sigil `.
 
-Run: `./bin/mako check --root . core/examples/counter/counter.mako`
-Expected: `ok  core/examples/counter/counter.mako`.
+Run: `./bin/sigil check --root . core/examples/counter/counter.sigil`
+Expected: `ok  core/examples/counter/counter.sigil`.
 
 - [ ] **Step 6: Verify the whole repo still builds and tests pass**
 
@@ -836,7 +836,7 @@ Expected: build succeeds; `core/...` tests pass (browser e2e may skip without Ch
 
 ```bash
 git add Makefile
-git commit -m "build: repoint Makefile build/install/run to the mako binary"
+git commit -m "build: repoint Makefile build/install/run to the sigil binary"
 ```
 
 ---
@@ -844,7 +844,7 @@ git commit -m "build: repoint Makefile build/install/run to the mako binary"
 ## Self-Review
 
 **Spec coverage:**
-- `core/cmd/mako/main.go` thin wrapper → Task 1. ✓
+- `core/cmd/sigil/main.go` thin wrapper → Task 1. ✓
 - `core/cli` cobra surface, constructor pattern, `Version`, `ErrSilent` → Task 1. ✓
 - `version` command → Task 1. ✓
 - `check` (+`--json`, `{ok,file,error}`, `ErrSilent`) → Task 2. ✓

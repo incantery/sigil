@@ -3,7 +3,7 @@ package lsp
 import (
 	"strings"
 
-	"github.com/incantery/mako/pkg/lang/ast"
+	"github.com/incantery/sigil/pkg/lang/ast"
 )
 
 // symbolIndex is the navigation view of one file: every top-level

@@ -22,7 +22,7 @@ substrate.*
   substitution) at lower time, **reusing the exact component inlining
   machinery** (`substChildren`). The runner is unchanged — it sees a flat
   step list. Recursion-guarded; flows compose (flow-calls-flow); verb
-  shadowing rejected. `branch.mako` shares one `match` flow; `cross-page`
+  shadowing rejected. `branch.sigil` shares one `match` flow; `cross-page`
   uses a parameterized `signInWith`. tree-sitter `flow_decl` + highlights
   + corpus. This is the cleaner half of the §1–3 generalization.
 - **OTel spine** (§6) — a run is a trace: scenario = root span, step =

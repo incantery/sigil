@@ -8,16 +8,16 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/diag"
 )
 
 var checkJSON bool
 
 var checkCmd = &cobra.Command{
-	Use:   "check <file.mako>",
+	Use:   "check <file.sigil>",
 	Short: "Parse and lower a Sigil file without running it",
-	Long: `Validates a .mako file: parse + lower with no server, no HTTP.
+	Long: `Validates a .sigil file: parse + lower with no server, no HTTP.
 Useful in editor/AI loops where you want fast structural feedback without
 the cost of starting a browser. Pass --json for machine-readable output
 suitable for piping into jq or an LSP.`,

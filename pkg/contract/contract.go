@@ -22,7 +22,7 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // Contract is the IDL subset of one compiled sigil program. The

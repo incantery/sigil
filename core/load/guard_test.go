@@ -43,7 +43,7 @@ pub let app =
 // type system — default-deny by construction.
 func TestGuardDefaultDeny(t *testing.T) {
 	dir := t.TempDir()
-	entry := filepath.Join(dir, "main.mako")
+	entry := filepath.Join(dir, "main.sigil")
 	// route expects (current, path, access, view); this omits access.
 	src := `import "std/router" (router, route)
 import "std/ui" (text)

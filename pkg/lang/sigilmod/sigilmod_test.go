@@ -94,7 +94,7 @@ func TestFind(t *testing.T) {
 	if err := os.MkdirAll(deep, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	leafFile := filepath.Join(deep, "x.mako")
+	leafFile := filepath.Join(deep, "x.sigil")
 	if err := os.WriteFile(leafFile, []byte(""), 0o644); err != nil {
 		t.Fatal(err)
 	}

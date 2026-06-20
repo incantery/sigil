@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/core/ast"
-	"github.com/incantery/mako/core/token"
+	"github.com/incantery/sigil/core/ast"
+	"github.com/incantery/sigil/core/token"
 )
 
 // Checker performs type inference over a module.
@@ -255,7 +255,7 @@ func (c *Checker) installIntrinsics(e *env) {
 	e.set("__onPopState", mono(arrows(thunk, tUnit))) // register a popstate handler (effect)
 
 	// Data primitives (pure). String split + total list access; std/string and
-	// std/list build the rest in mako over these.
+	// std/list build the rest in sigil over these.
 	e.set("__split", mono(arrows(tString, tString, tList(tString))))           // split by separator
 	e.set("__listLen", poly(arrows(tList(g(0)), tInt)))                        // length
 	e.set("__listAt", poly(arrows(tList(g(0)), tInt, tOption(g(0)))))          // total indexed access

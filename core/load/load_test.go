@@ -15,7 +15,7 @@ func build(t *testing.T, files map[string]string, entry string) (string, string)
 	t.Helper()
 	dir := t.TempDir()
 	for name, src := range files {
-		path := filepath.Join(dir, name+".mako")
+		path := filepath.Join(dir, name+".sigil")
 		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 			t.Fatal(err)
 		}
@@ -23,7 +23,7 @@ func build(t *testing.T, files map[string]string, entry string) (string, string)
 			t.Fatal(err)
 		}
 	}
-	prog, err := Load(filepath.Join(dir, entry+".mako"), Options{Root: dir})
+	prog, err := Load(filepath.Join(dir, entry+".sigil"), Options{Root: dir})
 	if err != nil {
 		t.Fatalf("load: %v", err)
 	}
@@ -103,9 +103,9 @@ func TestScopeIsolation(t *testing.T) {
 
 func TestUnknownSelectiveImport(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "lib.mako"), []byte("pub let inc x = x + 1"), 0o644)
-	os.WriteFile(filepath.Join(dir, "main.mako"), []byte("import \"lib\" (nope)\npub let result = 1"), 0o644)
-	_, err := Load(filepath.Join(dir, "main.mako"), Options{Root: dir})
+	os.WriteFile(filepath.Join(dir, "lib.sigil"), []byte("pub let inc x = x + 1"), 0o644)
+	os.WriteFile(filepath.Join(dir, "main.sigil"), []byte("import \"lib\" (nope)\npub let result = 1"), 0o644)
+	_, err := Load(filepath.Join(dir, "main.sigil"), Options{Root: dir})
 	if err == nil || !strings.Contains(err.Error(), "not exported") {
 		t.Fatalf("want 'not exported' error, got %v", err)
 	}
@@ -114,9 +114,9 @@ func TestUnknownSelectiveImport(t *testing.T) {
 // TestNonPubNotExported confirms a non-public binding is invisible to importers.
 func TestNonPubNotExported(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "lib.mako"), []byte("let secret = 1"), 0o644)
-	os.WriteFile(filepath.Join(dir, "main.mako"), []byte("import \"lib\" (secret)\npub let result = secret"), 0o644)
-	_, err := Load(filepath.Join(dir, "main.mako"), Options{Root: dir})
+	os.WriteFile(filepath.Join(dir, "lib.sigil"), []byte("let secret = 1"), 0o644)
+	os.WriteFile(filepath.Join(dir, "main.sigil"), []byte("import \"lib\" (secret)\npub let result = secret"), 0o644)
+	_, err := Load(filepath.Join(dir, "main.sigil"), Options{Root: dir})
 	if err == nil || !strings.Contains(err.Error(), "not exported") {
 		t.Fatalf("want 'not exported' error, got %v", err)
 	}
@@ -124,9 +124,9 @@ func TestNonPubNotExported(t *testing.T) {
 
 func TestImportCycle(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "a.mako"), []byte("import \"b\" (bv)\npub let av = bv"), 0o644)
-	os.WriteFile(filepath.Join(dir, "b.mako"), []byte("import \"a\" (av)\npub let bv = av"), 0o644)
-	_, err := Load(filepath.Join(dir, "a.mako"), Options{Root: dir})
+	os.WriteFile(filepath.Join(dir, "a.sigil"), []byte("import \"b\" (bv)\npub let av = bv"), 0o644)
+	os.WriteFile(filepath.Join(dir, "b.sigil"), []byte("import \"a\" (av)\npub let bv = av"), 0o644)
+	_, err := Load(filepath.Join(dir, "a.sigil"), Options{Root: dir})
 	if err == nil || !strings.Contains(err.Error(), "cycle") {
 		t.Fatalf("want cycle error, got %v", err)
 	}
@@ -134,8 +134,8 @@ func TestImportCycle(t *testing.T) {
 
 func TestUnresolvedImport(t *testing.T) {
 	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "main.mako"), []byte("import \"missing\" (x)\npub let result = x"), 0o644)
-	_, err := Load(filepath.Join(dir, "main.mako"), Options{Root: dir})
+	os.WriteFile(filepath.Join(dir, "main.sigil"), []byte("import \"missing\" (x)\npub let result = x"), 0o644)
+	_, err := Load(filepath.Join(dir, "main.sigil"), Options{Root: dir})
 	if err == nil || !strings.Contains(err.Error(), "cannot resolve") {
 		t.Fatalf("want resolve error, got %v", err)
 	}
@@ -148,10 +148,10 @@ func TestPrefixStripping(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(dir, "std"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	os.WriteFile(filepath.Join(dir, "std", "math.mako"), []byte("pub let two = 2"), 0o644)
-	os.WriteFile(filepath.Join(dir, "main.mako"),
+	os.WriteFile(filepath.Join(dir, "std", "math.sigil"), []byte("pub let two = 2"), 0o644)
+	os.WriteFile(filepath.Join(dir, "main.sigil"),
 		[]byte("import \"example.com/proj/std/math\" (two)\npub let result = two"), 0o644)
-	prog, err := Load(filepath.Join(dir, "main.mako"), Options{Root: dir, Prefix: "example.com/proj/"})
+	prog, err := Load(filepath.Join(dir, "main.sigil"), Options{Root: dir, Prefix: "example.com/proj/"})
 	if err != nil {
 		t.Fatalf("load: %v", err)
 	}

@@ -10,7 +10,7 @@ import (
 func TestMergeSinglePackage(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, root, "main.mako", `view App =
+	writeFile(t, root, "main.sigil", `view App =
   text "ok"
 `)
 	prog, err := Load(root)
@@ -35,10 +35,10 @@ func TestMergeSinglePackage(t *testing.T) {
 func TestMergeImportRewritesDottedTypeRef(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "types"), "types.mako", `type Slot =
+	writeFile(t, filepath.Join(root, "types"), "types.sigil", `type Slot =
   id : Int
 `)
-	writeFile(t, root, "main.mako", `import example.com/proj/types
+	writeFile(t, root, "main.sigil", `import example.com/proj/types
 
 view App =
   state s : types.Slot
@@ -84,13 +84,13 @@ view App =
 func TestMergeRejectsGlobalNameCollision(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "a"), "a.mako", `type Slot =
+	writeFile(t, filepath.Join(root, "a"), "a.sigil", `type Slot =
   id : Int
 `)
-	writeFile(t, filepath.Join(root, "b"), "b.mako", `type Slot =
+	writeFile(t, filepath.Join(root, "b"), "b.sigil", `type Slot =
   id : Int
 `)
-	writeFile(t, root, "main.mako", `import example.com/proj/a
+	writeFile(t, root, "main.sigil", `import example.com/proj/a
 import example.com/proj/b
 view App = text "ok"
 `)
@@ -110,10 +110,10 @@ view App = text "ok"
 func TestMergeRejectsUnknownDottedRef(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "types"), "types.mako", `type Slot =
+	writeFile(t, filepath.Join(root, "types"), "types.sigil", `type Slot =
   id : Int
 `)
-	writeFile(t, root, "main.mako", `import example.com/proj/types
+	writeFile(t, root, "main.sigil", `import example.com/proj/types
 
 view App =
   state s : types.NotARealType
@@ -140,7 +140,7 @@ func TestMergePreservesCellFieldRefs(t *testing.T) {
 		[]byte("module example.com/proj\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	writeFile(t, root, "main.mako", `type Slot =
+	writeFile(t, root, "main.sigil", `type Slot =
   id : Int
 
 view App =

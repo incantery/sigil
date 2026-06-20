@@ -6,16 +6,16 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/lang/format"
-	"github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/lang/format"
+	"github.com/incantery/sigil/pkg/lang/parser"
 )
 
 var fmtWrite bool
 
 var fmtCmd = &cobra.Command{
-	Use:   "fmt <file.mako>",
+	Use:   "fmt <file.sigil>",
 	Short: "Print the canonical formatting of a Sigil file",
-	Long: `Parses a .mako file and re-emits it in canonical form: fixed
+	Long: `Parses a .sigil file and re-emits it in canonical form: fixed
 2-space indent, kwargs sorted alphabetically, handlers sorted by event
 name, compound assignments (count = count + 1) re-sugared back to (count
 += 1). Use --write to rewrite the file in place.

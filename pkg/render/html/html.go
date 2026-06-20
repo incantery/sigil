@@ -21,9 +21,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/style"
-	"github.com/incantery/mako/pkg/ui"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/style"
+	"github.com/incantery/sigil/pkg/ui"
 )
 
 // Render walks an IR node and writes HTML to w. The styling is

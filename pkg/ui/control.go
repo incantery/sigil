@@ -3,7 +3,7 @@ package ui
 import (
 	"fmt"
 
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // If renders its children only when the given boolean cell is truthy. The

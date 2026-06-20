@@ -26,7 +26,7 @@ theme pokedex extends light =
 // Types are owned by a sibling package; we import the set so the
 // queries and the view can reference Slot / Mood without duplicating
 // the declarations here. First demo of L52's import mechanism.
-import github.com/incantery/mako/examples/pokedex/types
+import github.com/incantery/sigil/examples/pokedex/types
 
 // Icon set: the project brings its own SVGs (the compiler ships
 // zero curated icons). Folder walk discovers `plus.svg`,

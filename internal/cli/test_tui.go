@@ -11,7 +11,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // Color palette mirrors tui.go's choices so the test runner looks
@@ -59,7 +59,7 @@ const spinnerInterval = 100 * time.Millisecond
 // stepState mirrors the e2eEvent step lifecycle: pending → running →
 // passed | failed. Verb + payload come from step_start; At + failure
 // come from step_end. Line/Col are preserved so the failure card
-// can show source-location hints like "/file.mako:6:3".
+// can show source-location hints like "/file.sigil:6:3".
 type stepState struct {
 	Verb    string
 	Payload map[string]any

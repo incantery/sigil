@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/incantery/mako/pkg/serve"
+	"github.com/incantery/sigil/pkg/serve"
 )
 
 // ContractHash is the wire-shape digest of the sigil contract this

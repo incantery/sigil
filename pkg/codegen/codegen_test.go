@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/parser"
 )
 
 // update regenerates the golden files when their content legitimately
@@ -32,7 +32,7 @@ func TestEmitGolden(t *testing.T) {
 	for _, name := range cases {
 		t.Run(name, func(t *testing.T) {
 			// L52 reshuffled examples/sigil into per-demo subdirs.
-			src, err := os.ReadFile(filepath.Join("..", "..", "examples", "sigil", name, name+".mako"))
+			src, err := os.ReadFile(filepath.Join("..", "..", "examples", "sigil", name, name+".sigil"))
 			if err != nil {
 				t.Fatalf("read example: %v", err)
 			}
@@ -834,7 +834,7 @@ func indexOf(hay, needle string) int {
 }
 
 // TestEveryExampleIsCodegenEligible verifies that every example
-// .mako source in the repo can be served by codegen. There is no
+// .sigil source in the repo can be served by codegen. There is no
 // runtime fallback — Profile rejecting a doc would be a hard compile
 // error. If a feature is added to the language without a matching
 // codegen extension, this test catches it on next run.
@@ -848,7 +848,7 @@ func TestEveryExampleIsCodegenEligible(t *testing.T) {
 			// L52 reshuffled examples/sigil into per-demo subdirs so
 			// each demo is its own package. The file inside still
 			// matches the directory name.
-			src, err := os.ReadFile(filepath.Join("..", "..", "examples", "sigil", name, name+".mako"))
+			src, err := os.ReadFile(filepath.Join("..", "..", "examples", "sigil", name, name+".sigil"))
 			if err != nil {
 				t.Fatalf("read example: %v", err)
 			}

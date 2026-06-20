@@ -1,9 +1,9 @@
-# Mako
+# Sigil
 
-Mako is a small, typed, reactive language for building web UIs. It compiles to a
+Sigil is a small, typed, reactive language for building web UIs. It compiles to a
 single self-contained JavaScript bundle — **no npm, no node, no runtime
 framework**. Think "Go for the frontend": a tiny language core, with a standard
-library written in Mako itself.
+library written in Sigil itself.
 
 ## Why
 
@@ -14,11 +14,11 @@ library written in Mako itself.
 - **Reactive by construction.** Fine-grained signals (Solid-style), no virtual
   DOM — direct DOM updates.
 - **A small kernel.** ~two dozen intrinsics; everything else — components,
-  styling, routing, HTTP — is library code in `std/`, written in Mako.
+  styling, routing, HTTP — is library code in `std/`, written in Sigil.
 
 ## A taste
 
-```mako
+```sigil
 import "std/reactive" (cell)
 import "std/ui" (card, column, row, button, label)
 import "std/html" (mount)
@@ -41,7 +41,7 @@ pub let app =
 ## Run it
 
 ```sh
-go run ./core/cmd/serve core/examples/counter/counter.mako
+go run ./core/cmd/serve core/examples/counter/counter.sigil
 # open http://localhost:8099
 ```
 
@@ -53,7 +53,7 @@ the dev loop.
 - **`core/`** — the compiler: lexer, parser, Hindley-Milner type checker, partial
   evaluator (compile-time CSS extraction), JavaScript emitter, and the
   cross-module loader, plus the `serve` command.
-- **`std/`** — the standard library, written in Mako: `reactive`, `html`, `ui`,
+- **`std/`** — the standard library, written in Sigil: `reactive`, `html`, `ui`,
   `style` (typed design-system tokens), `router` (path routing, history, typed
   `:params`, default-deny guards), `http`, `result`, `list`, `string`.
 - **`docs/kernel-redesign.md`** — the design.
@@ -63,7 +63,7 @@ the dev loop.
 Early, but real. A complete single-page app — reactive state, semantic
 components, typed styling, events, HTTP with a `Result` boundary, client routing
 with history and typed parameters, type-enforced auth guards, and data lists
-(fetch → decode → map → render) — is expressible entirely in Mako library code
+(fetch → decode → map → render) — is expressible entirely in Sigil library code
 over the kernel, and every layer is verified in a real browser.
 
 > `pkg/`, `internal/`, `cmd/`, and `editor/` hold a superseded earlier compiler

@@ -3,7 +3,7 @@ package style
 import (
 	"testing"
 
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // TestIconOnlyButtonSquarePadding locks REQUEST 11 item 4: a button

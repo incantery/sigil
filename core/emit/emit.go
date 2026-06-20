@@ -1,4 +1,4 @@
-// Package emit lowers a type-checked mako core module to plain JavaScript.
+// Package emit lowers a type-checked sigil core module to plain JavaScript.
 //
 // The output is npm-free, dependency-free JS: ADT values become tagged objects
 // ({$:"Some", _0: x}), tuples and lists become arrays, records become objects,
@@ -13,11 +13,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/incantery/mako/core/ast"
-	"github.com/incantery/mako/core/parse"
-	"github.com/incantery/mako/core/peval"
-	"github.com/incantery/mako/core/token"
-	"github.com/incantery/mako/core/types"
+	"github.com/incantery/sigil/core/ast"
+	"github.com/incantery/sigil/core/parse"
+	"github.com/incantery/sigil/core/peval"
+	"github.com/incantery/sigil/core/token"
+	"github.com/incantery/sigil/core/types"
 )
 
 // prelude is emitted ahead of user code.
@@ -98,7 +98,7 @@ const __mount = (node) => (sel) => { document.querySelector(sel).appendChild(nod
 // __fetch performs a network request, then calls the continuation with the
 // (ok, body) primitives. Every outcome — HTTP error or network failure — routes
 // through the same callback, so it is total: no exception ever crosses into
-// mako. stdlib decodes (ok, body) into a Result.
+// sigil. stdlib decodes (ok, body) into a Result.
 const __fetch = (url) => (cb) => {
   fetch(url).then((r) => r.text().then((t) => cb(r.ok)(t)())).catch((e) => cb(false)(String(e))());
   return null;
@@ -193,7 +193,7 @@ func Module(m *ast.Module) (string, error) {
 // of the module being emitted.
 type ImportBinding struct {
 	FromID string
-	Names  []string // mako names (values and/or constructors)
+	Names  []string // sigil names (values and/or constructors)
 }
 
 // LinkedModule is one node of a resolved import graph, ready to emit. Each is
@@ -203,7 +203,7 @@ type LinkedModule struct {
 	ID      string // JS-safe, unique within the bundle
 	AST     *ast.Module
 	Imports []ImportBinding
-	Exports []string // mako names this module exposes to importers
+	Exports []string // sigil names this module exposes to importers
 }
 
 // Bundle emits a single npm-free JS program for a topologically ordered set of
@@ -300,7 +300,7 @@ func (e *emitter) fresh() string {
 	return fmt.Sprintf("__t%d", e.tmp)
 }
 
-// mangle maps a mako name to a JS identifier. User names are prefixed with $ to
+// mangle maps a sigil name to a JS identifier. User names are prefixed with $ to
 // avoid clashing with JS keywords/globals; __intrinsics pass through.
 func mangle(name string) string {
 	if strings.HasPrefix(name, "__") {

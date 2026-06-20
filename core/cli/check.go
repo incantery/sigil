@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/core/load"
+	"github.com/incantery/sigil/core/load"
 )
 
 func newCheckCmd() *cobra.Command {
@@ -15,8 +15,8 @@ func newCheckCmd() *cobra.Command {
 		asJSON bool
 	)
 	cmd := &cobra.Command{
-		Use:   "check ENTRY.mako",
-		Short: "Type-check a mako module without bundling or running it",
+		Use:   "check ENTRY.sigil",
+		Short: "Type-check a sigil module without bundling or running it",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			entry := args[0]

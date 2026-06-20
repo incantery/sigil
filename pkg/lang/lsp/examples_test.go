@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-// exampleSources loads every .mako file under examples/ at the repo
+// exampleSources loads every .sigil file under examples/ at the repo
 // root — the corpus that keeps editor tooling honest against the real
 // language surface.
 func exampleSources(t *testing.T) map[string]string {
@@ -18,7 +18,7 @@ func exampleSources(t *testing.T) map[string]string {
 		if err != nil {
 			return err
 		}
-		if d.IsDir() || !strings.HasSuffix(path, ".mako") {
+		if d.IsDir() || !strings.HasSuffix(path, ".sigil") {
 			return nil
 		}
 		b, err := os.ReadFile(path)
@@ -32,7 +32,7 @@ func exampleSources(t *testing.T) map[string]string {
 		t.Fatalf("walk examples: %v", err)
 	}
 	if len(out) == 0 {
-		t.Fatal("no example .mako files found")
+		t.Fatal("no example .sigil files found")
 	}
 	return out
 }

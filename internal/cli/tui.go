@@ -88,10 +88,10 @@ type keyEntry struct {
 }
 
 var commands = []cmdEntry{
-	{"run", "<file.mako>", "Compile a Sigil file and serve it over HTTP"},
-	{"check", "<file.mako>", "Validate a Sigil file (no server). --json for structured output"},
-	{"describe", "<file.mako>", "Print a tree description of what the file renders"},
-	{"fmt", "<file.mako>", "Print the canonical formatting of a Sigil file (--write)"},
+	{"run", "<file.sigil>", "Compile a Sigil file and serve it over HTTP"},
+	{"check", "<file.sigil>", "Validate a Sigil file (no server). --json for structured output"},
+	{"describe", "<file.sigil>", "Print a tree description of what the file renders"},
+	{"fmt", "<file.sigil>", "Print the canonical formatting of a Sigil file (--write)"},
 	{"version", "", "Print version info"},
 }
 

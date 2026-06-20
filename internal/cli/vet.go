@@ -11,9 +11,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/lang/diag"
-	"github.com/incantery/mako/pkg/lang/parser"
-	"github.com/incantery/mako/pkg/vet"
+	"github.com/incantery/sigil/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/vet"
 )
 
 var vetJSON bool
@@ -24,12 +24,12 @@ var vetCmd = &cobra.Command{
 	Long: `Runs the parser + lower stages over each input path and reports any
 findings. Path resolution mirrors Go:
 
-  sigil vet              walks .mako files in the current directory
+  sigil vet              walks .sigil files in the current directory
   sigil vet .            same as above
-  sigil vet ./...        recursive — every .mako file under cwd
+  sigil vet ./...        recursive — every .sigil file under cwd
   sigil vet dir/...      recursive under dir/
-  sigil vet a.mako      specific file
-  sigil vet a.mako b.mako  multiple files
+  sigil vet a.sigil      specific file
+  sigil vet a.sigil b.sigil  multiple files
 
 Errors come from parse + lower. Warnings come from vet rules:
 unused state cells, unused user-defined components. --json emits a
@@ -42,7 +42,7 @@ errors; warnings do not fail the run.`,
 			return err
 		}
 		if len(paths) == 0 {
-			fmt.Fprintln(os.Stderr, "sigil vet: no .mako files found")
+			fmt.Fprintln(os.Stderr, "sigil vet: no .sigil files found")
 			return ErrSilent
 		}
 
@@ -141,12 +141,12 @@ func printVetText(results []vetResult) {
 }
 
 // expandVetPaths turns a slice of user-supplied path arguments into
-// the concrete list of .mako files to vet. Rules:
+// the concrete list of .sigil files to vet. Rules:
 //
 //   - No args: walks "." (non-recursive)
 //   - "./..." or "<path>/...": recursive walk under that path
 //   - directory: non-recursive contents
-//   - file ending in .mako: included as-is
+//   - file ending in .sigil: included as-is
 //
 // Sorted output for deterministic reporting.
 func expandVetPaths(args []string) ([]string, error) {
@@ -184,8 +184,8 @@ func expandVetPaths(args []string) ([]string, error) {
 			return nil, fmt.Errorf("sigil vet: %s: %w", raw, err)
 		}
 		if !info.IsDir() {
-			if !strings.HasSuffix(path, ".mako") {
-				return nil, fmt.Errorf("sigil vet: %s: not a .mako file", raw)
+			if !strings.HasSuffix(path, ".sigil") {
+				return nil, fmt.Errorf("sigil vet: %s: not a .sigil file", raw)
 			}
 			add(path)
 			continue
@@ -197,14 +197,14 @@ func expandVetPaths(args []string) ([]string, error) {
 				}
 				if d.IsDir() {
 					// Skip hidden + node_modules-ish directories that
-					// definitely won't have user .mako source.
+					// definitely won't have user .sigil source.
 					name := d.Name()
 					if p != path && (strings.HasPrefix(name, ".") || name == "node_modules") {
 						return fs.SkipDir
 					}
 					return nil
 				}
-				if strings.HasSuffix(p, ".mako") {
+				if strings.HasSuffix(p, ".sigil") {
 					add(p)
 				}
 				return nil
@@ -220,7 +220,7 @@ func expandVetPaths(args []string) ([]string, error) {
 			return nil, err
 		}
 		for _, e := range entries {
-			if e.IsDir() || !strings.HasSuffix(e.Name(), ".mako") {
+			if e.IsDir() || !strings.HasSuffix(e.Name(), ".sigil") {
 				continue
 			}
 			add(filepath.Join(path, e.Name()))

@@ -9,10 +9,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/parser"
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 var storiesAddr string

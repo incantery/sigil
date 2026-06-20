@@ -31,8 +31,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/incantery/mako/pkg/lang/ast"
-	"github.com/incantery/mako/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/ast"
+	"github.com/incantery/sigil/pkg/lang/diag"
 )
 
 // Parse reads source and returns the top-level node plus any diagnostics

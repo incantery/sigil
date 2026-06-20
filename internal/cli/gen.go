@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/gen"
+	"github.com/incantery/sigil/pkg/gen"
 
 	// Generator targets register themselves into pkg/gen's registry.
-	_ "github.com/incantery/mako/pkg/codegen/gogen"
+	_ "github.com/incantery/sigil/pkg/codegen/gogen"
 )
 
 var genCmd = &cobra.Command{

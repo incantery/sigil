@@ -1,13 +1,13 @@
-// Package parse builds an ast.Module from mako core source, per core/grammar.md.
+// Package parse builds an ast.Module from sigil core source, per core/grammar.md.
 package parse
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/incantery/mako/core/ast"
-	"github.com/incantery/mako/core/lex"
-	"github.com/incantery/mako/core/token"
+	"github.com/incantery/sigil/core/ast"
+	"github.com/incantery/sigil/core/lex"
+	"github.com/incantery/sigil/core/token"
 )
 
 // Error is a parse error with source position.

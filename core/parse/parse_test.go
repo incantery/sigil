@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/core/ast"
+	"github.com/incantery/sigil/core/ast"
 )
 
 func TestParseModule(t *testing.T) {
@@ -124,18 +124,18 @@ func TestParseModule(t *testing.T) {
 }
 
 func TestParseImports(t *testing.T) {
-	src := `import "github.com/incantery/mako/std/ui" (Card, Stack)
-import "github.com/incantery/mako/std/style" as Style
-import "github.com/incantery/mako/std/list"
+	src := `import "github.com/incantery/sigil/std/ui" (Card, Stack)
+import "github.com/incantery/sigil/std/style" as Style
+import "github.com/incantery/sigil/std/list"
 let x = 1`
 	m, err := Module(src)
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
 	got := strings.TrimSpace(ast.Dump(m))
-	want := `(import "github.com/incantery/mako/std/ui" (Card Stack))
-(import "github.com/incantery/mako/std/style" as Style)
-(import "github.com/incantery/mako/std/list")
+	want := `(import "github.com/incantery/sigil/std/ui" (Card Stack))
+(import "github.com/incantery/sigil/std/style" as Style)
+(import "github.com/incantery/sigil/std/list")
 (let x 1)`
 	if got != want {
 		t.Errorf("imports mismatch\n got:\n%s\n want:\n%s", got, want)
@@ -156,8 +156,8 @@ func TestParseInterpolation(t *testing.T) {
 
 // TestEchoProgram parses the canonical Echo example end to end.
 func TestEchoProgram(t *testing.T) {
-	src := `import "github.com/incantery/mako/std/ui" (card, stack, button, text, title)
-import "github.com/incantery/mako/std/reactive" (cell)
+	src := `import "github.com/incantery/sigil/std/ui" (card, stack, button, text, title)
+import "github.com/incantery/sigil/std/reactive" (cell)
 
 let echo () =
   let (name, setName) = cell "alice"

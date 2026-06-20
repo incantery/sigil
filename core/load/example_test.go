@@ -16,7 +16,7 @@ import (
 // TestCounterExample loads and drives the committed counter example file, so the
 // example stays a working artifact (not just documentation).
 func TestCounterExample(t *testing.T) {
-	entry := filepath.Join(repoRoot, "core", "examples", "counter", "counter.mako")
+	entry := filepath.Join(repoRoot, "core", "examples", "counter", "counter.sigil")
 	prog, err := Load(entry, Options{Root: repoRoot})
 	if err != nil {
 		t.Fatalf("load example: %v", err)

@@ -64,9 +64,9 @@ import (
 	"go/format"
 	"strings"
 
-	"github.com/incantery/mako/pkg/contract"
-	"github.com/incantery/mako/pkg/gen"
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/contract"
+	"github.com/incantery/sigil/pkg/gen"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // ErrorChannel is the reserved stream channel that carries a
@@ -309,7 +309,7 @@ func writeHeader(b *strings.Builder, pkgName string, needs headerNeeds) {
 	if needs.sync {
 		b.WriteString("\t\"sync\"\n")
 	}
-	b.WriteString("\n\t\"github.com/incantery/mako/pkg/serve\"\n")
+	b.WriteString("\n\t\"github.com/incantery/sigil/pkg/serve\"\n")
 	b.WriteString(")\n\n")
 }
 

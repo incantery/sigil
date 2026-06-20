@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/incantery/mako/pkg/ir"
+import "github.com/incantery/sigil/pkg/ir"
 
 // Option configures a parent primitive. Options are passed alongside child
 // Components in a primitive's variadic; the primitive distinguishes them by

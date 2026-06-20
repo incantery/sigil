@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/lower"
 )
 
 // These tests are the drift guard between the Go compiler (source of

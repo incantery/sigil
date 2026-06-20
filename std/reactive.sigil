@@ -1,4 +1,4 @@
-// std/reactive — fine-grained reactivity as a mako library over the kernel's
+// std/reactive — fine-grained reactivity as a sigil library over the kernel's
 // __cell / __get / __set / __effect intrinsics.
 //
 // A cell is a Solid-style (read, write) pair: read the current value with `r ()`

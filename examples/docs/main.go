@@ -1,6 +1,6 @@
 // Command docs serves the Sigil documentation site — itself a Sigil app.
 //
-// It re-reads and recompiles docs.mako on every request, so editing the
+// It re-reads and recompiles docs.sigil on every request, so editing the
 // source and refreshing the browser is the whole dev loop.
 package main
 
@@ -11,14 +11,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/incantery/mako/pkg/lang/loader"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/pkg/lang/loader"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 func main() {
 	var sigilPath, addr string
-	flag.StringVar(&sigilPath, "sigil", "examples/docs/docs.mako",
+	flag.StringVar(&sigilPath, "sigil", "examples/docs/docs.sigil",
 		"path to the Sigil source file")
 	flag.StringVar(&addr, "addr", ":8088", "HTTP listen address")
 	flag.Parse()

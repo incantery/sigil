@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/theme"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/theme"
 )
 
 // These tests lock the REQUEST 12 ask-2 contract: a sigil monorepo
@@ -24,12 +24,12 @@ func TestMergeCarriesThemeAndFontsAcrossImports(t *testing.T) {
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
 	// Nested two levels deep — the Go-style layout iris wants
 	// (ui/theme), not a flat sibling.
-	writeFile(t, filepath.Join(root, "ui", "theme"), "theme.mako", `fonts google = "Spline Sans" "Instrument Serif"
+	writeFile(t, filepath.Join(root, "ui", "theme"), "theme.sigil", `fonts google = "Spline Sans" "Instrument Serif"
 
 theme Aura =
   primary = "#1d4ed8" on "#ffffff"
 `)
-	writeFile(t, filepath.Join(root, "app", "chat"), "chat.mako", `import example.com/proj/ui/theme
+	writeFile(t, filepath.Join(root, "app", "chat"), "chat.sigil", `import example.com/proj/ui/theme
 
 view App =
   text "ok"
@@ -70,12 +70,12 @@ view App =
 func TestMergeUnionsFontFamiliesAcrossPackages(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "ui", "theme"), "theme.mako", `fonts google = "Spline Sans" "Spline Sans Mono"
+	writeFile(t, filepath.Join(root, "ui", "theme"), "theme.sigil", `fonts google = "Spline Sans" "Spline Sans Mono"
 
 theme Aura =
   primary = "#1d4ed8" on "#ffffff"
 `)
-	writeFile(t, root, "main.mako", `import example.com/proj/ui/theme
+	writeFile(t, root, "main.sigil", `import example.com/proj/ui/theme
 
 fonts google = "Spline Sans" "Instrument Serif"
 
@@ -109,11 +109,11 @@ view App =
 func TestMergeCrossPackageComponent(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "ui", "components"), "pill.mako", `component Pill -> label =
+	writeFile(t, filepath.Join(root, "ui", "components"), "pill.sigil", `component Pill -> label =
   card
     text label
 `)
-	writeFile(t, filepath.Join(root, "app", "chat"), "chat.mako", `import example.com/proj/ui/components
+	writeFile(t, filepath.Join(root, "app", "chat"), "chat.sigil", `import example.com/proj/ui/components
 
 view App =
   components.Pill "hello"
@@ -137,11 +137,11 @@ view App =
 func TestMergeRejectsCrossPackageStreamCollision(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "a"), "a.mako", `stream Chat -> prompt : String = String
+	writeFile(t, filepath.Join(root, "a"), "a.sigil", `stream Chat -> prompt : String = String
 `)
-	writeFile(t, filepath.Join(root, "b"), "b.mako", `stream Chat -> prompt : String = String
+	writeFile(t, filepath.Join(root, "b"), "b.sigil", `stream Chat -> prompt : String = String
 `)
-	writeFile(t, root, "main.mako", `import example.com/proj/a
+	writeFile(t, root, "main.sigil", `import example.com/proj/a
 import example.com/proj/b
 
 view App =
@@ -167,9 +167,9 @@ func TestMergeRejectsCrossPackageBackendCollision(t *testing.T) {
   url same-origin
   auth none
 `
-	writeFile(t, filepath.Join(root, "a"), "a.mako", backend)
-	writeFile(t, filepath.Join(root, "b"), "b.mako", backend)
-	writeFile(t, root, "main.mako", `import example.com/proj/a
+	writeFile(t, filepath.Join(root, "a"), "a.sigil", backend)
+	writeFile(t, filepath.Join(root, "b"), "b.sigil", backend)
+	writeFile(t, root, "main.sigil", `import example.com/proj/a
 import example.com/proj/b
 
 view App =

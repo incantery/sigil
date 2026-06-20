@@ -13,7 +13,7 @@ const repoRoot = "../.."
 // directory as the resolution root, returning the bundle and entry id.
 func buildAgainstStd(t *testing.T, entrySrc string) (string, string) {
 	t.Helper()
-	entry := filepath.Join(t.TempDir(), "main.mako")
+	entry := filepath.Join(t.TempDir(), "main.sigil")
 	if err := os.WriteFile(entry, []byte(entrySrc), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func buildAgainstStd(t *testing.T, entrySrc string) (string, string) {
 	return js, prog.Entry.ID
 }
 
-// TestStdReactiveCell proves the first Mako-authored stdlib module compiles and
+// TestStdReactiveCell proves the first Sigil-authored stdlib module compiles and
 // runs through the loader: a (read, write) cell pair round-trips a write.
 func TestStdReactiveCell(t *testing.T) {
 	src := `import "std/reactive" (cell)
@@ -47,7 +47,7 @@ pub let result =
 }
 
 // TestStdReactiveComputed proves a derived signal recomputes after a dependency
-// write — fine-grained reactivity, entirely in Mako library code.
+// write — fine-grained reactivity, entirely in Sigil library code.
 func TestStdReactiveComputed(t *testing.T) {
 	src := `import "std/reactive" (cell, computed)
 pub let result =

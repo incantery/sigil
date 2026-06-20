@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/style"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/style"
 )
 
 // Resolver translates style.Spec values into atomic CSS class names

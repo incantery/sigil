@@ -3,7 +3,7 @@ package ui
 import (
 	"fmt"
 
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // newNode is the constructor every primitive funnels through. It seeds the

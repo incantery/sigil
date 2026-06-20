@@ -14,8 +14,8 @@ func newBuildCmd() *cobra.Command {
 		asHTML bool
 	)
 	cmd := &cobra.Command{
-		Use:   "build ENTRY.mako",
-		Short: "Compile a mako module to a JS bundle (or a full HTML page)",
+		Use:   "build ENTRY.sigil",
+		Short: "Compile a sigil module to a JS bundle (or a full HTML page)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			entry := args[0]

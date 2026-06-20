@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/incantery/mako/pkg/lang/ast"
-	"github.com/incantery/mako/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/ast"
+	"github.com/incantery/sigil/pkg/lang/diag"
 )
 
 // Merge returns the program flattened into a single ast.Node{Kind:

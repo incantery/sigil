@@ -36,7 +36,7 @@ func setupModule(t *testing.T, genYAML string) string {
 	if genYAML != "" {
 		writeFile(t, root, ConfigName, genYAML)
 	}
-	writeFile(t, filepath.Join(root, "app", "chat"), "chat.mako", `stream Chat -> prompt : String = String
+	writeFile(t, filepath.Join(root, "app", "chat"), "chat.sigil", `stream Chat -> prompt : String = String
 
 view App =
   text "ok"
@@ -177,7 +177,7 @@ generate:
     package: app/empty
     out: gen
 `)
-	writeFile(t, filepath.Join(root, "app", "empty"), "empty.mako", `view App =
+	writeFile(t, filepath.Join(root, "app", "empty"), "empty.sigil", `view App =
   text "ok"
 `)
 	err := Run(root, nil)

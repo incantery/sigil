@@ -1,7 +1,7 @@
-// std/ui — semantic UI components, written in mako over std/html. This is the
+// std/ui — semantic UI components, written in sigil over std/html. This is the
 // whole point of the kernel redesign: `card`, `column`, `button`, `text` are
 // ordinary library functions, not compiler-built-in `ir.Kind`s. New components
-// are added here, in mako — never by changing the compiler.
+// are added here, in sigil — never by changing the compiler.
 
 import "std/html" (el, dynText, attr, onClick, onInput)
 

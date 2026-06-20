@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/pkg/lang/ast"
-	"github.com/incantery/mako/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/ast"
+	"github.com/incantery/sigil/pkg/lang/lower"
 )
 
 // Semantic tokens are produced from the same AST the compiler uses, so

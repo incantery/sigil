@@ -12,8 +12,8 @@ import (
 	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 
-	"github.com/incantery/mako/pkg/codegen/e2e"
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/codegen/e2e"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // e2eEvent is the in-Go shape of one event the compiled JS bundle

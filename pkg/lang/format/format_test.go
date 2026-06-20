@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/lang/parser"
 )
 
 // TestRoundtrip parses then formats and verifies the output is a fixed

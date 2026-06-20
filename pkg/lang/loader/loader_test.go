@@ -21,7 +21,7 @@ func writeFile(t *testing.T, dir, name, contents string) {
 func TestLoadSinglePackage(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, root, "main.mako", `view App =
+	writeFile(t, root, "main.sigil", `view App =
   text "hi"
 `)
 	prog, err := Load(root)
@@ -42,13 +42,13 @@ func TestLoadSinglePackage(t *testing.T) {
 func TestLoadMultiFilePackage(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, root, "a.mako", `type Foo =
+	writeFile(t, root, "a.sigil", `type Foo =
   x : Int
 `)
-	writeFile(t, root, "b.mako", `type Bar =
+	writeFile(t, root, "b.sigil", `type Bar =
   y : Int
 `)
-	writeFile(t, root, "c.mako", `view App =
+	writeFile(t, root, "c.sigil", `view App =
   text "hi"
 `)
 	prog, err := Load(root)
@@ -63,7 +63,7 @@ func TestLoadMultiFilePackage(t *testing.T) {
 		t.Fatalf("want 3 files, got %d", len(pkg.Files))
 	}
 	// Files sorted alphabetically by path.
-	for i, want := range []string{"a.mako", "b.mako", "c.mako"} {
+	for i, want := range []string{"a.sigil", "b.sigil", "c.sigil"} {
 		got := filepath.Base(pkg.Files[i].Path)
 		if got != want {
 			t.Errorf("file %d: got %s, want %s", i, got, want)
@@ -74,10 +74,10 @@ func TestLoadMultiFilePackage(t *testing.T) {
 func TestLoadCrossPackageImports(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "types"), "types.mako", `type Slot =
+	writeFile(t, filepath.Join(root, "types"), "types.sigil", `type Slot =
   id : Int
 `)
-	writeFile(t, root, "main.mako", `import example.com/proj/types
+	writeFile(t, root, "main.sigil", `import example.com/proj/types
 view App =
   text "hi"
 `)
@@ -105,10 +105,10 @@ view App =
 func TestLoadImportAlias(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "types"), "types.mako", `type Slot =
+	writeFile(t, filepath.Join(root, "types"), "types.sigil", `type Slot =
   id : Int
 `)
-	writeFile(t, root, "main.mako", `import example.com/proj/types as t
+	writeFile(t, root, "main.sigil", `import example.com/proj/types as t
 view App =
   text "hi"
 `)
@@ -125,7 +125,7 @@ view App =
 func TestLoadExternalImportRejected(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, root, "main.mako", `import github.com/someone/else
+	writeFile(t, root, "main.sigil", `import github.com/someone/else
 view App = text "hi"
 `)
 	_, err := Load(root)
@@ -140,15 +140,15 @@ view App = text "hi"
 func TestLoadDetectsCycle(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, filepath.Join(root, "a"), "a.mako", `import example.com/proj/b
+	writeFile(t, filepath.Join(root, "a"), "a.sigil", `import example.com/proj/b
 type T =
   a : Int
 `)
-	writeFile(t, filepath.Join(root, "b"), "b.mako", `import example.com/proj/a
+	writeFile(t, filepath.Join(root, "b"), "b.sigil", `import example.com/proj/a
 type U =
   b : Int
 `)
-	writeFile(t, root, "main.mako", `import example.com/proj/a
+	writeFile(t, root, "main.sigil", `import example.com/proj/a
 view App = text "hi"
 `)
 	_, err := Load(root)
@@ -163,11 +163,11 @@ view App = text "hi"
 func TestLoadIgnoresUnderscorePrefixedAndNonSigil(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
-	writeFile(t, root, "main.mako", `view App =
+	writeFile(t, root, "main.sigil", `view App =
   text "hi"
 `)
 	// These should all be ignored.
-	writeFile(t, root, "_scratch.mako", "garbage that would fail to parse !@#$%")
+	writeFile(t, root, "_scratch.sigil", "garbage that would fail to parse !@#$%")
 	writeFile(t, root, "README.md", "# project notes")
 	writeFile(t, root, ".hidden", "do not look")
 	prog, err := Load(root)
@@ -184,14 +184,14 @@ func TestLoadEmptyPackageErrors(t *testing.T) {
 	root := t.TempDir()
 	writeFile(t, root, "sigil.mod", "module example.com/proj\n")
 	writeFile(t, filepath.Join(root, "empty"), "README.md", "no sigil files here")
-	writeFile(t, root, "main.mako", `import example.com/proj/empty
+	writeFile(t, root, "main.sigil", `import example.com/proj/empty
 view App = text "hi"
 `)
 	_, err := Load(root)
 	if err == nil {
 		t.Fatal("expected error for empty package")
 	}
-	if !strings.Contains(err.Error(), "no .mako files") {
+	if !strings.Contains(err.Error(), "no .sigil files") {
 		t.Fatalf("err = %v", err)
 	}
 }

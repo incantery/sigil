@@ -2,7 +2,7 @@
 // nothing else. Everything else — IR, renderers, runtime — is plumbing.
 package ui
 
-import "github.com/incantery/mako/pkg/ir"
+import "github.com/incantery/sigil/pkg/ir"
 
 // Component is the unit of authoring. Components don't render eagerly; they
 // produce IR when Build is called by the compiler. This lets the framework

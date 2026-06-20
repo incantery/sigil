@@ -1,9 +1,9 @@
-// Package ast defines the abstract syntax tree for the mako core language,
+// Package ast defines the abstract syntax tree for the sigil core language,
 // matching core/grammar.md. UI and reactivity are not represented here: element,
 // cell, Button, etc. are ordinary names applied via App.
 package ast
 
-import "github.com/incantery/mako/core/token"
+import "github.com/incantery/sigil/core/token"
 
 // Pos is a 1-based source position.
 type Pos struct {

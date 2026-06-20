@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	"github.com/incantery/mako/core/ast"
+	"github.com/incantery/sigil/core/ast"
 )
 
 // effectOps are the intrinsics that perform an effect. They may only be used

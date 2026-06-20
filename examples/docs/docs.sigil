@@ -102,7 +102,7 @@ view Docs =
           doc-section "Install"
             para "Build the compiler from source, then run a .sigil file. The dev loop re-reads the source on every request — edit and refresh."
             code
-              go install github.com/incantery/mako/cmd/sigil@latest
+              go install github.com/incantery/sigil/cmd/sigil@latest
               sigil run app.sigil          # serves http://localhost:8080
 
           doc-section "Your first view"

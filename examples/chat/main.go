@@ -1,7 +1,7 @@
 // Mock streaming backend + page server for the Sigil chat demo —
 // running entirely on the `sigil gen` seam:
 //
-//   - the contract (stream Chat, stream Broken) lives in chat.mako
+//   - the contract (stream Chat, stream Broken) lives in chat.sigil
 //   - sigil.gen.yaml (repo root) generates examples/chat/gen — the
 //     typed service interface, per-channel stream emitters, and the
 //     HTTP handlers owning framing + error mapping
@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
-	chatapi "github.com/incantery/mako/examples/chat/gen"
-	"github.com/incantery/mako/pkg/serve"
+	chatapi "github.com/incantery/sigil/examples/chat/gen"
+	"github.com/incantery/sigil/pkg/serve"
 )
 
 // api implements the generated chatapi.Api interface — the mock

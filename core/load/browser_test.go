@@ -12,8 +12,8 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-// counterApp is a complete mako program whose entire UI is built from
-// mako-defined components (std/ui) and mako-defined reactivity (std/reactive).
+// counterApp is a complete sigil program whose entire UI is built from
+// sigil-defined components (std/ui) and sigil-defined reactivity (std/reactive).
 // Nothing here is a compiler built-in — `card`, `column`, `button`, `label`,
 // and `cell` are all ordinary library functions resolved through the loader.
 const counterApp = `import "std/reactive" (cell)
@@ -33,7 +33,7 @@ pub let app =
 
 // echoApp is the canonical Echo: a text field whose value is mirrored into a
 // label through a cell. It exercises the decoded-event boundary (onInput → the
-// kernel's __eventValue decoder) entirely through mako library code.
+// kernel's __eventValue decoder) entirely through sigil library code.
 const echoApp = `import "std/reactive" (cell)
 import "std/ui" (card, column, label, input)
 import "std/html" (mount)
@@ -61,7 +61,7 @@ func TestComponentAppCompiles(t *testing.T) {
 }
 
 // TestComponentAppInBrowser is the milestone the kernel redesign aims at: a
-// counter whose components are mako library code renders and reacts in a real
+// counter whose components are sigil library code renders and reacts in a real
 // browser. Skips if Chrome is unavailable.
 func TestComponentAppInBrowser(t *testing.T) {
 	js, _ := buildAgainstStd(t, counterApp)

@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/contract"
-	"github.com/incantery/mako/pkg/lang/lower"
-	sparser "github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/contract"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	sparser "github.com/incantery/sigil/pkg/lang/parser"
 )
 
 // assertContains is the in-test grep helper. Fails the test with

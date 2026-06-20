@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/pkg/theme"
+	"github.com/incantery/sigil/pkg/theme"
 )
 
 // writeThemeCSS emits a stylesheet that defines all of Sigil's tokens as

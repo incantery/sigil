@@ -6,7 +6,7 @@
 // Types live in a sibling package (examples/studio/types) to exercise
 // the L52 import system at real scale.
 
-import github.com/incantery/mako/examples/studio/types
+import github.com/incantery/sigil/examples/studio/types
 
 theme studio extends dark =
   surface = "#111111" on "#e5e5e5"

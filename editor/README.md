@@ -63,13 +63,13 @@ On 0.10 with nvim-lspconfig, register the same `cmd`/`filetypes` via
 Add to `~/.config/helix/languages.toml`:
 
 ```toml
-[language-server.mako]
+[language-server.sigil]
 command = "sigil"
 args = ["lsp"]
 
 [[language]]
 name = "sigil"
-scope = "source.mako"
+scope = "source.sigil"
 file-types = ["sigil"]
 comment-token = "//"
 indent = { tab-width = 2, unit = "  " }
@@ -95,7 +95,7 @@ When the language grows:
   queries error on the new nodes (e.g. `flow_decl`). After regenerating,
   **restart nvim** — it caches the loaded parser for the session.
 - `make tree-sitter-test` runs the corpus + validates the queries.
-- `make tree-sitter-verify` parses every `examples/**/*.mako`.
+- `make tree-sitter-verify` parses every `examples/**/*.sigil`.
 - `go test ./pkg/lang/lsp/` includes the drift guards: decl keywords in
   grammar + highlights, and the builtin-kind list in `highlights.scm`
   against `lower.BuiltinKinds()`.

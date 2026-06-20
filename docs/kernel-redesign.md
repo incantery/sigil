@@ -1,18 +1,18 @@
-# Mako kernel redesign — "Go for the frontend"
+# Sigil kernel redesign — "Go for the frontend"
 
 Status: **agreed direction, not built** (2026-06-18). Supersedes the multi-target
 framing. Clean-room core in a new tree; the existing `pkg/` stays until strangled.
 
 ## Thesis
 
-Make mako feel to the frontend the way Go feels to the backend:
+Make sigil feel to the frontend the way Go feels to the backend:
 
-| Go | Mako |
+| Go | Sigil |
 | --- | --- |
 | small orthogonal core language | small **reactive** expression language |
-| large stdlib written *in Go* | UI + compute stdlib written *in mako* |
+| large stdlib written *in Go* | UI + compute stdlib written *in sigil* |
 | single static binary | single self-contained JS bundle, no npm |
-| `gofmt`, `go test` built in | `mako fmt`, `mako test` (already exist) |
+| `gofmt`, `go test` built in | `sigil fmt`, `sigil test` (already exist) |
 | `unsafe`/syscall escape hatch | **one** host primitive (`element`) + reactive intrinsics |
 
 The pivot is **not** "drop targets" — there is no real multi-target architecture
@@ -21,11 +21,11 @@ today (only `"web"` ever existed; ~100 LOC of dead scaffolding). The pivot is:
 > Today the standard library **is** the compiler. Every UI primitive (`card`,
 > `button`, `stack`), every layout default, every one of ~20 IR kinds, all design
 > tokens are hardcoded in Go (`pkg/ui/primitives.go`, `pkg/style/primitives.go`,
-> ~6.3K LOC of `lower.go`). **Zero** mako ships with the compiler.
+> ~6.3K LOC of `lower.go`). **Zero** sigil ships with the compiler.
 
 The compiler core grows a little (functions, operators, a real expression grammar)
 so it can shrink a lot: the ~20 hardcoded UI kinds collapse into **one** host
-primitive plus mako-defined components.
+primitive plus sigil-defined components.
 
 ## Decisions (2026-06-18)
 
@@ -37,14 +37,14 @@ SPA / MPA / Hybrid / Static remain — as **output modes** of one JS emitter, no
 
 ## The kernel (Go) — the irreducible core
 
-Everything else is mako. The kernel is only:
+Everything else is sigil. The kernel is only:
 
 - **Values**: Int, Float, Bool, String, List, Record, Variant (discriminated union), Function (first-class, closures).
 - **Expressions** (a little ML): literals, operators (`+ - * / %`, `== != < > <= >=`, `&& || !`, `++`, `|>`), `let`/`let rec`, `fun x -> e` lambdas (curried), `match … with`, ADTs + records, calls by **juxtaposition** (`cell "alice"`), field/index access, `if … then … else` as an expression, string interpolation. Type inference (see Open question on HM).
 - **Reactive intrinsics** (the "effect primitive"): exactly two.
   - `__cell initial` → a tracked reactive **pair** `(read, write)`. `read ()` registers a dependency; `write v` notifies dependents. (Solid-style signal; ML-honest — just a tuple of functions.)
   - `__effect thunk` → runs `thunk`, auto-tracks every `read ()` inside it, re-runs when any change.
-  - *Everything reactive* (`computed`, `memo`, `store`, `resource`, `batch`, async) is derived from these **in mako**.
+  - *Everything reactive* (`computed`, `memo`, `store`, `resource`, `batch`, async) is derived from these **in sigil**.
 - **Host intrinsic** (the one bridge to the platform): `element tag props children` + `text value` + `mount node root`. Reactive props/children are thunks the runtime wraps in `__effect`.
 - **Modules**: Go-style string-path imports (`import "github.com/.../std/ui" (Card, Stack)`), `pub`/private visibility. The import path *is* the fetch URL — no registry.
 
@@ -58,9 +58,9 @@ inference. Application is juxtaposition (`cell "alice"`, `name ()`). A cell is a
 Solid-style read/write **pair** — read `name ()`, write `setName v`. No methods,
 no mutation syntax; just functions and tuples.
 
-```mako
-import "github.com/incantery/mako/std/ui" (card, stack, button, text, title)
-import "github.com/incantery/mako/std/reactive" (cell)
+```sigil
+import "github.com/incantery/sigil/std/ui" (card, stack, button, text, title)
+import "github.com/incantery/sigil/std/reactive" (cell)
 
 let echo () =
   let (name, setName) = cell "alice"
@@ -81,24 +81,24 @@ constructor from a function with no lookahead. Inside `[ ]`/`{ }` layout is
 suspended and commas separate elements (trailing comma ok). Successive block-level
 `let`s need no `in`; the last expression is the result (Elm/F# layout).
 
-### The thesis, proven: a stdlib component defined *in mako*
+### The thesis, proven: a stdlib component defined *in sigil*
 
-`Button` is not a compiler builtin anymore. It is mako over the one host primitive,
+`Button` is not a compiler builtin anymore. It is sigil over the one host primitive,
 using record destructuring + defaults + field punning:
 
-```mako
-import "github.com/incantery/mako/std/html" (element)
-import "github.com/incantery/mako/std/style" (tokens)
+```sigil
+import "github.com/incantery/sigil/std/html" (element)
+import "github.com/incantery/sigil/std/style" (tokens)
 
 pub let button { label, click = fun () -> () } =
   element "button" { class = tokens.button, on = { click } } [ text label ]
 ```
 
-### Reactivity, derived from the two intrinsics — *in mako*
+### Reactivity, derived from the two intrinsics — *in sigil*
 
 `__cell` returns a `(read, write)` pair; `__effect` runs a thunk and auto-tracks reads.
 
-```mako
+```sigil
 // std/reactive
 pub let computed compute =
   let (value, setValue) = __cell (compute ())
@@ -140,7 +140,7 @@ across cells, not one Model). Worth it — signals are far better for animations
 - Enforcement is a syntactic pass over the typed AST (an `inEffect` flag), not an
   `Effect a` type threaded through every signature.
 
-```mako
+```sigil
 let counter () =
   let (count, setCount) = cell 0
   column [
@@ -151,7 +151,7 @@ let counter () =
 
 ## Styling (decided 2026-06-18)
 
-Mako is opinionated, Tailwind-flavored — the design system is the **type system**,
+Sigil is opinionated, Tailwind-flavored — the design system is the **type system**,
 not class strings. But it is **open**: bespoke and dynamic values are first-class,
 like every real design system (a closed/finite token set is not viable).
 
@@ -180,7 +180,7 @@ later compile-time specialization).
 ## Core surface — what's left to add (then core stops growing)
 
 The kernel is nearly closed. Remaining genuine core additions (each is something
-the platform exposes that mako can't reach via existing primitives):
+the platform exposes that sigil can't reach via existing primitives):
 
 1. **Reactive structure** — `__each : Cell (List a) -> (a -> Node) -> Node` (keyed)
    and `__when : Cell Bool -> (unit -> Node) -> Node`. Static `List Node` can't do
@@ -204,7 +204,7 @@ core/                 # the kernel (Go)
   lex/ parse/ ast/    # unified expression grammar
   emit/               # JS emitter + tiny runtime
   intrinsics/         # __cell, __effect, element, text, mount
-std/                  # the standard library — written in mako
+std/                  # the standard library — written in sigil
   reactive/  html/  ui/  style/         # the UI framework
   list/  string/  math/  json/          # the compute stdlib
   router/  forms/  net/  (M4)
@@ -220,10 +220,10 @@ the test scenario IR, `contract/` backend codegen.
 - **M0 — Typed kernel. ✅ DONE.** `core/` lexer + parser + AST + **HM type checker** + JS emit for the expression core (literals, operators, `let`/`let rec`, `fun`, `match`, ADTs, records, `Option`). A typed program compiles to JS and runs; type errors are real (mismatch / unbound / non-exhaustive / infinite-type all rejected). All tests green.
 - **M1 — Reactive + host. ✅ DONE.** Intrinsics with principal types (`__cell`/`__get`/`__set`/`__effect`, `__elem`/`__text`/`__attr`/`__bindAttr`/`__on`/`__mount`), the `effect { }` block + effect-context check (read-pure / write-effect), and a tiny JS runtime (fine-grained signal graph + DOM bind). The counter renders and reacts in a real headless browser (chromedp: 0 → click → 1 → 2).
 - **M1.5 — Finish the host layer. ✅ DONE.** Reactive structure intrinsics `__each` (keyed list, node reuse via `__eq`, untracked child render) + `__when` (conditional) on the signal runtime. Verified in a real browser: list reorders (abc→cba reusing nodes), grows (→abcd), conditional node toggles in/out of the DOM.
-- **M2 — Stdlib bootstrap.** Module loader (resolve `import "path"` + cross-module typecheck), then `std/reactive` (cell as Solid-style read/write pair, computed/effect), `std/html`, `std/style` (typed Tailwind-flavored utilities + tokens + the core CSS pass), and `std/ui` (text, column, button, card) written **in mako**, type-checked. Echo runs on mako-defined components. ← thesis proven.
-- **M3 — Compute stdlib.** `std/list`, `std/string`, `std/math`, `std/option` in mako. Language is self-sufficient.
-- **M4 — Re-home platform features.** Router, forms, backend/query/command/stream, theming — as typed mako stdlib (today special-cased in `lower.go`).
-- **M5 — Tooling + dogfood.** `mako fmt`, `mako test`, LSP (HM powers hover/type-on-hover/go-to-def), tree-sitter onto the new grammar. iris ports onto `core/`.
+- **M2 — Stdlib bootstrap.** Module loader (resolve `import "path"` + cross-module typecheck), then `std/reactive` (cell as Solid-style read/write pair, computed/effect), `std/html`, `std/style` (typed Tailwind-flavored utilities + tokens + the core CSS pass), and `std/ui` (text, column, button, card) written **in sigil**, type-checked. Echo runs on sigil-defined components. ← thesis proven.
+- **M3 — Compute stdlib.** `std/list`, `std/string`, `std/math`, `std/option` in sigil. Language is self-sufficient.
+- **M4 — Re-home platform features.** Router, forms, backend/query/command/stream, theming — as typed sigil stdlib (today special-cased in `lower.go`).
+- **M5 — Tooling + dogfood.** `sigil fmt`, `sigil test`, LSP (HM powers hover/type-on-hover/go-to-def), tree-sitter onto the new grammar. iris ports onto `core/`.
 
 ## Syntax decisions (ML-flavored)
 
@@ -243,7 +243,7 @@ Still open:
 
 Full HM inference. Rationale is the project's north star: **built for AI coding
 assistants from the ground up.** The type checker is the agent's correctness
-oracle, and the strongest possible form of mako's compiler-first enforcement:
+oracle, and the strongest possible form of sigil's compiler-first enforcement:
 
 - **Principal types as machine-checkable contracts** — an agent reading a stdlib signature gets a total spec, not a docstring it must trust.
 - **Exhaustive `match`** — the bug agents make most (forgetting a variant) is a compile error.

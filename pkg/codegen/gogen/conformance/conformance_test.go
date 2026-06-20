@@ -47,18 +47,18 @@ import (
 
 	"context"
 
-	"github.com/incantery/mako/pkg/codegen/gogen"
-	"github.com/incantery/mako/pkg/contract"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/parser"
-	"github.com/incantery/mako/pkg/serve"
+	"github.com/incantery/sigil/pkg/codegen/gogen"
+	"github.com/incantery/sigil/pkg/contract"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/serve"
 )
 
-var update = flag.Bool("update", false, "regenerate sigil.gen.go from fixture.mako")
+var update = flag.Bool("update", false, "regenerate sigil.gen.go from fixture.sigil")
 
 func fixtureContract(t *testing.T) contract.Contract {
 	t.Helper()
-	src, err := os.ReadFile("fixture.mako")
+	src, err := os.ReadFile("fixture.sigil")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func fixtureContract(t *testing.T) contract.Contract {
 	return contract.FromDoc(doc)
 }
 
-// TestGeneratedUpToDate locks sigil.gen.go to fixture.mako. Run
+// TestGeneratedUpToDate locks sigil.gen.go to fixture.sigil. Run
 // `go test ./pkg/codegen/gogen/conformance -run UpToDate -update`
 // after changing the generator or the fixture.
 func TestGeneratedUpToDate(t *testing.T) {

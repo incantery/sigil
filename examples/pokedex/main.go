@@ -1,7 +1,7 @@
 // Pokédex — a small end-to-end demo of the Sigil ops loop.
 //
-//   pokedex.mako    — types + queries + commands + view, authored in Sigil
-//   api/api.go       — generated from pokedex.mako via `sigil gen go`
+//   pokedex.sigil    — types + queries + commands + view, authored in Sigil
+//   api/api.go       — generated from pokedex.sigil via `sigil gen go`
 //   this file        — the hand-rolled server: implements the API
 //                      interface, mounts the routes, serves the
 //                      Sigil-compiled HTML at /
@@ -24,10 +24,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/incantery/mako/examples/pokedex/api"
-	"github.com/incantery/mako/pkg/lang/loader"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/examples/pokedex/api"
+	"github.com/incantery/sigil/pkg/lang/loader"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 // server is a tiny in-memory backend. Real apps replace this with a
@@ -96,7 +96,7 @@ func (s *server) GetSlot(_ context.Context, args api.GetSlotArgs) (api.Slot, err
 
 func main() {
 	var sigilPath, addr string
-	flag.StringVar(&sigilPath, "sigil", "examples/pokedex/pokedex.mako",
+	flag.StringVar(&sigilPath, "sigil", "examples/pokedex/pokedex.sigil",
 		"path to the Sigil source file")
 	flag.StringVar(&addr, "addr", ":8080", "HTTP listen address")
 	flag.Parse()
@@ -123,7 +123,7 @@ func main() {
 		}
 		// L52: compile through the loader so imports resolve. The
 		// loader walks up from absPath to find sigil.mod, parses
-		// every .mako file in this package + its transitively
+		// every .sigil file in this package + its transitively
 		// imported packages, merges them, and lowers as one program.
 		prog, err := loader.Load(absPath)
 		if err != nil {

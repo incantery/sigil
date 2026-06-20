@@ -14,8 +14,8 @@ func newServeCmd() *cobra.Command {
 		port string
 	)
 	cmd := &cobra.Command{
-		Use:   "serve ENTRY.mako",
-		Short: "Serve a mako module as a live-rebuilding dev page",
+		Use:   "serve ENTRY.sigil",
+		Short: "Serve a sigil module as a live-rebuilding dev page",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			entry := args[0]

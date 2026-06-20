@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Version is overridden at build time via -ldflags "-X github.com/incantery/mako/internal/cli.Version=…".
+// Version is overridden at build time via -ldflags "-X github.com/incantery/sigil/internal/cli.Version=…".
 var Version = "0.0.1-dev"
 
 var cfgFile string
@@ -44,7 +44,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
-		"config file (default: $HOME/.mako/config.yaml or ./sigil.yaml)")
+		"config file (default: $HOME/.sigil/config.yaml or ./sigil.yaml)")
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(runCmd)
@@ -61,7 +61,7 @@ func init() {
 	rootCmd.AddCommand(lspCmd)
 }
 
-// initConfig hooks viper into the cobra lifecycle. We look in $HOME/.mako
+// initConfig hooks viper into the cobra lifecycle. We look in $HOME/.sigil
 // and the working directory; env vars under SIGIL_* override file values.
 // Nothing reads config yet — this is the scaffold real commands will use.
 func initConfig() {
@@ -72,7 +72,7 @@ func initConfig() {
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath(".")
 		if home, err := os.UserHomeDir(); err == nil {
-			viper.AddConfigPath(filepath.Join(home, ".mako"))
+			viper.AddConfigPath(filepath.Join(home, ".sigil"))
 		}
 	}
 	viper.SetEnvPrefix("SIGIL")

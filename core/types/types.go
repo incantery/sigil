@@ -1,4 +1,4 @@
-// Package types is the mako core type checker: Hindley-Milner inference with
+// Package types is the sigil core type checker: Hindley-Milner inference with
 // level-based let-generalization (Algorithm W), algebraic data types, and match
 // exhaustiveness checking.
 //

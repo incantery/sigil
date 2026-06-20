@@ -28,7 +28,7 @@ gauntlet/
   server/                 a tiny static server for the reference pages
     main.go
     pages/<challenge>/<variant>.html
-  <challenge>.mako       the Sigil scenario(s) that drive the challenge
+  <challenge>.sigil       the Sigil scenario(s) that drive the challenge
 ```
 
 ## Running
@@ -45,7 +45,7 @@ make observability-down
 
 # or drive one file directly (compiles + runs the whole package):
 go run ./gauntlet/server &
-sigil test gauntlet/async-appear.mako --trace run.json
+sigil test gauntlet/async-appear.sigil --trace run.json
 ```
 
 `gauntlet-suite` works with no observability stack — it always writes the
@@ -56,13 +56,13 @@ collector is reachable on `:4318`. See `../docs/observability/`.
 
 | # | File | Hazard | Proves |
 |---|------|--------|--------|
-| 1 | `async-appear.mako` | content mounts after a delay | auto-wait (no sleeps) |
-| 2 | `cross-page.mako` | full-page navigation tears down the document | session outlives the page; `extract`+carried binding survives the nav; `expect-path` (the R14 e2e gap, closed) |
-| 3 | `branch.mako` | the page renders one of several states | `match text-of "<sel>"` branches on an observed value and runs the matching arm's assertions — the same `\|`-arm shape as L93 union match, reused for scenarios |
-| 4 | `disappear.mako` | transient indicator that auto-dismisses | `expect-no-text` waits for absence, not first frame |
-| 5 | `capability.mako` | a foreign list with no cell map | the vocabulary is typed to the target: `expect-count` (Observe floor) works; `expect-cell` (Introspect) is a **compile error** against an external target |
+| 1 | `async-appear.sigil` | content mounts after a delay | auto-wait (no sleeps) |
+| 2 | `cross-page.sigil` | full-page navigation tears down the document | session outlives the page; `extract`+carried binding survives the nav; `expect-path` (the R14 e2e gap, closed) |
+| 3 | `branch.sigil` | the page renders one of several states | `match text-of "<sel>"` branches on an observed value and runs the matching arm's assertions — the same `\|`-arm shape as L93 union match, reused for scenarios |
+| 4 | `disappear.sigil` | transient indicator that auto-dismisses | `expect-no-text` waits for absence, not first frame |
+| 5 | `capability.sigil` | a foreign list with no cell map | the vocabulary is typed to the target: `expect-count` (Observe floor) works; `expect-cell` (Introspect) is a **compile error** against an external target |
 
-Hardening hazards (`hardening.mako`):
+Hardening hazards (`hardening.sigil`):
 
 | Hazard | Page | Proves |
 |--------|------|--------|
@@ -98,6 +98,6 @@ test "…" = scenario in App
   expect-path "/dashboard"
 ```
 
-`branch.mako` shares one `match` flow across both its scenarios;
-`cross-page.mako` uses a parameterized `signInWith`. Flows are the unit
+`branch.sigil` shares one `match` flow across both its scenarios;
+`cross-page.sigil` uses a parameterized `signInWith`. Flows are the unit
 of reuse — the shared vocabulary the manager reads and the agent composes.

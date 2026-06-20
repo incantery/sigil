@@ -3,10 +3,10 @@ package cli
 import (
 	"errors"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/diag"
-	"github.com/incantery/mako/pkg/lang/loader"
-	"github.com/incantery/mako/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/loader"
+	"github.com/incantery/sigil/pkg/lang/lower"
 )
 
 // ErrSilent signals that a subcommand has already printed its own error

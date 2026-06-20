@@ -11,8 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/theme"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/theme"
 )
 
 var describeJSON bool
@@ -61,9 +61,9 @@ func renderTypeRef(t ir.TypeRef) string {
 }
 
 var describeCmd = &cobra.Command{
-	Use:   "describe <file.mako>",
+	Use:   "describe <file.sigil>",
 	Short: "Print a structured description of what a Sigil file renders",
-	Long: `Lowers a .mako file to IR and prints a tree-shaped description of
+	Long: `Lowers a .sigil file to IR and prints a tree-shaped description of
 the rendered output — without launching a browser. Useful in editor/AI
 loops to verify "did my change produce the structure I intended?" without
 a screenshot round-trip. Pass --json to emit the full IR document instead.`,
@@ -87,7 +87,7 @@ a screenshot round-trip. Pass --json to emit the full IR document instead.`,
 
 // describeTree prints a box-drawing tree of the IR rooted at doc.Root.
 // Each node line is "<kind> <interesting-props-inline>". The view name
-// (from the .mako source) prefixes the tree as a header; the cell table
+// (from the .sigil source) prefixes the tree as a header; the cell table
 // sits between the header and the tree.
 func describeTree(w io.Writer, doc ir.Document) {
 	header := "view " + doc.Name
@@ -169,7 +169,7 @@ func describeTree(w io.Writer, doc ir.Document) {
 }
 
 // writeCellsTable prints each cell as "  cN (name): Type = value". Names
-// come from doc.CellNames (only set for cells the .mako source named —
+// come from doc.CellNames (only set for cells the .sigil source named —
 // list cell *children* are typically anonymous, so they show as "  cN:
 // Type = value" without parens). Sorted by id for stable output.
 func writeCellsTable(w io.Writer, doc ir.Document) {

@@ -21,7 +21,7 @@
           "Sigil"
         ],
         "extensions": [
-          ".mako"
+          ".sigil"
         ],
         "configuration": "./language-configuration.json"
       }
@@ -29,7 +29,7 @@
     "grammars": [
       {
         "language": "sigil",
-        "scopeName": "source.mako",
+        "scopeName": "source.sigil",
         "path": "./syntaxes/sigil.tmLanguage.json"
       }
     ],

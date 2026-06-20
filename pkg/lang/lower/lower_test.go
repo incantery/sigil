@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/parser"
 )
 
 // lowerSrc is a convenience that parses + lowers; used by every test

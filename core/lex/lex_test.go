@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/core/token"
+	"github.com/incantery/sigil/core/token"
 )
 
 // render flattens a token stream into a compact space-separated string for

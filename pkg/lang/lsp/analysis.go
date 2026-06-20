@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/incantery/mako/pkg/lang/ast"
-	"github.com/incantery/mako/pkg/lang/diag"
-	"github.com/incantery/mako/pkg/lang/loader"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/lang/ast"
+	"github.com/incantery/sigil/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/loader"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/parser"
 )
 
 // analysis is everything derived from one buffer revision: the

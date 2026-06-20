@@ -10,10 +10,10 @@ const repoRoot = "../.."
 
 // counterEntry is the path to the committed counter example.
 func counterEntry() string {
-	return filepath.Join(repoRoot, "core", "examples", "counter", "counter.mako")
+	return filepath.Join(repoRoot, "core", "examples", "counter", "counter.sigil")
 }
 
-// run executes the mako command tree with args, capturing stdout and stderr.
+// run executes the sigil command tree with args, capturing stdout and stderr.
 // A fresh command tree per call keeps flag state isolated between tests.
 func run(args ...string) (string, string, error) {
 	root := newRootCmd()

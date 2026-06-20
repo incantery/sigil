@@ -10,7 +10,7 @@ func TestVersion(t *testing.T) {
 	if err != nil {
 		t.Fatalf("version: %v", err)
 	}
-	if !strings.HasPrefix(out, "mako ") {
-		t.Errorf("version output = %q, want prefix %q", out, "mako ")
+	if !strings.HasPrefix(out, "sigil ") {
+		t.Errorf("version output = %q, want prefix %q", out, "sigil ")
 	}
 }

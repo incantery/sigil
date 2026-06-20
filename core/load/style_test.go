@@ -45,7 +45,7 @@ func TestStyleExtraction(t *testing.T) {
 // token where a Space is expected is a compile error, not a silent bad style.
 func TestStyleTypeSafety(t *testing.T) {
 	dir := t.TempDir()
-	entry := filepath.Join(dir, "main.mako")
+	entry := filepath.Join(dir, "main.sigil")
 	// p expects a Space; Sky is a Color.
 	src := `import "std/html" (el, mount)
 import "std/style" (p)

@@ -7,15 +7,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/incantery/mako/examples/studio/api"
-	"github.com/incantery/mako/pkg/lang/loader"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/examples/studio/api"
+	"github.com/incantery/sigil/pkg/lang/loader"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 func main() {
 	var sigilPath, addr string
-	flag.StringVar(&sigilPath, "sigil", "examples/studio/studio.mako",
+	flag.StringVar(&sigilPath, "sigil", "examples/studio/studio.sigil",
 		"path to the Sigil source file")
 	flag.StringVar(&addr, "addr", ":9090", "HTTP listen address")
 	flag.Parse()

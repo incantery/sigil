@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // Input is everything one test bundle needs. App is the resolved

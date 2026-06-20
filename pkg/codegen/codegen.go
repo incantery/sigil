@@ -22,7 +22,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/pkg/ir"
+	"github.com/incantery/sigil/pkg/ir"
 )
 
 // Profile reports whether the given document is expressible by the

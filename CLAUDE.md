@@ -1,18 +1,18 @@
-# Mako — working notes (for picking the project back up)
+# Sigil — working notes (for picking the project back up)
 
-Mako is a small typed reactive UI language that compiles to a single npm-free JS
-bundle. A tiny kernel (Go) + a standard library written in Mako. See `README.md`
+Sigil is a small typed reactive UI language that compiles to a single npm-free JS
+bundle. A tiny kernel (Go) + a standard library written in Sigil. See `README.md`
 for the pitch and `docs/kernel-redesign.md` for the design.
 
 ## Where things live
 
-- **`core/`** — the compiler, part of the root module `github.com/incantery/mako`
+- **`core/`** — the compiler, part of the root module `github.com/incantery/sigil`
   (there is **no** `core/go.mod`). Packages: `lex`, `token`, `ast`, `parse`,
   `types` (Hindley-Milner), `peval` (partial evaluator / compile-time CSS
   extraction), `emit` (JS emitter + runtime prelude), `load` (module loader +
   linker). `core/cmd/serve` is the dev server. `core/examples/` holds runnable
-  `.mako` apps.
-- **`std/`** — the standard library, in Mako (`.mako`): reactive, html, ui, style,
+  `.sigil` apps.
+- **`std/`** — the standard library, in Sigil (`.sigil`): reactive, html, ui, style,
   router, http, result, list, string. Resolved by the loader against a `Root`
   dir; imports are Go-style strings, e.g. `import "std/ui" (card, button)`.
 - **`pkg/`, `internal/`, `cmd/`, `editor/`, `examples/`, `gauntlet/`** — the
@@ -25,7 +25,7 @@ for the pitch and `docs/kernel-redesign.md` for the design.
 ```sh
 go build ./...                       # whole repo (old + new) must stay green
 go test ./core/...                   # the language test suite (incl. headless-Chrome e2e)
-go run ./core/cmd/serve core/examples/counter/counter.mako   # serves on :8099
+go run ./core/cmd/serve core/examples/counter/counter.sigil   # serves on :8099
 ```
 
 Browser tests use chromedp and **skip** if Chrome is absent. The dep
@@ -33,7 +33,7 @@ Browser tests use chromedp and **skip** if Chrome is absent. The dep
 
 ## The kernel (≈24 intrinsics — keep it from growing)
 
-Everything else is stdlib in Mako. Intrinsics are `__`-prefixed:
+Everything else is stdlib in Sigil. Intrinsics are `__`-prefixed:
 
 - **Reactive:** `__cell __get __set __effect` (fine-grained signals).
 - **Host/DOM:** `__elem __text __attr __bindAttr __style __on __mount`;
@@ -63,7 +63,7 @@ Everything else is stdlib in Mako. Intrinsics are `__`-prefixed:
 
 ## What works today (all browser-verified)
 
-A complete SPA in Mako stdlib: reactive state, components (`std/ui`), typed
+A complete SPA in Sigil stdlib: reactive state, components (`std/ui`), typed
 styling with design-system tokens (`std/style`, `p Sky` is a *type error*),
 events + a real text-input Echo, HTTP with a `Result` boundary (`std/http`),
 client routing with history + popstate + typed `:params` + **default-deny guards
@@ -90,7 +90,7 @@ guarded by `core/load` `TestCounterExample`.
 - `cell []` (empty-list cell) type-checks — the checker has the value restriction.
 - `chromedp.Text` trims trailing whitespace (an empty-cell `"hello, "` reads
   `"hello,"`); account for it in assertions.
-- New language features should land kernel-minimal: prefer adding a stdlib `.mako`
+- New language features should land kernel-minimal: prefer adding a stdlib `.sigil`
   function over a new intrinsic; browser-verify; keep the type checker as the
   enforcement layer.
 

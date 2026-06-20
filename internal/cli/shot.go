@@ -12,7 +12,7 @@ import (
 	"github.com/chromedp/chromedp"
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 var (
@@ -29,16 +29,16 @@ var (
 )
 
 var shotCmd = &cobra.Command{
-	Use:   "shot [file.mako]",
+	Use:   "shot [file.sigil]",
 	Short: "Render a Sigil file in headless Chromium and save a PNG",
-	Long: `Compiles a .mako source file (or hits a running URL), renders it
+	Long: `Compiles a .sigil source file (or hits a running URL), renders it
 in a headless Chromium tab, and writes a PNG of the page. The
 fastest available loop for "did my layout change do what I wanted":
 
-  sigil shot examples/sigil/hello.mako --out /tmp/hello.png
+  sigil shot examples/sigil/hello.sigil --out /tmp/hello.png
 
 For app-target demos that depend on a running backend, point at the
-URL directly instead of compiling the .mako here — the file's view
+URL directly instead of compiling the .sigil here — the file's view
 references queries / commands that only resolve against the server:
 
   sigil shot --url http://localhost:8080 --out /tmp/pokedex.png
@@ -48,7 +48,7 @@ The default viewport (1280x800) approximates a typical desktop;
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if shotURL == "" && len(args) == 0 {
-			return fmt.Errorf("provide a .mako file path or --url")
+			return fmt.Errorf("provide a .sigil file path or --url")
 		}
 		if shotURL != "" && len(args) > 0 {
 			return fmt.Errorf("pass either a file path OR --url, not both")

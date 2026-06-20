@@ -1,7 +1,7 @@
 # Pokédex demo
 
 A working end-to-end Sigil app — types, queries, and commands declared
-in `pokedex.mako`; a typed Go contract generated into `api/api.go`
+in `pokedex.sigil`; a typed Go contract generated into `api/api.go`
 via `sigil gen go`; and a hand-rolled Go HTTP server in `main.go`
 that implements the contract and serves the Sigil-compiled HTML.
 
@@ -28,10 +28,10 @@ to see the new value.
 
 ## Regenerate the API contract
 
-When you edit `pokedex.mako`, regenerate `api/api.go`:
+When you edit `pokedex.sigil`, regenerate `api/api.go`:
 
 ```
-sigil gen go examples/pokedex/pokedex.mako --package api \
+sigil gen go examples/pokedex/pokedex.sigil --package api \
   --out examples/pokedex/api/api.go
 ```
 
@@ -46,7 +46,7 @@ The Sigil source declares an `app Pokedex` with a `target web host
 With the server running:
 
 ```
-sigil test examples/pokedex/pokedex.mako
+sigil test examples/pokedex/pokedex.sigil
 ```
 
 The runner compiles each scenario to a self-contained JS bundle,

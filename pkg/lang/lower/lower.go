@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/ast"
-	"github.com/incantery/mako/pkg/lang/diag"
-	"github.com/incantery/mako/pkg/lang/icons"
-	"github.com/incantery/mako/pkg/theme"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/ast"
+	"github.com/incantery/sigil/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/icons"
+	"github.com/incantery/sigil/pkg/theme"
 )
 
 // applyTone validates a `tone=` kwarg value against Sigil's closed

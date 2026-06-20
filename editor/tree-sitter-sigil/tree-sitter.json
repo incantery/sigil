@@ -3,7 +3,7 @@
     {
       "name": "sigil",
       "camelcase": "Sigil",
-      "scope": "source.mako",
+      "scope": "source.sigil",
       "path": ".",
       "file-types": ["sigil"],
       "highlights": ["queries/highlights.scm"],
@@ -17,7 +17,7 @@
     "description": "Tree-sitter grammar for the Sigil language",
     "authors": [{"name": "Sigil"}],
     "links": {
-      "repository": "https://github.com/incantery/mako"
+      "repository": "https://github.com/incantery/sigil"
     }
   },
   "bindings": {

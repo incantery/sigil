@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/incantery/mako/core/token"
+	"github.com/incantery/sigil/core/token"
 )
 
 // Dump renders a module as a compact S-expression for structural testing.

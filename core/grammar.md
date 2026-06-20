@@ -1,4 +1,4 @@
-# Mako core grammar (M0 expression core)
+# Sigil core grammar (M0 expression core)
 
 The minimal ML-flavored expression language. UI and reactivity are **not** in the
 grammar — `element`, `cell`, `Button`, etc. are ordinary identifiers applied as
@@ -166,8 +166,8 @@ no node kind to the AST beyond an `Interp [segment]` sugar that lowers immediate
 
 ## Worked example (every construct that M0 must parse)
 
-```mako
-import "github.com/incantery/mako/std/reactive" (cell)
+```sigil
+import "github.com/incantery/sigil/std/reactive" (cell)
 
 type Tab = Home | Profile | Settings
 

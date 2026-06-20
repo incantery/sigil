@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/contract"
+	"github.com/incantery/sigil/pkg/contract"
 )
 
 func writeApp(t *testing.T) string {
@@ -38,7 +38,7 @@ view App =
   input prompt placeholder="ask"
   text "hello"
 `
-	if err := os.WriteFile(filepath.Join(dir, "app.mako"), []byte(src), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "app.sigil"), []byte(src), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	return dir
@@ -170,7 +170,7 @@ func writePathApp(t *testing.T) string {
       public
       text "about page"
 `
-	if err := os.WriteFile(filepath.Join(dir, "app.mako"), []byte(src), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "app.sigil"), []byte(src), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	return dir
@@ -203,7 +203,7 @@ view App =
         path "/"
         text "home"
 `
-	if err := os.WriteFile(filepath.Join(dir, "app.mako"), []byte(src), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "app.sigil"), []byte(src), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	h, err := Page(dir)
@@ -268,7 +268,7 @@ func TestPageContractMismatchFailsBoot(t *testing.T) {
 
 func TestPageBrokenSourceFailsBoot(t *testing.T) {
 	dir := writeApp(t)
-	if err := os.WriteFile(filepath.Join(dir, "broken.mako"), []byte("view Broken =\n  nosuchthing 5\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "broken.sigil"), []byte("view Broken =\n  nosuchthing 5\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := Page(dir); err == nil {
@@ -302,7 +302,7 @@ func TestPageDevModeContractDrift(t *testing.T) {
 
 	// Add an op: the contract changes, so its hash no longer matches
 	// the one the handler was constructed with.
-	if err := os.WriteFile(filepath.Join(dir, "extra.mako"),
+	if err := os.WriteFile(filepath.Join(dir, "extra.sigil"),
 		[]byte("query Added = Bool\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -339,7 +339,7 @@ func TestPageDevModeRecompiles(t *testing.T) {
 
 	// Break the source: dev mode reports per request instead of
 	// crashing the process.
-	if err := os.WriteFile(filepath.Join(dir, "app.mako"), []byte("view App =\n  nosuchthing 5\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "app.sigil"), []byte("view App =\n  nosuchthing 5\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	res2, err := http.Get(srv.URL + "/")

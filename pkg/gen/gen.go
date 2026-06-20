@@ -20,10 +20,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/pkg/contract"
-	"github.com/incantery/mako/pkg/lang/loader"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/sigilmod"
+	"github.com/incantery/sigil/pkg/contract"
+	"github.com/incantery/sigil/pkg/lang/loader"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/sigilmod"
 )
 
 // Target is one code generator. Implementations consume the contract

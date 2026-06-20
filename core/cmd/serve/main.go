@@ -1,12 +1,12 @@
-// Command serve compiles a Mako entry module against the standard library and
+// Command serve compiles a Sigil entry module against the standard library and
 // serves it as a single, self-contained, npm-free page.
 //
-//	go run ./core/cmd/serve [-root DIR] [-port N] ENTRY.mako
+//	go run ./core/cmd/serve [-root DIR] [-port N] ENTRY.sigil
 //
 // -root is the module root that holds std/ (default "."). The bundle is rebuilt
 // on every request, so editing the source and refreshing is the dev loop.
 //
-// Superseded by `mako serve` (core/cli). This binary — and its copy of the
+// Superseded by `sigil serve` (core/cli). This binary — and its copy of the
 // `shell` page template, now also in core/cli/compile.go — should be removed
 // when the old kernel goes.
 package main
@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/incantery/mako/core/load"
+	"github.com/incantery/sigil/core/load"
 )
 
 const shell = `<!doctype html>
@@ -35,7 +35,7 @@ func main() {
 	port := flag.String("port", "8099", "port to serve on")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: serve [-root DIR] [-port N] ENTRY.mako")
+		fmt.Fprintln(os.Stderr, "usage: serve [-root DIR] [-port N] ENTRY.sigil")
 		os.Exit(2)
 	}
 	entry := flag.Arg(0)

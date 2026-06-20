@@ -7,14 +7,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/mako/pkg/codegen"
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/theme"
-	"github.com/incantery/mako/pkg/ui"
+	"github.com/incantery/sigil/pkg/codegen"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/theme"
+	"github.com/incantery/sigil/pkg/ui"
 )
 
 // WriteDoc emits a complete HTML document from an already-lowered IR
-// document. This is the path .mako sources flow through (cells come
+// document. This is the path .sigil sources flow through (cells come
 // from the source's `state` decls, not the Go ui package's global
 // registry).
 //

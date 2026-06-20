@@ -17,11 +17,11 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/ir"
-	"github.com/incantery/mako/pkg/lang/diag"
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/parser"
-	"github.com/incantery/mako/pkg/render/html"
+	"github.com/incantery/sigil/pkg/ir"
+	"github.com/incantery/sigil/pkg/lang/diag"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/render/html"
 )
 
 var exploreAddr string
@@ -29,12 +29,12 @@ var exploreAddr string
 var exploreCmd = &cobra.Command{
 	Use:   "explore [dir]",
 	Short: "Browse every Sigil example in a directory as a live web app with hot reload",
-	Long: `Walks a directory for *.mako files and serves a live explorer at the
+	Long: `Walks a directory for *.sigil files and serves a live explorer at the
 given address. The explorer itself is a Sigil view — sidebar of example
 names, source pane, rendered pane. Each example is served at
 /example/<basename>; source at /source/<basename>.
 
-Hot reload via SSE: edit any .mako file in the directory and every
+Hot reload via SSE: edit any .sigil file in the directory and every
 visible iframe refreshes. Compile errors render inline as a themed
 error page instead of plain-text 500s, so a broken example doesn't
 break the explorer.
@@ -57,7 +57,7 @@ is built with what we're inspecting.`,
 			return err
 		}
 		if len(examples) == 0 {
-			return fmt.Errorf("no *.mako files found in %s", absDir)
+			return fmt.Errorf("no *.sigil files found in %s", absDir)
 		}
 
 		hub := newReloadHub()
@@ -100,7 +100,7 @@ is built with what we're inspecting.`,
 				return
 			}
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			writeSourcePage(w, name+".mako", string(src))
+			writeSourcePage(w, name+".sigil", string(src))
 		})
 
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -142,7 +142,7 @@ is built with what we're inspecting.`,
 }
 
 type exampleEntry struct {
-	name string // basename without .mako suffix
+	name string // basename without .sigil suffix
 	path string // absolute path
 }
 
@@ -157,10 +157,10 @@ func collectExamples(dir string) ([]exampleEntry, error) {
 			continue
 		}
 		name := e.Name()
-		if !strings.HasSuffix(name, ".mako") {
+		if !strings.HasSuffix(name, ".sigil") {
 			continue
 		}
-		base := strings.TrimSuffix(name, ".mako")
+		base := strings.TrimSuffix(name, ".sigil")
 		out = append(out, exampleEntry{name: base, path: filepath.Join(dir, name)})
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].name < out[j].name })
@@ -172,7 +172,7 @@ func exampleByName(absDir, name string) (string, bool) {
 	if name == "" || strings.ContainsAny(name, "/\\") {
 		return "", false
 	}
-	full := filepath.Join(absDir, name+".mako")
+	full := filepath.Join(absDir, name+".sigil")
 	if _, err := os.Stat(full); err != nil {
 		return "", false
 	}
@@ -235,7 +235,7 @@ const hotReloadScript = `<script>
 </script>
 `
 
-// writeSourcePage emits the raw .mako source as a minimal themed page.
+// writeSourcePage emits the raw .sigil source as a minimal themed page.
 // We don't reuse the full Sigil pipeline — these pages have no state,
 // no primitives, no runtime — just <pre> with a small stylesheet that
 // matches the explorer's light/dark theme via the same media queries.
@@ -405,7 +405,7 @@ func (h *reloadHub) serveSSE(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// watchDir runs fsnotify over dir and pushes "reload" on every *.mako
+// watchDir runs fsnotify over dir and pushes "reload" on every *.sigil
 // change. 100ms debounce coalesces editor save bursts (rename+create+
 // write) into one broadcast.
 func watchDir(dir string, hub *reloadHub) {
@@ -426,7 +426,7 @@ func watchDir(dir string, hub *reloadHub) {
 			if !ok {
 				return
 			}
-			if !strings.HasSuffix(e.Name, ".mako") {
+			if !strings.HasSuffix(e.Name, ".sigil") {
 				continue
 			}
 			if debounce != nil {

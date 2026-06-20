@@ -78,7 +78,7 @@ type BindingRef struct {
 // Document is a complete render output: the root node plus the initial values
 // of every reactive cell referenced by the tree. Renderers consume Documents.
 //
-// Name is the source view's name when the document came from a .mako file —
+// Name is the source view's name when the document came from a .sigil file —
 // used by renderers as the page title and by inspect/describe commands to
 // label the tree. Empty when the document was built programmatically.
 //

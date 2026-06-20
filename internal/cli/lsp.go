@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/mako/pkg/lang/lsp"
+	"github.com/incantery/sigil/pkg/lang/lsp"
 )
 
 var lspVerbose bool

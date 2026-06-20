@@ -13,11 +13,11 @@ it. The output is the OTLP/JSON shape any OTLP/HTTP backend accepts.
 
 ```sh
 # write the run to a file (the AI's queryable artifact)
-sigil test gauntlet/cross-page.mako --trace run.json
+sigil test gauntlet/cross-page.sigil --trace run.json
 
 # push to any OTLP/HTTP collector (Tempo, Datadog Agent, the OTel
 # Collector, …) — /v1/traces is appended if you pass a bare base URL
-sigil test gauntlet/cross-page.mako --otlp http://localhost:4318
+sigil test gauntlet/cross-page.sigil --otlp http://localhost:4318
 
 # prod-lean: keep structure, timing, and status; drop detail attributes
 sigil test … --otlp http://collector:4318 --trace-lean

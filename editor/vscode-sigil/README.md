@@ -1,6 +1,6 @@
 # Sigil for VS Code
 
-Language support for [Sigil](https://github.com/incantery/mako) — the
+Language support for [Sigil](https://github.com/incantery/sigil) — the
 Go-native semantic UI compiler.
 
 - **Instant syntax highlighting** via a TextMate grammar.

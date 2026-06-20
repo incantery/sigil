@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/mako/pkg/lang/lower"
-	"github.com/incantery/mako/pkg/lang/parser"
+	"github.com/incantery/sigil/pkg/lang/lower"
+	"github.com/incantery/sigil/pkg/lang/parser"
 )
 
-// renderSource compiles a .mako source through parse → lower →
+// renderSource compiles a .sigil source through parse → lower →
 // WriteDoc and returns the full HTML page.
 func renderSource(t *testing.T, src string) string {
 	t.Helper()
