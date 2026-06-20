@@ -41,8 +41,9 @@ pub let app =
 ## Run it
 
 ```sh
-go run ./core/cmd/serve core/examples/counter/counter.sigil
+go run ./core/cmd/sigil serve core/examples/counter/counter.sigil
 # open http://localhost:8099
+# or: make build && bin/sigil serve core/examples/counter/counter.sigil
 ```
 
 The bundle is rebuilt on every request, so editing the source and refreshing is
@@ -52,7 +53,7 @@ the dev loop.
 
 - **`core/`** — the compiler: lexer, parser, Hindley-Milner type checker, partial
   evaluator (compile-time CSS extraction), JavaScript emitter, and the
-  cross-module loader, plus the `serve` command.
+  cross-module loader, plus the `sigil` CLI (`check`, `build`, `serve`).
 - **`std/`** — the standard library, written in Sigil: `reactive`, `html`, `ui`,
   `style` (typed design-system tokens), `router` (path routing, history, typed
   `:params`, default-deny guards), `http`, `result`, `list`, `string`.
