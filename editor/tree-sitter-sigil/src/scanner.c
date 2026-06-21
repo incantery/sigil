@@ -9,18 +9,20 @@
 //   On each significant newline, compare the next line's indent to the stack top:
 //     indent > top  → emit NEWLINE (if valid), then INDENT on next call
 //     indent == top → emit NEWLINE
-//     indent < top  → emit NEWLINE (if valid), then DEDENT(s) on subsequent calls,
-//                     then one final NEWLINE for the outer level
+//     indent < top  → emit NEWLINE (if valid), then for each block level:
+//                       DEDENT, NEWLINE (to terminate the enclosing statement),
+//                     then one final NEWLINE for the outermost level
 //   At EOF: same as shallower case (unwind to sentinel).
 //
 // Inside ( ) [ ] { } layout is fully suspended: no layout tokens emitted.
 // Blank lines and `//`-comment-only lines are skipped when measuring indent.
 //
 // State machine (phase):
-//   PHASE_NONE         — nothing pending, normal scan
-//   PHASE_INDENT       — emit INDENT (after NEWLINE was emitted for deeper line)
-//   PHASE_DEDENT       — emit DEDENT(s) (after NEWLINE was emitted for shallower line)
-//   PHASE_POST_DEDENT  — emit one final NEWLINE after all DEDENTs are done
+//   PHASE_NONE            — nothing pending, normal scan
+//   PHASE_INDENT          — emit INDENT (after NEWLINE was emitted for deeper line)
+//   PHASE_DEDENT          — emit DEDENT (then NEWLINE between consecutive DEDENTs)
+//   PHASE_INTER_DEDENT    — emit NEWLINE between two consecutive DEDENTs
+//   PHASE_POST_DEDENT     — emit one final NEWLINE after all DEDENTs are done
 
 #include <tree_sitter/parser.h>
 #include <stdlib.h>
@@ -39,6 +41,7 @@ typedef enum {
   PHASE_NONE,
   PHASE_INDENT,
   PHASE_DEDENT,
+  PHASE_INTER_DEDENT,
   PHASE_POST_DEDENT,
 } Phase;
 
@@ -172,14 +175,28 @@ bool tree_sitter_sigil_external_scanner_scan(void *payload, TSLexer *lexer,
       if (s_top(s) <= s->pending_indent) {
         // Last DEDENT — schedule post-DEDENT NEWLINE for outer level.
         s->phase = PHASE_POST_DEDENT;
+      } else {
+        // More DEDENTs remain — emit an inter-DEDENT NEWLINE first so the
+        // enclosing block's repeat(seq(_statement, _newline)) can close
+        // before the next DEDENT fires.
+        s->phase = PHASE_INTER_DEDENT;
       }
-      // else: more DEDENTs needed; stay in PHASE_DEDENT.
       lexer->result_symbol = DEDENT;
       return true;
     }
-    // DEDENT not valid yet — caller will come back.
-    s->phase = PHASE_NONE;
-    break;
+    // DEDENT not valid yet — preserve phase so tree-sitter retries.
+    return false;
+
+  case PHASE_INTER_DEDENT:
+    // Emit NEWLINE between consecutive DEDENTs to terminate the enclosing
+    // statement before closing the next outer block.
+    if (valid_symbols[NEWLINE]) {
+      s->phase = PHASE_DEDENT;
+      lexer->result_symbol = NEWLINE;
+      return true;
+    }
+    // NEWLINE not valid yet — preserve phase so tree-sitter retries.
+    return false;
 
   case PHASE_POST_DEDENT:
     if (valid_symbols[NEWLINE]) {
@@ -187,8 +204,8 @@ bool tree_sitter_sigil_external_scanner_scan(void *payload, TSLexer *lexer,
       lexer->result_symbol = NEWLINE;
       return true;
     }
-    s->phase = PHASE_NONE;
-    break;
+    // NEWLINE not valid yet — preserve phase so tree-sitter retries.
+    return false;
 
   case PHASE_NONE:
     break;
@@ -294,8 +311,10 @@ bool tree_sitter_sigil_external_scanner_scan(void *payload, TSLexer *lexer,
       s_pop(s);
       if (s_top(s) <= indent) {
         s->phase = PHASE_POST_DEDENT;
+      } else {
+        // More DEDENTs remain — emit NEWLINE between them.
+        s->phase = PHASE_INTER_DEDENT;
       }
-      // else: more DEDENTs needed; stay in PHASE_DEDENT.
       lexer->result_symbol = DEDENT;
       return true;
     }
@@ -315,6 +334,8 @@ bool tree_sitter_sigil_external_scanner_scan(void *payload, TSLexer *lexer,
       s_pop(s);
       if (s_top(s) <= 0) {
         s->phase = PHASE_POST_DEDENT;
+      } else {
+        s->phase = PHASE_INTER_DEDENT;
       }
       lexer->result_symbol = DEDENT;
       return true;

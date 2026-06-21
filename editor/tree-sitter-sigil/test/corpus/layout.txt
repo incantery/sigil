@@ -11,3 +11,28 @@ let x =
   (let_decl
     name: (identifier)
     (block (identifier))))
+
+==================
+multiple DEDENTs at once (nested blocks dedenting two levels)
+==================
+
+let a =
+  let b =
+    c
+let d =
+  e
+
+---
+
+(source_file
+  (let_decl
+    name: (identifier)
+    (block
+      (let_decl
+        name: (identifier)
+        (block
+          (identifier)))))
+  (let_decl
+    name: (identifier)
+    (block
+      (identifier))))
