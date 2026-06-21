@@ -99,24 +99,33 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ---
 
-### Task 2: Move examples to the root and drop the empty core/
+### Task 2: Move examples + grammar.md out of core/ and remove core/
 
-Relocates `core/examples` → `examples` and updates the two test files that
-hardcode the `core/examples` path. After this, `core/` is empty and removed.
+Empties `core/` and removes it. `core/` currently holds three things Task 1 left
+behind: `core/examples/`, `core/grammar.md`, and an empty `core/cmd/` leftover
+directory from Task 1's `git mv`. This task relocates `examples/` to the root and
+`grammar.md` to `docs/`, updates every reference to both, and deletes `core/`.
+
+(`grammar.md` and its four code-comment references were not in the original plan —
+discovered during Task 1 review. `docs/` is the home: it is language-grammar
+documentation, not Go source.)
 
 **Files:**
 - Move: `core/examples/` → `examples/`
-- Modify: `internal/load/example_test.go` (path string)
-- Modify: `internal/cli/cli_test.go` (path string)
+- Move: `core/grammar.md` → `docs/grammar.md`
+- Modify: `internal/load/example_test.go` (example path string)
+- Modify: `internal/cli/cli_test.go` (example path string)
+- Modify: `internal/token/token.go`, `internal/lex/lex.go`, `internal/parse/parse.go`, `internal/ast/ast.go` (doc comments: `core/grammar.md` → `docs/grammar.md`)
 
 **Interfaces:**
 - Consumes: the `internal/*` packages from Task 1.
-- Produces: example apps at `examples/<name>/<name>.sigil`; no remaining `core/` directory.
+- Produces: example apps at `examples/<name>/<name>.sigil`; grammar doc at `docs/grammar.md`; no remaining `core/` directory.
 
-- [ ] **Step 1: Move the examples directory**
+- [ ] **Step 1: Move examples and grammar.md**
 
 ```bash
 git mv core/examples examples
+git mv core/grammar.md docs/grammar.md
 ```
 
 - [ ] **Step 2: Fix the hardcoded example path in load's test**
@@ -133,15 +142,33 @@ In `internal/cli/cli_test.go`, drop the `"core"` path segment:
 	return filepath.Join(repoRoot, "examples", "counter", "counter.sigil")
 ```
 
-- [ ] **Step 4: Remove the now-empty core/ directory**
+- [ ] **Step 4: Update the four grammar.md doc-comment references**
 
-Run:
+Rewrite `core/grammar.md` → `docs/grammar.md` in each of these comment lines:
+- `internal/token/token.go:3` — `// The token set mirrors docs/grammar.md.` …
+- `internal/lex/lex.go:3` — `// It implements the offside rule from docs/grammar.md:` …
+- `internal/parse/parse.go:1` — `// Package parse builds an ast.Module from sigil core source, per docs/grammar.md.`
+- `internal/ast/ast.go:2` — `// matching docs/grammar.md.` …
+
+A single sweep is fine:
 ```bash
-rmdir core 2>/dev/null; test ! -d core && echo "core/ gone" || { echo "core/ not empty:"; find core; }
+grep -rl 'core/grammar.md' --include='*.go' . \
+  | xargs sed -i '' 's#core/grammar.md#docs/grammar.md#g'
+grep -rn 'core/grammar.md' --include='*.go' . || echo "CLEAN"
+```
+Expected: `CLEAN`.
+
+- [ ] **Step 5: Remove the now-empty core/ directory**
+
+`core/` now contains only empty leftover directories (`core/cmd/`), so remove the
+whole tree:
+```bash
+rm -rf core
+test ! -d core && echo "core/ gone" || { echo "core/ not empty:"; find core; }
 ```
 Expected: `core/ gone`.
 
-- [ ] **Step 5: Run the full suite**
+- [ ] **Step 6: Run the full suite**
 
 Run:
 ```bash
@@ -150,11 +177,11 @@ go build ./... && go vet ./... && go test ./... 2>&1 | tail -8
 Expected: all `ok`; `TestCounterExample` (in `internal/load`) and the cli test
 that compiles the counter both pass against the new `examples/` path.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add -A
-git commit -m "refactor: move examples/ to repo root, remove empty core/
+git commit -m "refactor: move examples/ to root, grammar.md to docs/, remove core/
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 ```

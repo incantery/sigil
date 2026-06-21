@@ -41,9 +41,9 @@ pub let app =
 ## Run it
 
 ```sh
-go run ./core/cmd/sigil serve core/examples/counter/counter.sigil
+go run ./cmd/sigil serve examples/counter/counter.sigil
 # open http://localhost:8099
-# or: make build && bin/sigil serve core/examples/counter/counter.sigil
+# or: make build && bin/sigil serve examples/counter/counter.sigil
 ```
 
 The bundle is rebuilt on every request, so editing the source and refreshing is
@@ -51,9 +51,11 @@ the dev loop.
 
 ## Layout
 
-- **`core/`** — the compiler: lexer, parser, Hindley-Milner type checker, partial
-  evaluator (compile-time CSS extraction), JavaScript emitter, and the
-  cross-module loader, plus the `sigil` CLI (`check`, `build`, `serve`).
+- **`internal/`** — the compiler: lexer, parser, Hindley-Milner type checker,
+  partial evaluator (compile-time CSS extraction), JavaScript emitter, cross-module
+  loader, and the `sigil` CLI (`check`, `build`, `serve`). The binary entry point
+  is `cmd/sigil`.
+- **`examples/`** — runnable `.sigil` apps (e.g. `examples/counter/counter.sigil`).
 - **`std/`** — the standard library, written in Sigil: `reactive`, `html`, `ui`,
   `style` (typed design-system tokens), `router` (path routing, history, typed
   `:params`, default-deny guards), `http`, `result`, `list`, `string`.
@@ -67,6 +69,6 @@ with history and typed parameters, type-enforced auth guards, and data lists
 (fetch → decode → map → render) — is expressible entirely in Sigil library code
 over the kernel, and every layer is verified in a real browser.
 
-> An earlier compiler (the old "sigil" kernel, formerly in `pkg/`, `internal/`,
-> `cmd/`, and `editor/`) has been removed; it lives on only in git history. The
-> language lives in `core/` and `std/`.
+> An earlier compiler (the old "sigil" kernel, formerly in `pkg/` and `editor/`)
+> has been removed; it lives on only in git history. The language lives in
+> `internal/`, `cmd/sigil`, and `std/`.

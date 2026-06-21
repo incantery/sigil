@@ -3,8 +3,8 @@
 # Common targets — run `make` (or `make help`) to see them.
 
 BIN_NAME := sigil
-CMD_PATH := ./core/cmd/sigil
-PKG      := github.com/incantery/sigil/core/cli
+CMD_PATH := ./cmd/sigil
+PKG      := github.com/incantery/sigil/internal/cli
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.0.1-dev)
 LDFLAGS  := -X $(PKG).Version=$(VERSION)
 
@@ -27,7 +27,7 @@ install: ## Install sigil to $GOBIN (or $GOPATH/bin)
 	@go install -ldflags "$(LDFLAGS)" $(CMD_PATH)
 	@echo "→ $(INSTALL_DIR)/$(BIN_NAME) ($(VERSION))"
 
-run: ## Run sigil without installing (e.g. make run -- serve core/examples/counter/counter.sigil)
+run: ## Run sigil without installing (e.g. make run -- serve examples/counter/counter.sigil)
 	@go run -ldflags "$(LDFLAGS)" $(CMD_PATH)
 
 test: ## Run all Go tests

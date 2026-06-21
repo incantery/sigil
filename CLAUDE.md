@@ -6,29 +6,28 @@ for the pitch and `docs/kernel-redesign.md` for the design.
 
 ## Where things live
 
-- **`core/`** — the compiler, part of the root module `github.com/incantery/sigil`
-  (there is **no** `core/go.mod`). Packages: `lex`, `token`, `ast`, `parse`,
-  `types` (Hindley-Milner), `peval` (partial evaluator / compile-time CSS
-  extraction), `emit` (JS emitter + runtime prelude), `load` (module loader +
-  linker). `core/cli` is the `sigil` CLI (`version`, `check`, `build`, `serve`),
-  wrapped by the `core/cmd/sigil` binary. `core/examples/` holds runnable
-  `.sigil` apps.
+- **`internal/`** — the compiler, part of the root module `github.com/incantery/sigil`.
+  Packages (flat): `lex`, `token`, `ast`, `parse`, `types` (Hindley-Milner),
+  `peval` (partial evaluator / compile-time CSS extraction), `emit` (JS emitter +
+  runtime prelude), `load` (module loader + linker), `cli` (the `sigil` CLI:
+  `version`, `check`, `build`, `serve`). The CLI is wrapped by the `cmd/sigil`
+  binary (`go run ./cmd/sigil` or `make build` → `bin/sigil`).
+- **`examples/`** — runnable `.sigil` apps (e.g. `examples/counter/counter.sigil`).
 - **`std/`** — the standard library, in Sigil (`.sigil`): reactive, html, ui, style,
   router, http, result, list, string. Resolved by the loader against a `Root`
   dir; imports are Go-style strings, e.g. `import "std/ui" (card, button)`.
 
-The old "sigil" kernel (`pkg/`, `internal/`, `cmd/`, `editor/`, `examples/`,
-`gauntlet/`, and the observability/Tilt scaffolding) has been **deleted** — it
-survives only in git history (removed after the mako→sigil rename, which made its
-`sigil` naming collide with the real toolchain). The language is `core/` + `std/`.
+The old "sigil" kernel (`pkg/`, `editor/`, `gauntlet/`, and the observability/Tilt
+scaffolding) has been **deleted** — it survives only in git history. The language
+is `internal/` + `cmd/sigil` + `std/`.
 
 ## Build / test / run
 
 ```sh
-go build ./...                       # whole repo must stay green
-go test ./...                        # the language test suite (incl. headless-Chrome e2e)
-go run ./core/cmd/sigil serve core/examples/counter/counter.sigil   # serves on :8099
-make build                           # → bin/sigil (then: bin/sigil serve|build|check ENTRY.sigil)
+go build ./...                                            # whole repo must stay green
+go test ./...                                             # language suite (incl. headless-Chrome e2e)
+go run ./cmd/sigil serve examples/counter/counter.sigil   # serves on :8099
+make build                                                # → bin/sigil
 ```
 
 Browser tests use chromedp and **skip** if Chrome is absent. The dep
@@ -50,11 +49,11 @@ Everything else is stdlib in Sigil. Intrinsics are `__`-prefixed:
 
 ## Architecture seams worth knowing
 
-- **Loader (`core/load`):** resolves imports, cross-module typechecks in
+- **Loader (`internal/load`):** resolves imports, cross-module typechecks in
   dependency order, links into one bundle where each module is an IIFE (so non-pub
   helpers can't collide). Imported **types + constructors always flow**; plain
   values only when named in the selective import.
-- **Partial evaluator (`core/peval`):** const-folds expressions (inline, beta,
+- **Partial evaluator (`internal/peval`):** const-folds expressions (inline, beta,
   match-reduction). The emitter runs it over list-literal elements; a folded
   `__style "prop" "val"` is hoisted to an atomic CSS class (`__addClass` +
   `__installStyles`). It is a pure **optimization** — `__style` has an inline
@@ -71,13 +70,13 @@ styling with design-system tokens (`std/style`, `p Sky` is a *type error*),
 events + a real text-input Echo, HTTP with a `Result` boundary (`std/http`),
 client routing with history + popstate + typed `:params` + **default-deny guards
 enforced by the type system** (`std/router`), and data lists
-(fetch → split → map → render). `core/examples/counter` is the canonical example,
-guarded by `core/load` `TestCounterExample`.
+(fetch → split → map → render). `examples/counter` is the canonical example,
+guarded by `internal/load` `TestCounterExample`.
 
 ## What's next (rough priority)
 
 The old kernel is gone and the `sigil` CLI (`check`/`build`/`serve`) is in place,
-so the tree is now just `core/` + `std/`. Next:
+so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
 
 1. More guarded boundaries: `localStorage` (persistence), time, random — same
    total-decoder pattern, mostly synchronous.
@@ -85,7 +84,7 @@ so the tree is now just `core/` + `std/`. Next:
    inputs (bind value back — needs property-vs-attribute handling).
 3. M4: a backend op-auth model → real server enforcement + the router's
    "no auth op under a public route" cross-check (check B).
-4. Editor/tooling for `core/`: an LSP and formatter (the old kernel had both —
+4. Editor/tooling: an LSP and formatter (the old kernel had both —
    `pkg/lang/lsp`, `pkg/lang/format` — in git history as reference, though built
    on the superseded architecture).
 
