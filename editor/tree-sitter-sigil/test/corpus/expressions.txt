@@ -1,0 +1,90 @@
+==================
+lambda and application
+==================
+
+let f =
+  fun x -> g x y
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (block
+      (lambda (parameter (identifier))
+        (application (application (identifier) (identifier)) (identifier))))))
+
+==================
+if then else
+==================
+
+let r = if a then b else c
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (if condition: (identifier) consequence: (identifier) alternative: (identifier))))
+
+==================
+literals: string float uident hole unit list
+==================
+
+let v = [Some, __cell, 3.14, "hi", ()]
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (list (uident) (hole) (float) (string) (unit))))
+
+==================
+multi-parameter lambda
+==================
+
+let f = fun x y -> x
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (lambda (parameter (identifier)) (parameter (identifier)) (identifier))))
+
+==================
+unit and tuple-pattern lambda parameters
+==================
+
+let f = fun () -> x
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (lambda (parameter (unit)) (identifier))))
+
+==================
+tuple expression
+==================
+
+let p = (path, navigate)
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (tuple (identifier) (identifier))))
+
+==================
+effect block with multiple statements
+==================
+
+let nav = (effect { push p ; setPath p }) ()
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (application
+      (paren
+        (effect_block (application (identifier) (identifier))
+          (application (identifier) (identifier))))
+      (unit))))

@@ -1,0 +1,12 @@
+==================
+string interpolation and field access
+==================
+
+let r = "hi ${user.name}!"
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (string
+      (interpolation (field record: (identifier) field: (identifier))))))

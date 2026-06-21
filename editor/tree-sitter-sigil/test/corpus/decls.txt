@@ -1,0 +1,108 @@
+==================
+pub rec let with params
+==================
+
+pub let rec map f xs =
+  xs
+
+---
+
+(source_file
+  (let_decl (pub) (rec)
+    name: (identifier)
+    (parameter (identifier))
+    (parameter (identifier))
+    (block (identifier))))
+
+==================
+import with alias
+==================
+
+import "std/ui" (card, button) as ui
+
+---
+
+(source_file
+  (import_decl
+    path: (string)
+    (import_name (identifier))
+    (import_name (identifier))
+    alias: (identifier)))
+
+==================
+type with constructors
+==================
+
+type Color = Red | Green | Blue
+
+---
+
+(source_file
+  (type_decl
+    name: (uident)
+    (constructor name: (uident))
+    (constructor name: (uident))
+    (constructor name: (uident))))
+
+==================
+pub type with constructors
+==================
+
+pub type Result = Ok | Err
+
+---
+
+(source_file
+  (type_decl
+    (pub)
+    name: (uident)
+    (constructor name: (uident))
+    (constructor name: (uident))))
+
+==================
+type with params and of-constructors
+==================
+
+pub type Result a e = Ok of a | Err of e
+
+---
+
+(source_file
+  (type_decl
+    (pub)
+    name: (uident)
+    param: (type_param (identifier))
+    param: (type_param (identifier))
+    (constructor name: (uident) payload: (type_var (identifier)))
+    (constructor name: (uident) payload: (type_var (identifier)))))
+
+==================
+of-constructor carrying a function type
+==================
+
+pub type Access = Public | Guard of (Unit -> Bool)
+
+---
+
+(source_file
+  (type_decl
+    (pub)
+    name: (uident)
+    (constructor name: (uident))
+    (constructor
+      name: (uident)
+      payload: (type_paren
+        (type_arrow (type_con (uident)) (type_con (uident)))))))
+
+==================
+destructuring let binding
+==================
+
+let (count, setCount) = cell 0
+
+---
+
+(source_file
+  (let_decl
+    name: (tuple_pattern (pattern (identifier)) (pattern (identifier)))
+    (application (identifier) (number))))

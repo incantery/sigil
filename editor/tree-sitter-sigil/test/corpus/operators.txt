@@ -1,0 +1,31 @@
+==================
+precedence: + binds tighter than ==, |> loosest
+==================
+
+let r = a |> b == c + d * e
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (binop
+      left: (identifier)
+      right: (binop
+        left: (identifier)
+        right: (binop
+          left: (identifier)
+          right: (binop left: (identifier) right: (identifier)))))))
+
+==================
+unary minus and concat right-assoc
+==================
+
+let r = -a ++ b ++ c
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (binop
+      left: (unop (identifier))
+      right: (binop left: (identifier) right: (identifier)))))

@@ -5,7 +5,10 @@
 // ordinary block delimiters.
 package token
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // Kind enumerates the lexical categories.
 type Kind int
@@ -111,6 +114,17 @@ var keywords = map[string]Kind{
 	"with":   WITH,
 	"of":     OF,
 	"effect": EFFECT,
+}
+
+// Keywords returns the language's reserved words, sorted. Editor tooling
+// (the tree-sitter grammar) cross-checks against this set.
+func Keywords() []string {
+	ks := make([]string, 0, len(keywords))
+	for k := range keywords {
+		ks = append(ks, k)
+	}
+	sort.Strings(ks)
+	return ks
 }
 
 // LookupIdent maps an identifier spelling to its keyword Kind, or IDENT if it is
