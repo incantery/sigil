@@ -10,10 +10,9 @@ protocol is hand-rolled (no external LSP dependency).
 - **Diagnostics** — type/parse/lex errors as you type (the editor's unsaved
   buffer is type-checked via an in-memory overlay). One diagnostic per file:
   the compiler stops at the first error, so fix it and the next appears.
-- **Document symbols** — top-level `let`/`type` declarations (functions,
-  values, enums, records) for the outline / symbol picker. Flat for now;
-  constructors and record fields as children come with #3 (they need source
-  positions added to those AST nodes).
+- **Document symbols** — top-level `let`/`type` declarations for the outline /
+  symbol picker, with `type` declarations **nested**: an ADT shows its
+  constructors and a record shows its fields as child symbols.
 - **Hover** — the inferred type of the expression under the cursor
   (`name : type`; a top-level binding shows its generalized scheme, e.g.
   `map : (a -> b) -> List a -> List b`). Powered by a per-node type record
