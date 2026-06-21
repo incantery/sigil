@@ -76,13 +76,28 @@ let f x = x
 		}
 	}
 
+	// selectionRange stays the name span; range was expanded past it to contain
+	// the members (so selectionRange.End is strictly before the expanded range.End).
+	if got := color.SelectionRange.End.Character - color.SelectionRange.Start.Character; got != len("Color") {
+		t.Errorf("Color selectionRange spans %d chars, want %d (the name)", got, len("Color"))
+	}
+	if !posBeforeSym(color.SelectionRange.End, color.Range.End) {
+		t.Error("Color range.End should extend past selectionRange.End to contain its children")
+	}
+
 	// Record: Point is a Struct with two Field children.
 	point := byName["Point"]
 	if point.Kind != SymbolKindStruct {
 		t.Errorf("Point kind = %d, want Struct(%d)", point.Kind, SymbolKindStruct)
 	}
-	if len(point.Children) != 2 || point.Children[0].Name != "x" || point.Children[0].Kind != SymbolKindField {
-		t.Errorf("Point children = %+v, want [x,y] of kind Field", point.Children)
+	if len(point.Children) != 2 {
+		t.Fatalf("Point has %d children, want 2", len(point.Children))
+	}
+	if point.Children[0].Name != "x" || point.Children[0].Kind != SymbolKindField {
+		t.Errorf("Point child[0] = %q kind %d, want x Field", point.Children[0].Name, point.Children[0].Kind)
+	}
+	if point.Children[1].Name != "y" || point.Children[1].Kind != SymbolKindField {
+		t.Errorf("Point child[1] = %q kind %d, want y Field", point.Children[1].Name, point.Children[1].Kind)
 	}
 
 	// Function stays a leaf (no children).
