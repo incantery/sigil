@@ -20,6 +20,8 @@
     var dev = window.__sigilDev;
     // Snapshot live cell values by their creation-order index.
     var snap = new Map();
+    // dev.cells is keyed by each cell's integer creation-order index (the dev
+    // __cell does cells.set(counter++, cell)), so the Map key IS the snapshot index.
     dev.cells.forEach(function (cell, i) { snap.set(i, cell.v); });
     // Dispose global listeners (popstate, etc.) and invalidate in-flight fetches.
     dev.disposers.forEach(function (d) { try { d(); } catch (e) {} });
@@ -36,9 +38,15 @@
   function hotSwap(src) {
     var snap = teardown();
     window.__sigilDev.hydration = snap;
-    runBundle(src);
-    window.__sigilDev.hydration = new Map();
-    hideOverlay();
+    try {
+      runBundle(src);
+      hideOverlay();
+    } catch (err) {
+      // A runtime error at bundle top level shouldn't brick the page: surface it.
+      showOverlay(String((err && err.stack) || err));
+    } finally {
+      window.__sigilDev.hydration = new Map();
+    }
   }
 
   // --- build-error overlay -------------------------------------------------
