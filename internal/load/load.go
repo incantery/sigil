@@ -207,7 +207,10 @@ func (l *loader) mergeDeps(m *Module) (*types.Exports, error) {
 // Bundle links the type-checked program into one JS program. A program-wide
 // partial-evaluator environment (every module's top-level definitions) is built
 // so the emitter can fold static styles across module boundaries.
-func (p *Program) Bundle() (string, error) {
+func (p *Program) Bundle() (string, error)    { return p.bundle(false) }
+func (p *Program) BundleDev() (string, error) { return p.bundle(true) }
+
+func (p *Program) bundle(dev bool) (string, error) {
 	linked := make([]emit.LinkedModule, len(p.Modules))
 	env := peval.NewEnv()
 	for i, m := range p.Modules {
@@ -218,6 +221,9 @@ func (p *Program) Bundle() (string, error) {
 			Imports: importBindings(m),
 			Exports: exportNames(m),
 		}
+	}
+	if dev {
+		return emit.BundleDev(linked, env)
 	}
 	return emit.Bundle(linked, env)
 }
