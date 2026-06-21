@@ -246,7 +246,7 @@ func (p *parser) parseTypeDecl(pub bool) (ast.Decl, error) {
 		if err != nil {
 			return nil, err
 		}
-		v := &ast.Variant{Name: ctorTok.Lit}
+		v := &ast.Variant{Pos: pos(ctorTok), Name: ctorTok.Lit}
 		if p.accept(token.OF) {
 			t, err := p.parseType()
 			if err != nil {
@@ -794,7 +794,8 @@ func (p *parser) parseParams() ([]ast.Param, error) {
 	for {
 		switch p.cur().Kind {
 		case token.IDENT:
-			params = append(params, ast.VarParam{Name: p.advance().Lit})
+			vt := p.advance()
+			params = append(params, ast.VarParam{Pos: pos(vt), Name: vt.Lit})
 		case token.UNDERSCORE:
 			p.advance()
 			params = append(params, ast.WildParam{})
@@ -829,7 +830,7 @@ func (p *parser) parseRecordParam() (ast.Param, error) {
 		if err != nil {
 			return nil, err
 		}
-		f := &ast.RecordParamField{Name: name.Lit}
+		f := &ast.RecordParamField{Pos: pos(name), Name: name.Lit}
 		if p.accept(token.EQ) {
 			def, err := p.parseExpr()
 			if err != nil {
@@ -880,7 +881,7 @@ func (p *parser) parsePatternAtom() (ast.Pattern, error) {
 	switch t.Kind {
 	case token.IDENT:
 		p.advance()
-		return ast.VarPat{Name: t.Lit}, nil
+		return ast.VarPat{Pos: pos(t), Name: t.Lit}, nil
 	case token.UNDERSCORE:
 		p.advance()
 		return ast.WildPat{}, nil
@@ -972,7 +973,7 @@ func (p *parser) parseRecordPattern() (ast.Pattern, error) {
 		if err != nil {
 			return nil, err
 		}
-		f := &ast.PatField{Name: name.Lit}
+		f := &ast.PatField{Pos: pos(name), Name: name.Lit}
 		if p.accept(token.EQ) {
 			sub, err := p.parsePattern()
 			if err != nil {
