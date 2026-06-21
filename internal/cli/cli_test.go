@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-// repoRoot is the module root that holds std/ (two levels up from core/cli).
+// repoRoot is the module root that holds std/ (two levels up from internal/cli).
 const repoRoot = "../.."
 
 // counterEntry is the path to the committed counter example.
