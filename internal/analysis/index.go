@@ -55,7 +55,9 @@ func (ix *NodeIndex) At(line, col int) (ast.Expr, Range, bool) {
 	var best *entry
 	for i := range ix.entries {
 		en := &ix.entries[i]
-		if enc(en.start) <= enc(p) && enc(p) <= enc(en.end) {
+		// Extents are half-open [start, end): end is one past the last source
+		// character, so the upper bound is exclusive.
+		if enc(en.start) <= enc(p) && enc(p) < enc(en.end) {
 			if best == nil || span(en) < span(best) {
 				best = en
 			}
@@ -132,7 +134,11 @@ func leafEnd(e ast.Expr, start ast.Pos) ast.Pos {
 	case *ast.FloatLit:
 		return adv(len(e.Raw))
 	case *ast.StrLit:
-		return adv(len(e.Value) + 2) // approximate: include the quotes
+		// Approximate: quotes + unescaped content length. Source escape
+		// sequences (\n, \\, ...) make this undercount, so a hover on the tail
+		// of an escaped string may fall through to the enclosing node. The AST
+		// does not retain the raw source length; precise string extents await it.
+		return adv(len(e.Value) + 2)
 	case *ast.Unit:
 		return adv(2) // "()"
 	}

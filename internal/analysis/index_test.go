@@ -27,12 +27,32 @@ func TestAtFindsSmallestNode(t *testing.T) {
 	}
 
 	// Cursor on the literal "1" (col 20) -> the IntLit node.
-	if _, _, ok := ix.At(1, 20); !ok {
-		t.Error("expected a node at the literal")
+	lit, _, ok := ix.At(1, 20)
+	if !ok {
+		t.Fatal("expected a node at the literal")
+	}
+	if _, isInt := lit.(*ast.IntLit); !isInt {
+		t.Errorf("At(1,20) = %T, want *ast.IntLit", lit)
 	}
 
 	// Cursor past end of line (col 40) -> nothing.
 	if _, _, ok := ix.At(1, 40); ok {
 		t.Error("expected no node past end of line")
+	}
+}
+
+func TestAtPicksInnermost(t *testing.T) {
+	// "let main = f (g 1)" — the "1" is at col 17 (1-based).
+	m, err := parse.Module("let main = f (g 1)\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ix := Index(m)
+	node, _, ok := ix.At(1, 17)
+	if !ok {
+		t.Fatal("expected a node at the inner literal")
+	}
+	if _, isInt := node.(*ast.IntLit); !isInt {
+		t.Errorf("At(1,17) = %T, want the innermost *ast.IntLit", node)
 	}
 }
