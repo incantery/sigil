@@ -79,6 +79,7 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 	case "textDocument/documentSymbol":
 		var p DocumentSymbolParams
 		_ = json.Unmarshal(msg.Params, &p)
+		// An unopened doc yields "" -> parses to an empty module -> empty symbol list (safe).
 		text, _ := s.docs.get(p.TextDocument.URI)
 		_ = s.conn.Reply(msg.ID, documentSymbols(text))
 	default:
@@ -118,7 +119,7 @@ func (s *Server) resolveRoot(p InitializeParams) string {
 	if len(p.WorkspaceFolders) > 0 {
 		return uriToPath(p.WorkspaceFolders[0].URI)
 	}
-	return "."
+	return ""
 }
 
 // uriToPath converts a file:// URI to a filesystem path (percent-decoded).

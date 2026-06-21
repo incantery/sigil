@@ -37,4 +37,7 @@ vim.api.nvim_create_autocmd("FileType", {
 ## Not yet (→ #3/#4)
 
 Hover, go-to-definition, semantic tokens, completion, multi-error reporting,
-incremental sync. See `docs/superpowers/specs/2026-06-21-sigil-lsp-foundation-design.md`.
+incremental sync. Also note: an error inside an *imported* file is currently reported against the
+open file at the imported error's line/col (precise cross-file attribution lands
+with #3). In practice the open file is usually the one with the error, so this
+rarely bites. See `docs/superpowers/specs/2026-06-21-sigil-lsp-foundation-design.md`.
