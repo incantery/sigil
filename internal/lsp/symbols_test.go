@@ -39,3 +39,54 @@ func TestDocumentSymbolsParseErrorEmpty(t *testing.T) {
 		t.Errorf("unparsable source should yield no symbols, got %d", len(syms))
 	}
 }
+
+func TestDocumentSymbolsHierarchical(t *testing.T) {
+	src := `pub type Color = Red | Green | Blue
+type Point = { x: Int, y: Int }
+let f x = x
+`
+	syms := documentSymbols(src)
+	if len(syms) != 3 {
+		t.Fatalf("want 3 top-level symbols, got %d", len(syms))
+	}
+	byName := map[string]DocumentSymbol{}
+	for _, s := range syms {
+		byName[s.Name] = s
+	}
+
+	// ADT: Color is an Enum with three EnumMember children.
+	color := byName["Color"]
+	if color.Kind != SymbolKindEnum {
+		t.Errorf("Color kind = %d, want Enum(%d)", color.Kind, SymbolKindEnum)
+	}
+	if len(color.Children) != 3 {
+		t.Fatalf("Color has %d children, want 3", len(color.Children))
+	}
+	wantCtors := []string{"Red", "Green", "Blue"}
+	for i, c := range color.Children {
+		if c.Name != wantCtors[i] || c.Kind != SymbolKindEnumMember {
+			t.Errorf("child %d = %q kind %d, want %q EnumMember(%d)", i, c.Name, c.Kind, wantCtors[i], SymbolKindEnumMember)
+		}
+	}
+	// Containment: each child's range is inside Color's range. Uses the package
+	// helper posBeforeSym defined in symbols.go (Step 3/4).
+	for _, c := range color.Children {
+		if posBeforeSym(c.Range.Start, color.Range.Start) || posBeforeSym(color.Range.End, c.Range.End) {
+			t.Errorf("child %q range %+v not contained in parent %+v", c.Name, c.Range, color.Range)
+		}
+	}
+
+	// Record: Point is a Struct with two Field children.
+	point := byName["Point"]
+	if point.Kind != SymbolKindStruct {
+		t.Errorf("Point kind = %d, want Struct(%d)", point.Kind, SymbolKindStruct)
+	}
+	if len(point.Children) != 2 || point.Children[0].Name != "x" || point.Children[0].Kind != SymbolKindField {
+		t.Errorf("Point children = %+v, want [x,y] of kind Field", point.Children)
+	}
+
+	// Function stays a leaf (no children).
+	if f := byName["f"]; f.Kind != SymbolKindFunction || len(f.Children) != 0 {
+		t.Errorf("f = kind %d, %d children; want Function(%d) leaf", f.Kind, len(f.Children), SymbolKindFunction)
+	}
+}
