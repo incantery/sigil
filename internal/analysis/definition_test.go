@@ -80,3 +80,30 @@ func TestDefinitionWhitespaceNone(t *testing.T) {
 		t.Error("expected no definition off-source")
 	}
 }
+
+func TestDefinitionLetInScoping(t *testing.T) {
+	// let outer x =
+	//   let x = x + 1
+	//   x
+	// The `x` in the inner let's RHS (line 2, col 11) must see the PARAM x
+	// (1:11), NOT the inner let — a non-recursive let's RHS does not see the
+	// name it binds. The body `x` (line 3, col 3) sees the inner let (2:3),
+	// shadowing the param.
+	prog := loadProg(t, "let outer x =\n  let x = x + 1\n  x\n")
+
+	rhs, ok := Definition(prog, 2, 11)
+	if !ok {
+		t.Fatal("expected resolution of the RHS x")
+	}
+	if rhs.Range.Start.Line != 1 || rhs.Range.Start.Col != 11 {
+		t.Errorf("RHS x def = %d:%d, want 1:11 (the param, not the inner let)", rhs.Range.Start.Line, rhs.Range.Start.Col)
+	}
+
+	body, ok := Definition(prog, 3, 3)
+	if !ok {
+		t.Fatal("expected resolution of the body x")
+	}
+	if body.Range.Start.Line != 2 || body.Range.Start.Col != 3 {
+		t.Errorf("body x def = %d:%d, want 2:3 (the inner let)", body.Range.Start.Line, body.Range.Start.Col)
+	}
+}
