@@ -40,8 +40,10 @@ func TestSemanticRoles(t *testing.T) {
 		{2, 13, RoleVariable, "n (use)"},
 		{3, 5, RoleVariable, "r (value decl)"},
 		{3, 9, RoleFunction, "inc (fn use)"},
+		{4, 11, RoleVariable, "x (param use in x.field)"},
 		{4, 13, RoleProperty, "field (access)"},
 		{5, 26, RoleEnumMember, "Some (ctor pattern)"},
+		{5, 31, RoleVariable, "y (pattern binder in Some y)"},
 	}
 	for _, c := range cases {
 		if got := roleAt(t, roles, c.line, c.col); got != c.want {
