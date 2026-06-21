@@ -52,6 +52,10 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 			DocumentSymbolProvider: true,
 			HoverProvider:          true,
 			DefinitionProvider:     true,
+			SemanticTokensProvider: &SemanticTokensOptions{
+				Legend: SemanticTokensLegend{TokenTypes: SemanticTokenTypes, TokenModifiers: []string{}},
+				Full:   true,
+			},
 		}})
 	case "initialized":
 		// no-op
@@ -91,6 +95,8 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 		s.handleHover(msg)
 	case "textDocument/definition":
 		s.handleDefinition(msg)
+	case "textDocument/semanticTokens/full":
+		s.handleSemanticTokens(msg)
 	default:
 		if !msg.IsNotification() {
 			_ = s.conn.ReplyError(msg.ID, CodeMethodNotFound, "method not found: "+msg.Method)
@@ -183,6 +189,15 @@ func (s *Server) handleDefinition(msg *Message) {
 			End:   Position{Line: loc.Range.End.Line - 1, Character: loc.Range.End.Col - 1},
 		},
 	})
+}
+
+// handleSemanticTokens handles a textDocument/semanticTokens/full request,
+// returning the semantic token data array for the in-memory document.
+func (s *Server) handleSemanticTokens(msg *Message) {
+	var p SemanticTokensParams
+	_ = json.Unmarshal(msg.Params, &p)
+	text, _ := s.docs.get(p.TextDocument.URI)
+	_ = s.conn.Reply(msg.ID, SemanticTokens{Data: analysis.SemanticTokens(text)})
 }
 
 // resolveRoot picks the load Root: rootUri, else first workspace folder.
