@@ -20,6 +20,11 @@ protocol is hand-rolled (no external LSP dependency).
 - **Go to definition** — jump from a use of a name to its binder: a parameter,
   a local `let`, a pattern binder, a same-file top-level definition, or an
   imported name (jumps into the dependency's source file, e.g. `std/ui`).
+- **Semantic tokens** — type-aware coloring: every identifier is classified by
+  role (`type` / constructor / `function` / `parameter` / `variable` / record
+  `property`), so the editor can distinguish a type from a constructor and a
+  function from a local — disambiguation the grammar alone can't do. Keywords,
+  operators, numbers, and strings are covered too (`semanticTokens/full`).
 
 ## Neovim
 
@@ -40,10 +45,10 @@ vim.api.nvim_create_autocmd("FileType", {
 `import "std/ui"` resolve. (`sigil` must be on `PATH` — `make build` then add
 `bin/` to PATH, or use an absolute `cmd`.)
 
-## Not yet (→ #3/#4)
+## Not yet (→ #4)
 
-Semantic tokens, completion, multi-error reporting,
-incremental sync. Also note: an error inside an *imported* file is currently reported against the
+Completion, multi-error reporting, incremental sync, and range-and-delta token
+requests. Also note: an error inside an *imported* file is currently reported against the
 open file at the imported error's line/col (precise cross-file attribution lands
-with #3). In practice the open file is usually the one with the error, so this
+with future improvements). In practice the open file is usually the one with the error, so this
 rarely bites. See `docs/superpowers/specs/2026-06-21-sigil-lsp-foundation-design.md`.
