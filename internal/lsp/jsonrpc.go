@@ -26,7 +26,7 @@ type Message struct {
 }
 
 // IsNotification reports whether the message has no id (so no reply is owed).
-func (m *Message) IsNotification() bool { return len(m.ID) == 0 }
+func (m *Message) IsNotification() bool { return len(m.ID) == 0 || string(m.ID) == "null" }
 
 // Conn reads and writes Content-Length-framed JSON-RPC messages.
 type Conn struct {

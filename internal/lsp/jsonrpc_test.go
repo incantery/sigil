@@ -83,3 +83,54 @@ func TestConnReadTwoMessages(t *testing.T) {
 		t.Errorf("methods = %q,%q want a,b", m1.Method, m2.Method)
 	}
 }
+
+func TestConnReplyErrorFramesError(t *testing.T) {
+	var out bytes.Buffer
+	c := NewConn(strings.NewReader(""), &out)
+	if err := c.ReplyError(json.RawMessage("5"), CodeMethodNotFound, "nope"); err != nil {
+		t.Fatal(err)
+	}
+	body := out.String()[strings.Index(out.String(), "\r\n\r\n")+4:]
+	var env struct {
+		JSONRPC string          `json:"jsonrpc"`
+		ID      json.RawMessage `json:"id"`
+		Error   struct {
+			Code    int    `json:"code"`
+			Message string `json:"message"`
+		} `json:"error"`
+	}
+	if err := json.Unmarshal([]byte(body), &env); err != nil {
+		t.Fatalf("error body not valid JSON: %v\n%s", err, body)
+	}
+	if env.JSONRPC != "2.0" || string(env.ID) != "5" || env.Error.Code != CodeMethodNotFound || env.Error.Message != "nope" {
+		t.Errorf("unexpected error envelope: %+v", env)
+	}
+}
+
+func TestConnNotifyFramesNotification(t *testing.T) {
+	var out bytes.Buffer
+	c := NewConn(strings.NewReader(""), &out)
+	if err := c.Notify("textDocument/publishDiagnostics", map[string]string{"uri": "file:///x"}); err != nil {
+		t.Fatal(err)
+	}
+	body := out.String()[strings.Index(out.String(), "\r\n\r\n")+4:]
+	var env map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(body), &env); err != nil {
+		t.Fatalf("notify body not valid JSON: %v\n%s", err, body)
+	}
+	if _, hasID := env["id"]; hasID {
+		t.Error("notification must not carry an id")
+	}
+	if string(env["method"]) != `"textDocument/publishDiagnostics"` {
+		t.Errorf("method = %s", env["method"])
+	}
+}
+
+func TestIsNotificationNullID(t *testing.T) {
+	if !(&Message{ID: json.RawMessage("null")}).IsNotification() {
+		t.Error("null id should be treated as a notification")
+	}
+	if (&Message{ID: json.RawMessage("1")}).IsNotification() {
+		t.Error("numeric id is a request, not a notification")
+	}
+}
