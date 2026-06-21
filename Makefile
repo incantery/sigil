@@ -3,8 +3,8 @@
 # Common targets — run `make` (or `make help`) to see them.
 
 BIN_NAME := sigil
-CMD_PATH := ./core/cmd/sigil
-PKG      := github.com/incantery/sigil/core/cli
+CMD_PATH := ./cmd/sigil
+PKG      := github.com/incantery/sigil/internal/cli
 VERSION  ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo 0.0.1-dev)
 LDFLAGS  := -X $(PKG).Version=$(VERSION)
 
