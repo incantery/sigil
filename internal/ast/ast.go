@@ -35,18 +35,20 @@ type Decl interface{ declNode() }
 //	let f a b = e        -> Name="f", Params=[a b]
 //	let (a, b) = e       -> Name="",  Pat=tuple
 type LetDecl struct {
-	Pos    Pos
-	Pub    bool
-	Rec    bool
-	Name   string
-	Params []Param
-	Pat    Pattern // used only when Name==""
-	Body   Expr
+	Pos     Pos
+	NamePos Pos // position of the bound name (zero if a destructuring let)
+	Pub     bool
+	Rec     bool
+	Name    string
+	Params  []Param
+	Pat     Pattern // used only when Name==""
+	Body    Expr
 }
 
 // TypeDecl declares an ADT or record type.
 type TypeDecl struct {
 	Pos      Pos
+	NamePos  Pos
 	Pub      bool
 	Name     string
 	Params   []string // type variables
@@ -288,6 +290,7 @@ type (
 	}
 	WildPat struct{}
 	CtorPat struct {
+		Pos  Pos
 		Name string
 		Args []Pattern
 	}

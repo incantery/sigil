@@ -28,11 +28,37 @@ type InitializeResult struct {
 	Capabilities ServerCapabilities `json:"capabilities"`
 }
 
+// SemanticTokenTypes is the legend; an index into it is a token's type. Roles
+// 0..5 (analysis.Role) map to the first six entries.
+var SemanticTokenTypes = []string{
+	"type", "enumMember", "function", "parameter", "variable", "property",
+	"keyword", "operator", "number", "string",
+}
+
+type SemanticTokensLegend struct {
+	TokenTypes     []string `json:"tokenTypes"`
+	TokenModifiers []string `json:"tokenModifiers"`
+}
+
+type SemanticTokensOptions struct {
+	Legend SemanticTokensLegend `json:"legend"`
+	Full   bool                 `json:"full"`
+}
+
+type SemanticTokensParams struct {
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+}
+
+type SemanticTokens struct {
+	Data []uint `json:"data"`
+}
+
 type ServerCapabilities struct {
-	TextDocumentSync       int  `json:"textDocumentSync"`
-	DocumentSymbolProvider bool `json:"documentSymbolProvider"`
-	HoverProvider          bool `json:"hoverProvider"`
-	DefinitionProvider     bool `json:"definitionProvider"`
+	TextDocumentSync       int                    `json:"textDocumentSync"`
+	DocumentSymbolProvider bool                   `json:"documentSymbolProvider"`
+	HoverProvider          bool                   `json:"hoverProvider"`
+	DefinitionProvider     bool                   `json:"definitionProvider"`
+	SemanticTokensProvider *SemanticTokensOptions `json:"semanticTokensProvider,omitempty"`
 }
 
 type TextDocumentItem struct {

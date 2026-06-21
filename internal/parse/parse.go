@@ -185,7 +185,9 @@ func (p *parser) parseLetDecl(pub bool) (ast.Decl, error) {
 	rec := p.accept(token.REC)
 	d := &ast.LetDecl{Pos: pos(start), Pub: pub, Rec: rec}
 	if p.at(token.IDENT) {
-		d.Name = p.advance().Lit
+		nameTok := p.advance()
+		d.Name = nameTok.Lit
+		d.NamePos = pos(nameTok)
 		params, err := p.parseParams()
 		if err != nil {
 			return nil, err
@@ -215,7 +217,7 @@ func (p *parser) parseTypeDecl(pub bool) (ast.Decl, error) {
 	if err != nil {
 		return nil, err
 	}
-	d := &ast.TypeDecl{Pos: pos(start), Pub: pub, Name: name.Lit}
+	d := &ast.TypeDecl{Pos: pos(start), NamePos: pos(name), Pub: pub, Name: name.Lit}
 	for p.at(token.IDENT) {
 		d.Params = append(d.Params, p.advance().Lit)
 	}
@@ -853,8 +855,8 @@ func (p *parser) parseRecordParam() (ast.Param, error) {
 
 func (p *parser) parsePattern() (ast.Pattern, error) {
 	if p.at(token.UIDENT) {
-		name := p.advance().Lit
-		cp := ast.CtorPat{Name: name}
+		nameTok := p.advance()
+		cp := ast.CtorPat{Pos: pos(nameTok), Name: nameTok.Lit}
 		for canStartPatternAtom(p.cur().Kind) {
 			arg, err := p.parsePatternAtom()
 			if err != nil {
@@ -887,7 +889,7 @@ func (p *parser) parsePatternAtom() (ast.Pattern, error) {
 		return ast.WildPat{}, nil
 	case token.UIDENT:
 		p.advance()
-		return ast.CtorPat{Name: t.Lit}, nil // nullary
+		return ast.CtorPat{Pos: pos(t), Name: t.Lit}, nil // nullary
 	case token.INT:
 		p.advance()
 		return ast.IntPat{Raw: t.Lit}, nil

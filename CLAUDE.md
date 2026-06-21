@@ -127,8 +127,13 @@ place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
    **#2 follow-up: hierarchical document symbols — DONE** (`type` declarations
    now nest their constructors (ADT → EnumMember children) or fields (record →
    Field children) as child symbols; `FieldType` gained a position; `Variant`
-   already had one). Remaining type-aware work: **3c semantic tokens** (role
-   classification); then **#4** completion. Also a formatter eventually. The old kernel's
+   already had one).
+   **#3 type-aware: slice 3c (semantic tokens) — DONE** (structural role
+   classifier + delta encoder in `internal/analysis/semantic.go`; parser gained
+   name positions on `let`/`type` decls and constructor-pattern positions;
+   `textDocument/semanticTokens/full` handler in LSP). The **type-aware trio**
+   (hover, go-to-def, semantic tokens) is now complete. Remaining editor work:
+   **#4 completion**. Also a formatter eventually. The old kernel's
    `pkg/lang/lsp` + `pkg/lang/format` are in git history as reference (superseded
    architecture). Follow-up idea from the #1 review: extend the keyword cross-check
    to assert every keyword appears in BOTH `highlights.scm` and
