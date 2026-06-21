@@ -15,24 +15,21 @@ func newServeCmd() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "serve ENTRY.sigil",
-		Short: "Serve a sigil module as a live-rebuilding dev page",
+		Short: "Serve a sigil module as a static production page",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			entry := args[0]
-			// Build once up front to fail fast on errors (before binding a port).
-			if _, err := bundle(entry, root); err != nil {
+			// Production: build once up front. A type/parse error aborts before
+			// binding a port; there is no per-request rebuild.
+			js, err := bundle(entry, root)
+			if err != nil {
 				return err
 			}
+			page := htmlPage(entry, js)
 			mux := http.NewServeMux()
 			mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
-				js, err := bundle(entry, root)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					fmt.Fprintf(w, "build error: %v", err)
-					return
-				}
 				w.Header().Set("Content-Type", "text/html")
-				fmt.Fprint(w, htmlPage(entry, js))
+				fmt.Fprint(w, page)
 			})
 			addr := ":" + port
 			log.Printf("serving %s on http://localhost%s", entry, addr)
