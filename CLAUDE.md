@@ -117,9 +117,14 @@ place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
    recorder in `internal/types` (`CheckModuleRecording`/`TypeInfo`);
    `load.Options.Record` → `Program.EntryInfo`; new `internal/analysis` package:
    position→node index via structural extents + hover returning `name : type` or
-   generalized scheme). Remaining slices: **3b go-to-definition** (needs the
-   definition resolver), **3c semantic tokens** (role classification); then
-   **#4** completion. Also a formatter eventually. The old kernel's
+   generalized scheme).
+   **#3 type-aware: slice 3b (go-to-definition) — DONE** (binder positions added
+   to the AST (`VarParam`/`VarPat`/`RecordParamField`/`PatField`/`Variant`);
+   scope-aware resolver in `internal/analysis` (local → same-file top-level →
+   imported/cross-file); `load.Module.Imports()`; `textDocument/definition`
+   handler). Binder positions now exist, so hierarchical document symbols (the
+   #2 follow-up) are unblocked. Remaining: **3c semantic tokens** (role
+   classification); then **#4** completion. Also a formatter eventually. The old kernel's
    `pkg/lang/lsp` + `pkg/lang/format` are in git history as reference (superseded
    architecture). Follow-up idea from the #1 review: extend the keyword cross-check
    to assert every keyword appears in BOTH `highlights.scm` and

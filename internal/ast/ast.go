@@ -56,6 +56,7 @@ type TypeDecl struct {
 
 // Variant is one constructor of an ADT.
 type Variant struct {
+	Pos  Pos
 	Name string
 	Arg  TypeExpr // nil for nullary constructors
 }
@@ -250,7 +251,10 @@ type Param interface{ paramNode() }
 
 type (
 	// VarParam binds a name.
-	VarParam struct{ Name string }
+	VarParam struct {
+		Pos  Pos
+		Name string
+	}
 	// WildParam is _.
 	WildParam struct{}
 	// PatParam is a parenthesized destructuring pattern.
@@ -261,6 +265,7 @@ type (
 
 // RecordParamField is one field of a RecordParam.
 type RecordParamField struct {
+	Pos     Pos
 	Name    string
 	Default Expr // nil if no default
 }
@@ -276,7 +281,10 @@ func (RecordParam) paramNode() {}
 type Pattern interface{ patNode() }
 
 type (
-	VarPat  struct{ Name string }
+	VarPat struct {
+		Pos  Pos
+		Name string
+	}
 	WildPat struct{}
 	CtorPat struct {
 		Name string
@@ -292,8 +300,9 @@ type (
 
 // PatField is one field of a record pattern; Pat==nil means pun (bind Name).
 type PatField struct {
+	Pos  Pos
 	Name string
-	Pat  Pattern
+	Pat  Pattern // Pat==nil means pun (bind Name)
 }
 
 func (VarPat) patNode()    {}

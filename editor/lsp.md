@@ -18,6 +18,9 @@ protocol is hand-rolled (no external LSP dependency).
   (`name : type`; a top-level binding shows its generalized scheme, e.g.
   `map : (a -> b) -> List a -> List b`). Powered by a per-node type record
   captured from the checker.
+- **Go to definition** — jump from a use of a name to its binder: a parameter,
+  a local `let`, a pattern binder, a same-file top-level definition, or an
+  imported name (jumps into the dependency's source file, e.g. `std/ui`).
 
 ## Neovim
 
@@ -40,7 +43,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 ## Not yet (→ #3/#4)
 
-Go-to-definition, semantic tokens, completion, multi-error reporting,
+Semantic tokens, completion, multi-error reporting,
 incremental sync. Also note: an error inside an *imported* file is currently reported against the
 open file at the imported error's line/col (precise cross-file attribution lands
 with #3). In practice the open file is usually the one with the error, so this

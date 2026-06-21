@@ -60,6 +60,23 @@ type resolvedImport struct {
 	names []string // selectively imported value names; nil means import all
 }
 
+// Import is a resolved dependency of a module: the dependency module and the
+// value names selectively imported (Names == nil for a bare import). Exposed so
+// LSP analysis can resolve a name to its defining module/file.
+type Import struct {
+	Dep   *Module
+	Names []string
+}
+
+// Imports returns m's resolved imports.
+func (m *Module) Imports() []Import {
+	out := make([]Import, 0, len(m.imports))
+	for _, ri := range m.imports {
+		out = append(out, Import{Dep: ri.dep, Names: ri.names})
+	}
+	return out
+}
+
 // Program is a fully linked set of modules in dependency order (dependencies
 // before dependents); Entry is the module that was loaded.
 type Program struct {

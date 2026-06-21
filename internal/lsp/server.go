@@ -51,6 +51,7 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 			TextDocumentSync:       TextDocumentSyncFull,
 			DocumentSymbolProvider: true,
 			HoverProvider:          true,
+			DefinitionProvider:     true,
 		}})
 	case "initialized":
 		// no-op
@@ -88,6 +89,8 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 		_ = s.conn.Reply(msg.ID, documentSymbols(text))
 	case "textDocument/hover":
 		s.handleHover(msg)
+	case "textDocument/definition":
+		s.handleDefinition(msg)
 	default:
 		if !msg.IsNotification() {
 			_ = s.conn.ReplyError(msg.ID, CodeMethodNotFound, "method not found: "+msg.Method)
@@ -146,6 +149,38 @@ func (s *Server) handleHover(msg *Message) {
 		Range: Range{
 			Start: Position{Line: res.Range.Start.Line - 1, Character: res.Range.Start.Col - 1},
 			End:   Position{Line: res.Range.End.Line - 1, Character: res.Range.End.Col - 1},
+		},
+	})
+}
+
+// handleDefinition handles a textDocument/definition request, loading the document
+// without type recording and calling analysis.Definition to find the binder location.
+func (s *Server) handleDefinition(msg *Message) {
+	var p DefinitionParams
+	_ = json.Unmarshal(msg.Params, &p)
+	path := uriToPath(p.TextDocument.URI)
+	if abs, err := filepath.Abs(path); err == nil {
+		path = abs
+	}
+	root := s.root
+	if root == "" {
+		root = filepath.Dir(path)
+	}
+	prog, err := load.Load(path, load.Options{Root: root, Overlay: s.docs.overlay()})
+	if err != nil {
+		_ = s.conn.Reply(msg.ID, nil) // broken file: null
+		return
+	}
+	loc, ok := analysis.Definition(prog, p.Position.Line+1, p.Position.Character+1)
+	if !ok {
+		_ = s.conn.Reply(msg.ID, nil)
+		return
+	}
+	_ = s.conn.Reply(msg.ID, Location{
+		URI: "file://" + loc.File,
+		Range: Range{
+			Start: Position{Line: loc.Range.Start.Line - 1, Character: loc.Range.Start.Col - 1},
+			End:   Position{Line: loc.Range.End.Line - 1, Character: loc.Range.End.Col - 1},
 		},
 	})
 }
