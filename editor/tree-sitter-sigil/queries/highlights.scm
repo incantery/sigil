@@ -1,5 +1,5 @@
 ; keywords (anonymous string nodes)
-["let" "import" "as" "type" "fun" "if" "then" "else" "match" "with"] @keyword
+["let" "import" "as" "type" "fun" "if" "then" "else" "match" "with" "effect" "of"] @keyword
 ; pub and rec are named nodes in this grammar
 (pub) @keyword
 (rec) @keyword
@@ -24,5 +24,5 @@
 
 ; operators & punctuation
 ["|>" "||" "&&" "==" "!=" "<" ">" "<=" ">=" "++" "+" "-" "*" "/" "->" "="] @operator
-["(" ")" "[" "]" "}" "|" "," "."] @punctuation.delimiter
+["(" ")" "[" "]" "{" "}" "|" "," "."] @punctuation.delimiter
 (wildcard) @variable.builtin
