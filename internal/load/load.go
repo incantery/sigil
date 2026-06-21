@@ -35,6 +35,10 @@ type Options struct {
 	// Prefix, if set, is stripped from each import path before resolving (the
 	// module's own import-path prefix, so in-repo imports map to local files).
 	Prefix string
+	// Overlay maps an absolute file path to in-memory content. When load reads a
+	// file present here, it uses this content instead of the on-disk bytes. Used
+	// by the LSP to type-check unsaved editor buffers. nil = always read disk.
+	Overlay map[string]string
 }
 
 // Module is one node of a resolved, type-checked import graph.
@@ -113,9 +117,15 @@ func (l *loader) load(file, canonPath string) (*Module, error) {
 		l.stack = l.stack[:len(l.stack)-1]
 	}()
 
-	src, err := os.ReadFile(file)
-	if err != nil {
-		return nil, fmt.Errorf("read %s: %w", file, err)
+	var src []byte
+	if text, ok := l.opts.Overlay[file]; ok {
+		src = []byte(text)
+	} else {
+		b, err := os.ReadFile(file)
+		if err != nil {
+			return nil, fmt.Errorf("read %s: %w", file, err)
+		}
+		src = b
 	}
 	a, err := parse.Module(string(src))
 	if err != nil {
