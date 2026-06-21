@@ -1,5 +1,5 @@
 // Command sigil is the sigil toolchain CLI. The command surface lives in
-// core/cli so it can be tested independently of this binary wrapper.
+// internal/cli so it can be tested independently of this binary wrapper.
 package main
 
 import (
