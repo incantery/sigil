@@ -81,6 +81,35 @@ func TestDefinitionWhitespaceNone(t *testing.T) {
 	}
 }
 
+func TestDefinitionImported(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "lib.sigil"), []byte("pub let answer = 42\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	entry := filepath.Join(dir, "app.sigil")
+	if err := os.WriteFile(entry, []byte("import \"lib\" (answer)\nlet main = answer\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	prog, err := load.Load(entry, load.Options{Root: dir})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// `answer` use on line 2 (col 12) resolves into lib.sigil, on line 1.
+	// (The target is the `pub let answer` declaration, whose Pos is at the decl
+	// keyword — assert the File and line, not an exact column, since the column
+	// depends on the pub/let prefix.)
+	loc, ok := Definition(prog, 2, 12)
+	if !ok {
+		t.Fatal("expected to resolve the imported name")
+	}
+	if loc.File != filepath.Join(dir, "lib.sigil") {
+		t.Errorf("File = %q, want lib.sigil", loc.File)
+	}
+	if loc.Range.Start.Line != 1 {
+		t.Errorf("imported def line = %d, want 1", loc.Range.Start.Line)
+	}
+}
+
 func TestDefinitionLetInScoping(t *testing.T) {
 	// let outer x =
 	//   let x = x + 1

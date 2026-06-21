@@ -223,7 +223,48 @@ func variantInModule(m *ast.Module, name string) (ast.Pos, bool) {
 	return ast.Pos{}, false
 }
 
-// resolveImported is implemented in Task 4; in-file resolution returns false here.
+// resolveImported resolves name against the entry module's imports, returning the
+// dependency's defining position. A selective value import must name it;
+// constructors always flow. Only public decls/variants are valid targets.
 func resolveImported(prog *load.Program, name string, isCtor bool) (Location, bool) {
+	for _, imp := range prog.Entry.Imports() {
+		if !isCtor && imp.Names != nil && !contains(imp.Names, name) {
+			continue // selective value import that doesn't bring in this name
+		}
+		if p, ok := declInModule(imp.Dep.AST, name, isCtor); ok {
+			return loc(imp.Dep.File, p, name), true
+		}
+	}
 	return Location{}, false
+}
+
+func contains(xs []string, x string) bool {
+	for _, s := range xs {
+		if s == x {
+			return true
+		}
+	}
+	return false
+}
+
+// declInModule finds a public value binding (isCtor == false) or constructor
+// (isCtor == true) named name in a dependency module.
+func declInModule(m *ast.Module, name string, isCtor bool) (ast.Pos, bool) {
+	for _, d := range m.Decls {
+		switch d := d.(type) {
+		case *ast.LetDecl:
+			if !isCtor && d.Pub && d.Name == name {
+				return d.Pos, true
+			}
+		case *ast.TypeDecl:
+			if isCtor && d.Pub {
+				for _, v := range d.Variants {
+					if v.Name == name {
+						return v.Pos, true
+					}
+				}
+			}
+		}
+	}
+	return ast.Pos{}, false
 }
