@@ -8,7 +8,7 @@
 (string) @string
 (interpolation ["${" "}"] @punctuation.special)
 (number) @number
-(float) @number
+(float) @number.float
 (line_comment) @comment
 
 ; types vs values (capitalization)
@@ -19,7 +19,6 @@
 ; bindings and calls
 (let_decl name: (identifier) @function)
 (parameter (identifier) @variable.parameter)
-(application (_) @function.call .)
 (field field: (identifier) @property)
 (identifier) @variable
 
