@@ -123,7 +123,11 @@ place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
    scope-aware resolver in `internal/analysis` (local → same-file top-level →
    imported/cross-file); `load.Module.Imports()`; `textDocument/definition`
    handler). Binder positions now exist, so hierarchical document symbols (the
-   #2 follow-up) are unblocked. Remaining: **3c semantic tokens** (role
+   #2 follow-up) are unblocked.
+   **#2 follow-up: hierarchical document symbols — DONE** (`type` declarations
+   now nest their constructors (ADT → EnumMember children) or fields (record →
+   Field children) as child symbols; `FieldType` gained a position; `Variant`
+   already had one). Remaining type-aware work: **3c semantic tokens** (role
    classification); then **#4** completion. Also a formatter eventually. The old kernel's
    `pkg/lang/lsp` + `pkg/lang/format` are in git history as reference (superseded
    architecture). Follow-up idea from the #1 review: extend the keyword cross-check

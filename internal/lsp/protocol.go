@@ -6,10 +6,12 @@ package lsp
 const TextDocumentSyncFull = 1
 
 const (
-	SymbolKindEnum     = 10
-	SymbolKindFunction = 12
-	SymbolKindVariable = 13
-	SymbolKindStruct   = 23
+	SymbolKindField      = 8
+	SymbolKindEnum       = 10
+	SymbolKindFunction   = 12
+	SymbolKindVariable   = 13
+	SymbolKindEnumMember = 22
+	SymbolKindStruct     = 23
 )
 
 type InitializeParams struct {
@@ -90,10 +92,11 @@ type DidSaveParams struct {
 }
 
 type DocumentSymbol struct {
-	Name           string `json:"name"`
-	Kind           int    `json:"kind"`
-	Range          Range  `json:"range"`
-	SelectionRange Range  `json:"selectionRange"`
+	Name           string           `json:"name"`
+	Kind           int              `json:"kind"`
+	Range          Range            `json:"range"`
+	SelectionRange Range            `json:"selectionRange"`
+	Children       []DocumentSymbol `json:"children,omitempty"`
 }
 
 type DocumentSymbolParams struct {
