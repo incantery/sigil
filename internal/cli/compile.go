@@ -30,3 +30,13 @@ func bundle(entry, root string) (string, error) {
 	}
 	return prog.Bundle()
 }
+
+// bundleDev type-checks and links the entry like bundle, but emits the dev
+// (HMR-instrumented) prelude.
+func bundleDev(entry, root string) (string, error) {
+	prog, err := load.Load(entry, load.Options{Root: root})
+	if err != nil {
+		return "", err
+	}
+	return prog.BundleDev()
+}
