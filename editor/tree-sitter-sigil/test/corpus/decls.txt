@@ -43,3 +43,18 @@ type Color = Red | Green | Blue
     (constructor name: (uident))
     (constructor name: (uident))
     (constructor name: (uident))))
+
+==================
+pub type with constructors
+==================
+
+pub type Result = Ok | Err
+
+---
+
+(source_file
+  (type_decl
+    (pub)
+    name: (uident)
+    (constructor name: (uident))
+    (constructor name: (uident))))

@@ -1,0 +1,15 @@
+==================
+match with arms and guard
+==================
+
+let r = match x with
+  | Some y if y -> y
+  | None -> z
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (match scrutinee: (identifier)
+      (match_arm pattern: (pattern (uident) (pattern (identifier))) guard: (identifier) body: (identifier))
+      (match_arm pattern: (pattern (uident)) body: (identifier)))))

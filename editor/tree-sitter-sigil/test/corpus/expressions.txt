@@ -36,3 +36,15 @@ let v = [Some, __cell, 3.14, "hi", ()]
 (source_file
   (let_decl name: (identifier)
     (list (uident) (hole) (float) (string) (unit))))
+
+==================
+multi-parameter lambda
+==================
+
+let f = fun x y -> x
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (lambda (parameter (identifier)) (parameter (identifier)) (identifier))))
