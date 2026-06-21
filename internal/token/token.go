@@ -30,7 +30,8 @@ const (
 	HOLE       // intrinsic: __cell, __effect
 	UNDERSCORE // _
 
-	// Keywords.
+	// Keywords. NOTE: this block must stay contiguous (LET..EFFECT) —
+	// internal/analysis/semantic.go classifies keywords by range.
 	LET
 	REC
 	PUB
@@ -61,7 +62,8 @@ const (
 	COLON // :
 	SEMI  // ;
 
-	// Operators.
+	// Operators. NOTE: this block must stay contiguous (PIPEFWD..BANG) —
+	// internal/analysis/semantic.go classifies operators by range.
 	PIPEFWD // |>
 	OROR    // ||
 	ANDAND  // &&

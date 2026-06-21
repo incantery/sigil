@@ -20,7 +20,7 @@ protocol is hand-rolled (no external LSP dependency).
 - **Go to definition** — jump from a use of a name to its binder: a parameter,
   a local `let`, a pattern binder, a same-file top-level definition, or an
   imported name (jumps into the dependency's source file, e.g. `std/ui`).
-- **Semantic tokens** — type-aware coloring: every identifier is classified by
+- **Semantic tokens** — role-based coloring: every identifier is classified by
   role (`type` / constructor / `function` / `parameter` / `variable` / record
   `property`), so the editor can distinguish a type from a constructor and a
   function from a local — disambiguation the grammar alone can't do. Keywords,
@@ -51,4 +51,5 @@ Completion, multi-error reporting, incremental sync, and range-and-delta token
 requests. Also note: an error inside an *imported* file is currently reported against the
 open file at the imported error's line/col (precise cross-file attribution lands
 with future improvements). In practice the open file is usually the one with the error, so this
-rarely bites. See `docs/superpowers/specs/2026-06-21-sigil-lsp-foundation-design.md`.
+rarely bites. Interpolated strings whose `${...}` hole contains a nested `"` may have their
+highlight extent mis-measured (a rare cosmetic edge). See `docs/superpowers/specs/2026-06-21-sigil-lsp-foundation-design.md`.
