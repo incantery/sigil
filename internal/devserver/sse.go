@@ -65,7 +65,9 @@ func (h *Hub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if !ok {
 				return
 			}
-			fmt.Fprintf(w, "data: %s\n\n", msg)
+			if _, err := fmt.Fprintf(w, "data: %s\n\n", msg); err != nil {
+				return // client gone; stop streaming so the goroutine exits promptly
+			}
 			flusher.Flush()
 		}
 	}
