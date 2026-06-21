@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// repoRoot is the module root that holds std/ (two levels up from core/load).
+// repoRoot is the module root that holds std/ (two levels up from internal/load).
 const repoRoot = "../.."
 
 // buildAgainstStd writes entrySrc to a temp file and loads it with the real std/

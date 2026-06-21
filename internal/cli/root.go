@@ -1,5 +1,5 @@
 // Package cli implements the sigil command-line interface: a cobra command tree
-// over the core kernel (core/load + core/emit). Subcommands live in sibling
+// over the kernel (internal/load + internal/emit). Subcommands live in sibling
 // files; cmd/sigil is a thin binary wrapper around Execute.
 package cli
 

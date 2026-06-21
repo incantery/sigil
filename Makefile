@@ -27,7 +27,7 @@ install: ## Install sigil to $GOBIN (or $GOPATH/bin)
 	@go install -ldflags "$(LDFLAGS)" $(CMD_PATH)
 	@echo "→ $(INSTALL_DIR)/$(BIN_NAME) ($(VERSION))"
 
-run: ## Run sigil without installing (e.g. make run -- serve core/examples/counter/counter.sigil)
+run: ## Run sigil without installing (e.g. make run -- serve examples/counter/counter.sigil)
 	@go run -ldflags "$(LDFLAGS)" $(CMD_PATH)
 
 test: ## Run all Go tests

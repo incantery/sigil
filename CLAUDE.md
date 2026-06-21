@@ -24,10 +24,10 @@ is `internal/` + `cmd/sigil` + `std/`.
 ## Build / test / run
 
 ```sh
-go build ./...
-go test ./...
+go build ./...                                            # whole repo must stay green
+go test ./...                                             # language suite (incl. headless-Chrome e2e)
 go run ./cmd/sigil serve examples/counter/counter.sigil   # serves on :8099
-make build                           # → bin/sigil
+make build                                                # → bin/sigil
 ```
 
 Browser tests use chromedp and **skip** if Chrome is absent. The dep
