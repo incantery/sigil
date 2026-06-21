@@ -1,0 +1,13 @@
+==================
+let with indented block
+==================
+
+let x =
+  y
+
+---
+
+(source_file
+  (let_decl
+    name: (identifier)
+    (block (identifier))))
