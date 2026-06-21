@@ -1,3 +1,6 @@
+// KEYWORDS — kept in sync with internal/token (TestGrammarKeywordsMatch).
+const KEYWORDS = ["as","effect","else","fun","if","import","let","match","of","pub","rec","then","type","with"];
+
 function commaSep1(rule) { return seq(rule, repeat(seq(',', rule))); }
 
 module.exports = grammar({
@@ -32,7 +35,10 @@ module.exports = grammar({
     constructor: $ => seq(field('name', $.uident), repeat($._atom)),
 
     // loosest → tightest; matches docs/grammar.md
-    _expression: $ => choice($.lambda, $.if, $.match, $.binop, $.unop, $.application, $._postfix),
+    _expression: $ => choice($.lambda, $.if, $.match, $.effect_block, $.binop, $.unop, $.application, $._postfix),
+
+    // effect { e1; e2; ... } — the brace block suspends layout; ; separates stmts
+    effect_block: $ => seq('effect', '{', seq($._expression, repeat(seq(';', $._expression)), optional(';')), '}'),
 
     lambda: $ => prec.right(seq('fun', repeat1($.parameter), '->', $._expression)),
     if: $ => prec.right(seq(

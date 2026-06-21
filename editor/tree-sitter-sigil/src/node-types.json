@@ -79,6 +79,10 @@
             "named": true
           },
           {
+            "type": "effect_block",
+            "named": true
+          },
+          {
             "type": "field",
             "named": true
           },
@@ -150,6 +154,10 @@
           },
           {
             "type": "block",
+            "named": true
+          },
+          {
+            "type": "effect_block",
             "named": true
           },
           {
@@ -230,6 +238,10 @@
         },
         {
           "type": "block",
+          "named": true
+        },
+        {
+          "type": "effect_block",
           "named": true
         },
         {
@@ -366,6 +378,89 @@
     }
   },
   {
+    "type": "effect_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "application",
+          "named": true
+        },
+        {
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "block",
+          "named": true
+        },
+        {
+          "type": "effect_block",
+          "named": true
+        },
+        {
+          "type": "field",
+          "named": true
+        },
+        {
+          "type": "float",
+          "named": true
+        },
+        {
+          "type": "hole",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "if",
+          "named": true
+        },
+        {
+          "type": "lambda",
+          "named": true
+        },
+        {
+          "type": "list",
+          "named": true
+        },
+        {
+          "type": "match",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "paren",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "uident",
+          "named": true
+        },
+        {
+          "type": "unit",
+          "named": true
+        },
+        {
+          "type": "unop",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "field",
     "named": true,
     "fields": {
@@ -448,6 +543,10 @@
             "named": true
           },
           {
+            "type": "effect_block",
+            "named": true
+          },
+          {
             "type": "field",
             "named": true
           },
@@ -522,6 +621,10 @@
             "named": true
           },
           {
+            "type": "effect_block",
+            "named": true
+          },
+          {
             "type": "field",
             "named": true
           },
@@ -593,6 +696,10 @@
           },
           {
             "type": "block",
+            "named": true
+          },
+          {
+            "type": "effect_block",
             "named": true
           },
           {
@@ -731,6 +838,10 @@
           "named": true
         },
         {
+          "type": "effect_block",
+          "named": true
+        },
+        {
           "type": "field",
           "named": true
         },
@@ -807,6 +918,10 @@
         },
         {
           "type": "block",
+          "named": true
+        },
+        {
+          "type": "effect_block",
           "named": true
         },
         {
@@ -904,6 +1019,10 @@
           "named": true
         },
         {
+          "type": "effect_block",
+          "named": true
+        },
+        {
           "type": "field",
           "named": true
         },
@@ -995,6 +1114,10 @@
           "named": true
         },
         {
+          "type": "effect_block",
+          "named": true
+        },
+        {
           "type": "field",
           "named": true
         },
@@ -1071,6 +1194,10 @@
           },
           {
             "type": "block",
+            "named": true
+          },
+          {
+            "type": "effect_block",
             "named": true
           },
           {
@@ -1164,6 +1291,10 @@
             "named": true
           },
           {
+            "type": "effect_block",
+            "named": true
+          },
+          {
             "type": "field",
             "named": true
           },
@@ -1235,6 +1366,10 @@
           },
           {
             "type": "block",
+            "named": true
+          },
+          {
+            "type": "effect_block",
             "named": true
           },
           {
@@ -1340,6 +1475,10 @@
         },
         {
           "type": "block",
+          "named": true
+        },
+        {
+          "type": "effect_block",
           "named": true
         },
         {
@@ -1455,6 +1594,10 @@
         },
         {
           "type": "block",
+          "named": true
+        },
+        {
+          "type": "effect_block",
           "named": true
         },
         {
@@ -1599,6 +1742,10 @@
           "named": true
         },
         {
+          "type": "effect_block",
+          "named": true
+        },
+        {
           "type": "field",
           "named": true
         },
@@ -1714,6 +1861,10 @@
     "named": false
   },
   {
+    "type": ";",
+    "named": false
+  },
+  {
     "type": "<",
     "named": false
   },
@@ -1747,6 +1898,10 @@
   },
   {
     "type": "as",
+    "named": false
+  },
+  {
+    "type": "effect",
     "named": false
   },
   {
@@ -1820,6 +1975,10 @@
   },
   {
     "type": "with",
+    "named": false
+  },
+  {
+    "type": "{",
     "named": false
   },
   {
