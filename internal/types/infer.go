@@ -18,6 +18,9 @@ type Checker struct {
 	// ctorSchemes resolves constructor names from pattern position (where the
 	// value env is not threaded through).
 	ctorSchemes map[string]*Scheme
+	// rec, when non-nil, records the inferred type of every expression node
+	// (LSP analysis). nil in normal checking — a single nil-check on the hot path.
+	rec map[ast.Expr]Type
 }
 
 // dataEnv records ADTs so constructors can be typed and matches checked for
@@ -109,7 +112,12 @@ func (c *Checker) seed(root *env, deps *Exports) {
 // seeding deps (may be nil) first. It returns the populated checker and root
 // scope so callers can read inferred schemes back out.
 func checkInto(m *ast.Module, deps *Exports) (*Checker, *env, error) {
+	return checkIntoRec(m, deps, nil)
+}
+
+func checkIntoRec(m *ast.Module, deps *Exports, rec map[ast.Expr]Type) (*Checker, *env, error) {
 	c := newChecker()
+	c.rec = rec
 	root := newEnv(nil)
 	c.installBuiltins(root)
 	if deps != nil {
@@ -164,14 +172,8 @@ func Check(m *ast.Module) (map[string]string, error) {
 	return out, nil
 }
 
-// CheckModule type-checks m with the exports of its already-checked dependencies
-// seeded in, and returns m's own public exports. This is the cross-module entry
-// point used by the loader; Check is the single-module shorthand.
-func CheckModule(m *ast.Module, deps *Exports) (*Exports, error) {
-	c, root, err := checkInto(m, deps)
-	if err != nil {
-		return nil, err
-	}
+// moduleExports builds m's public Exports from a checked module's root scope.
+func moduleExports(c *Checker, root *env, m *ast.Module) *Exports {
 	ex := newExports()
 	for _, d := range m.Decls {
 		switch d := d.(type) {
@@ -197,7 +199,68 @@ func CheckModule(m *ast.Module, deps *Exports) (*Exports, error) {
 			}
 		}
 	}
-	return ex, nil
+	return ex
+}
+
+// CheckModule type-checks m with the exports of its already-checked dependencies
+// seeded in, and returns m's own public exports. This is the cross-module entry
+// point used by the loader; Check is the single-module shorthand.
+func CheckModule(m *ast.Module, deps *Exports) (*Exports, error) {
+	c, root, err := checkInto(m, deps)
+	if err != nil {
+		return nil, err
+	}
+	return moduleExports(c, root, m), nil
+}
+
+// TypeInfo is the per-node type record of one checked module, for LSP analysis.
+type TypeInfo struct {
+	Nodes   map[ast.Expr]Type  // expression node -> its inferred type
+	Schemes map[string]*Scheme // top-level binding name -> generalized scheme
+}
+
+// StringOf renders the recorded type of a node (prune happens in String).
+func (ti *TypeInfo) StringOf(e ast.Expr) (string, bool) {
+	t, ok := ti.Nodes[e]
+	if !ok {
+		return "", false
+	}
+	return String(t), true
+}
+
+// SchemeOf renders the generalized scheme of a top-level binding name.
+func (ti *TypeInfo) SchemeOf(name string) (string, bool) {
+	sc, ok := ti.Schemes[name]
+	if !ok {
+		return "", false
+	}
+	return SchemeString(sc), true
+}
+
+// topSchemes mirrors Check's filtering: user value bindings only (no builtins,
+// constructors, or __intrinsics).
+func topSchemes(c *Checker, root *env) map[string]*Scheme {
+	out := map[string]*Scheme{}
+	for name, sc := range root.vars {
+		if builtinNames[name] || strings.HasPrefix(name, "__") {
+			continue
+		}
+		if _, isCtor := c.ctorSchemes[name]; isCtor {
+			continue
+		}
+		out[name] = sc
+	}
+	return out
+}
+
+// CheckModuleRecording is CheckModule plus a captured per-node TypeInfo.
+func CheckModuleRecording(m *ast.Module, deps *Exports) (*Exports, *TypeInfo, error) {
+	rec := map[ast.Expr]Type{}
+	c, root, err := checkIntoRec(m, deps, rec)
+	if err != nil {
+		return nil, nil, err
+	}
+	return moduleExports(c, root, m), &TypeInfo{Nodes: rec, Schemes: topSchemes(c, root)}, nil
 }
 
 var builtinNames = map[string]bool{"true": true, "false": true, "Some": true, "None": true}
@@ -656,7 +719,17 @@ func effectiveBody(params []ast.Param, body ast.Expr) ast.Expr {
 
 // --- expression inference ---
 
+// infer types an expression and, when recording is on, captures node -> type.
+// All recursive inference goes through here, so one hook covers every node.
 func (c *Checker) infer(e ast.Expr, env *env) (Type, error) {
+	t, err := c.inferExpr(e, env)
+	if err == nil && c.rec != nil {
+		c.rec[e] = t
+	}
+	return t, err
+}
+
+func (c *Checker) inferExpr(e ast.Expr, env *env) (Type, error) {
 	switch e := e.(type) {
 	case *ast.IntLit:
 		return tInt, nil
