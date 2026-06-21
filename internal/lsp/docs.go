@@ -1,6 +1,9 @@
 package lsp
 
-import "sync"
+import (
+	"path/filepath"
+	"sync"
+)
 
 // docStore holds the text of open documents, keyed by LSP URI.
 type docStore struct {
@@ -36,7 +39,11 @@ func (d *docStore) overlay() map[string]string {
 	defer d.mu.RUnlock()
 	ov := make(map[string]string, len(d.docs))
 	for uri, text := range d.docs {
-		ov[uriToPath(uri)] = text
+		p := uriToPath(uri)
+		if abs, err := filepath.Abs(p); err == nil {
+			p = abs
+		}
+		ov[p] = text
 	}
 	return ov
 }

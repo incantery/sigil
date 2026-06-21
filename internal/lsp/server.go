@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"path/filepath"
 )
 
 // Server is a sigil LSP server speaking JSON-RPC over a Conn.
@@ -58,22 +59,50 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 		var p DidOpenParams
 		_ = json.Unmarshal(msg.Params, &p)
 		s.docs.set(p.TextDocument.URI, p.TextDocument.Text)
+		s.publishDiagnostics(p.TextDocument.URI)
 	case "textDocument/didChange":
 		var p DidChangeParams
 		_ = json.Unmarshal(msg.Params, &p)
 		if n := len(p.ContentChanges); n > 0 {
 			s.docs.set(p.TextDocument.URI, p.ContentChanges[n-1].Text) // full sync: last wins
 		}
+		s.publishDiagnostics(p.TextDocument.URI)
+	case "textDocument/didSave":
+		var p DidSaveParams
+		_ = json.Unmarshal(msg.Params, &p)
+		s.publishDiagnostics(p.TextDocument.URI)
 	case "textDocument/didClose":
 		var p DidCloseParams
 		_ = json.Unmarshal(msg.Params, &p)
 		s.docs.remove(p.TextDocument.URI)
+		_ = s.conn.Notify("textDocument/publishDiagnostics", PublishDiagnosticsParams{URI: p.TextDocument.URI, Diagnostics: []Diagnostic{}})
 	default:
 		if !msg.IsNotification() {
 			_ = s.conn.ReplyError(msg.ID, CodeMethodNotFound, "method not found: "+msg.Method)
 		}
 	}
 	return false
+}
+
+// publishDiagnostics analyzes the open document at uri and sends its diagnostics.
+func (s *Server) publishDiagnostics(uri string) {
+	text, ok := s.docs.get(uri)
+	if !ok {
+		return
+	}
+	path := uriToPath(uri)
+	if abs, err := filepath.Abs(path); err == nil {
+		path = abs
+	}
+	root := s.root
+	if root == "" {
+		root = filepath.Dir(path)
+	}
+	err := analyze(path, root, s.docs.overlay())
+	_ = s.conn.Notify("textDocument/publishDiagnostics", PublishDiagnosticsParams{
+		URI:         uri,
+		Diagnostics: diagnosticsFor(err, text),
+	})
 }
 
 // resolveRoot picks the load Root: rootUri, else first workspace folder.

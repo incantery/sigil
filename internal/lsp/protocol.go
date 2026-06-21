@@ -51,3 +51,31 @@ type DidChangeParams struct {
 type DidCloseParams struct {
 	TextDocument TextDocumentIdentifier `json:"textDocument"`
 }
+
+const SeverityError = 1
+
+type Position struct {
+	Line      int `json:"line"`
+	Character int `json:"character"`
+}
+
+type Range struct {
+	Start Position `json:"start"`
+	End   Position `json:"end"`
+}
+
+type Diagnostic struct {
+	Range    Range  `json:"range"`
+	Severity int    `json:"severity"`
+	Source   string `json:"source"`
+	Message  string `json:"message"`
+}
+
+type PublishDiagnosticsParams struct {
+	URI         string       `json:"uri"`
+	Diagnostics []Diagnostic `json:"diagnostics"`
+}
+
+type DidSaveParams struct {
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+}
