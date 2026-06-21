@@ -1,4 +1,30 @@
 ==================
+flat top-level declarations (newline separates siblings)
+==================
+
+let a = 1
+let b = 2
+
+---
+
+(source_file
+  (let_decl name: (identifier) (number))
+  (let_decl name: (identifier) (number)))
+
+==================
+flat top-level after leading blank lines
+==================
+
+
+
+let a = 1
+
+---
+
+(source_file
+  (let_decl name: (identifier) (number)))
+
+==================
 let with indented block
 ==================
 

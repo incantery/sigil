@@ -13,3 +13,50 @@ let r = match x with
     (match scrutinee: (identifier)
       (match_arm pattern: (pattern (uident) (pattern (identifier))) guard: (identifier) body: (identifier))
       (match_arm pattern: (pattern (uident)) body: (identifier)))))
+
+==================
+own-line match with same-indent arms
+==================
+
+let withDefault d r =
+  match r with
+  | Ok x -> x
+  | Err e -> d
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (parameter (identifier))
+    (parameter (identifier))
+    (block
+      (match scrutinee: (identifier)
+        (match_arm pattern: (pattern (uident) (pattern (identifier))) body: (identifier))
+        (match_arm pattern: (pattern (uident) (pattern (identifier))) body: (identifier))))))
+
+==================
+nested match inside parentheses closing at the bracket
+==================
+
+let f a b =
+  match a with
+  | None ->
+    (match b with
+     | None -> true
+     | Some y -> false)
+  | Some p -> q
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (parameter (identifier))
+    (parameter (identifier))
+    (block
+      (match scrutinee: (identifier)
+        (match_arm pattern: (pattern (uident))
+          body: (paren
+            (match scrutinee: (identifier)
+              (match_arm pattern: (pattern (uident)) body: (identifier))
+              (match_arm pattern: (pattern (uident) (pattern (identifier))) body: (identifier)))))
+        (match_arm pattern: (pattern (uident) (pattern (identifier))) body: (identifier))))))

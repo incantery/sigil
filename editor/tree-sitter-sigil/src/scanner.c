@@ -56,6 +56,14 @@ typedef struct {
 } Scanner;
 
 // --- indent stack helpers ---
+//
+// A stack entry is an indent column. The high bit (MATCH_BIT) marks a "match
+// arm block": a block whose statements (arms) sit at the SAME column as the
+// `match` that introduces them, delimited by leading `|`. Such a block is
+// opened by an INDENT even when the next line is not deeper, and closed by a
+// DEDENT when the next same-column line does not start with `|`.
+
+#define MATCH_BIT 0x80000000u
 
 static void s_push(Scanner *s, uint32_t v) {
   if (s->size == s->cap) {
@@ -65,8 +73,18 @@ static void s_push(Scanner *s, uint32_t v) {
   s->stack[s->size++] = v;
 }
 
-static uint32_t s_top(Scanner *s) {
+// raw top (including the MATCH_BIT marker).
+static uint32_t s_top_raw(Scanner *s) {
   return s->size > 0 ? s->stack[s->size - 1] : 0;
+}
+
+// top indent column (MATCH_BIT masked off).
+static uint32_t s_top(Scanner *s) {
+  return s_top_raw(s) & ~MATCH_BIT;
+}
+
+static bool s_top_is_match(Scanner *s) {
+  return (s_top_raw(s) & MATCH_BIT) != 0;
 }
 
 static void s_pop(Scanner *s) {
@@ -211,9 +229,23 @@ bool tree_sitter_sigil_external_scanner_scan(void *payload, TSLexer *lexer,
     break;
   }
 
-  // --- Step 2: update bracket depth (no token emitted) ---
+  // --- Step 2: update bracket depth / close match blocks at `)` `]` `}` ---
   {
     int32_t la = lexer->lookahead;
+
+    // A same-column match-arm block can be the last thing inside a bracket:
+    //   (match … with | A -> x | B -> y)
+    // Its closing `)` arrives with no intervening newline, so the block's
+    // DEDENT must be emitted here, before the bracket is consumed. The scanner
+    // is invoked at the `)` with DEDENT valid (verified), so close one match
+    // level per call until the grammar stops asking for DEDENT.
+    if ((la == ')' || la == ']' || la == '}') &&
+        s_top_is_match(s) && valid_symbols[DEDENT]) {
+      s_pop(s);
+      lexer->result_symbol = DEDENT;
+      return true;       // do NOT consume the bracket yet; re-enter on next call
+    }
+
     if (la == '(' || la == '[' || la == '{') {
       if (s->bracket_depth < 255) s->bracket_depth++;
       return false;
@@ -227,6 +259,14 @@ bool tree_sitter_sigil_external_scanner_scan(void *payload, TSLexer *lexer,
   // --- Step 3: handle newline (layout trigger) ---
   if (s->bracket_depth == 0 &&
       (lexer->lookahead == '\n' || lexer->lookahead == '\r')) {
+
+    // Column of the newline itself: >0 means this line had real content before
+    // the newline (a statement-terminating newline); 0 means a leading blank
+    // line. We use this to distinguish the file's first statement separator
+    // from a spurious leading NEWLINE that error recovery may request during
+    // incremental reparse — without relying on `started`, which is only
+    // committed once the scanner has produced a token (return true).
+    bool has_content_before_nl = lexer->get_column(lexer) > 0;
 
     // Consume newlines.
     while (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
@@ -262,8 +302,43 @@ bool tree_sitter_sigil_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     // At EOF or at a significant character: measure indent.
-    uint32_t indent = lexer->eof(lexer) ? 0 : (uint32_t)lexer->get_column(lexer);
+    bool at_eof     = lexer->eof(lexer);
+    uint32_t indent = at_eof ? 0 : (uint32_t)lexer->get_column(lexer);
     uint32_t top    = s_top(s);
+    bool next_is_bar = !at_eof && lexer->lookahead == '|';
+
+    // A match-arm block opens right after `with`: the grammar then wants an
+    // INDENT and not a NEWLINE. Emit INDENT even when the arms are not deeper
+    // (same column as `match`), marking the level so it can be closed on the
+    // first non-`|` line. This is the only place a same-column INDENT is made.
+    if (valid_symbols[INDENT] && !valid_symbols[NEWLINE] &&
+        indent >= top && next_is_bar) {
+      s->pending_indent = indent | MATCH_BIT;
+      s->started = true;
+      s_push(s, indent | MATCH_BIT);
+      lexer->result_symbol = INDENT;
+      return true;
+    }
+
+    // Inside a same-column match-arm block: a line that does NOT start with `|`
+    // ends the block — close it with a DEDENT (the shallower path below then
+    // handles any further levels). Fall through by treating the match level as
+    // closed when the next line is not an arm.
+    if (s_top_is_match(s) && indent == top && !next_is_bar) {
+      s->pending_indent = indent;
+      if (valid_symbols[NEWLINE]) {
+        s->phase = PHASE_DEDENT;       // NEWLINE now, DEDENT(s) next
+        lexer->result_symbol = NEWLINE;
+        return true;
+      }
+      if (valid_symbols[DEDENT]) {
+        s_pop(s);
+        s->phase = (s_top(s) <= indent) ? PHASE_POST_DEDENT : PHASE_INTER_DEDENT;
+        lexer->result_symbol = DEDENT;
+        return true;
+      }
+      return false;
+    }
 
     if (indent > top) {
       // Deeper indent — open a block.
@@ -283,19 +358,18 @@ bool tree_sitter_sigil_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     if (indent == top) {
-      // Same level — statement separator.
-      // Suppress NEWLINE at the very start of the file (nothing parsed yet),
-      // UNLESS we're at EOF (where we must close any open statement).
-      bool at_eof = lexer->eof(lexer);
-      if ((s->started || at_eof) && valid_symbols[NEWLINE]) {
+      // Same level — statement separator (this includes same-column match arms,
+      // which start with `|`). Emit NEWLINE whenever the parser wants one,
+      // EXCEPT at the very start of the file (no real content seen yet): error
+      // recovery during incremental reparse can spuriously mark NEWLINE valid at
+      // a leading blank line, which would inject a stray NEWLINE before the
+      // first statement. `has_content_before_nl` / `started` guard that.
+      if ((s->started || has_content_before_nl || at_eof) &&
+          valid_symbols[NEWLINE]) {
         s->started = true;
         lexer->result_symbol = NEWLINE;
         return true;
       }
-      // Mark that we've processed at least one newline (even if suppressed).
-      // This prevents infinite suppression if the file has multiple blank lines
-      // before the first statement.
-      s->started = true;
       return false;
     }
 

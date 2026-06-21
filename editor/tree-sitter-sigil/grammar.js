@@ -18,10 +18,19 @@ module.exports = grammar({
 
     let_decl: $ => seq(
       optional($.pub), 'let', optional($.rec),
-      field('name', $.identifier), repeat($.parameter), '=', $._expression),
+      choice(
+        // function / value binding: a name followed by zero or more params
+        seq(field('name', $.identifier), repeat($.parameter)),
+        // destructuring binding: `let (a, b) = …` (no params)
+        field('name', $.tuple_pattern)),
+      '=', $._body),
     pub: $ => 'pub',
     rec: $ => 'rec',
-    parameter: $ => $.identifier,
+    // A parameter is an identifier, the unit pattern `()`, a wildcard, or a
+    // parenthesised / tuple pattern (`fun () -> …`, `fun (a, b) -> …`).
+    parameter: $ => choice(
+      $.identifier, $.unit, $.wildcard,
+      seq('(', $.pattern, ')'), $.tuple_pattern),
 
     import_decl: $ => seq(
       'import', field('path', $.string),
@@ -30,12 +39,38 @@ module.exports = grammar({
     import_name: $ => choice($.identifier, $.uident),
 
     type_decl: $ => seq(
-      optional($.pub), 'type', field('name', $.uident), '=',
+      optional($.pub), 'type', field('name', $.uident),
+      repeat(field('param', $.type_param)), '=',
       $.constructor, repeat(seq('|', $.constructor))),
-    constructor: $ => seq(field('name', $.uident), repeat($._atom)),
+    type_param: $ => $.identifier,
+    // A constructor optionally carries a payload type after `of`:
+    //   Ok of a   |   Guard of (Unit -> Bool)
+    constructor: $ => seq(
+      field('name', $.uident),
+      optional(seq('of', field('payload', $._type)))),
+
+    // --- type expressions (structural; laxer than the real checker) ---
+    // arrows are right-associative and loosest; application is tighter.
+    _type: $ => choice($.type_arrow, $._type_app),
+    type_arrow: $ => prec.right(seq($._type_app, '->', $._type)),
+    _type_app: $ => choice($.type_apply, $._type_atom),
+    type_apply: $ => prec.left(seq($._type_app, $._type_atom)),
+    _type_atom: $ => choice(
+      $.type_var, $.type_con, $.type_paren, $.type_tuple),
+    type_var: $ => $.identifier,            // lowercase = type variable
+    type_con: $ => $.uident,                // uppercase = type constructor
+    type_paren: $ => seq('(', $._type, ')'),
+    type_tuple: $ => seq('(', $._type, repeat1(seq(',', $._type)), ')'),
 
     // loosest → tightest; matches docs/grammar.md
     _expression: $ => choice($.lambda, $.if, $.match, $.effect_block, $.binop, $.unop, $.application, $._postfix),
+
+    // A body is an inline expression OR an indented `block`. Blocks are allowed
+    // ONLY in binding positions (after `=`, `->`, `then`, `else`), never as a
+    // function argument or list element, so INDENT is never valid inside
+    // brackets — which keeps the layout scanner from injecting a spurious block
+    // into a multi-line list.
+    _body: $ => choice($._expression, $.block),
 
     // effect { e1; e2; ... } — the brace block suspends layout; ; separates stmts
     effect_block: $ => seq('effect', '{', seq($._expression, repeat(seq(';', $._expression)), optional(';')), '}'),
@@ -62,20 +97,28 @@ module.exports = grammar({
     _postfix: $ => choice($.field, $._atom),
     field: $ => prec.left(10, seq(field('record', $._atom), '.', field('field', $.identifier))),
 
-    // match arms are indented (layout block); _indent/_dedent are hidden nodes
+    // match arms are a layout block introduced by `with`. They may be indented
+    // under a mid-line `match` (→ INDENT/DEDENT), or aligned with a `match` that
+    // sits on its own line (→ same-indent NEWLINEs). The external scanner emits
+    // a MATCH_INDENT before the first arm in BOTH cases (see scanner.c), so the
+    // grammar sees a uniform block here.
     match: $ => prec.right(seq('match', field('scrutinee', $._expression), 'with',
-      $._indent, repeat1(seq($.match_arm, $._newline)), $._dedent)),
+      $._indent, $.match_arm, repeat(seq($._newline, $.match_arm)),
+      optional($._newline), $._dedent)),
     match_arm: $ => seq('|', field('pattern', $.pattern),
       optional(seq('if', field('guard', $._expression))), '->', field('body', $._expression)),
     pattern: $ => choice(
       seq($.uident, repeat($.pattern)), $.identifier, $.wildcard, $.number, $.string,
-      seq('(', $.pattern, ')')),
+      seq('(', $.pattern, ')'),
+      $.tuple_pattern),
+    tuple_pattern: $ => seq('(', $.pattern, repeat1(seq(',', $.pattern)), ')'),
     wildcard: $ => '_',
 
     _atom: $ => choice(
       $.identifier, $.uident, $.hole, $.float, $.number, $.string,
-      $.unit, $.list, $.paren, $.block),
+      $.unit, $.list, $.paren, $.tuple),
     paren: $ => seq('(', $._expression, ')'),
+    tuple: $ => seq('(', $._expression, repeat1(seq(',', $._expression)), ')'),
     unit: $ => seq('(', ')'),
     list: $ => seq('[', optional(commaSep1($._expression)), ']'),
 

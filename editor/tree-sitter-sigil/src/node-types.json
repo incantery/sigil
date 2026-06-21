@@ -12,10 +12,6 @@
           "named": true
         },
         {
-          "type": "block",
-          "named": true
-        },
-        {
           "type": "field",
           "named": true
         },
@@ -48,6 +44,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "uident",
           "named": true
         },
@@ -72,10 +72,6 @@
           },
           {
             "type": "binop",
-            "named": true
-          },
-          {
-            "type": "block",
             "named": true
           },
           {
@@ -124,6 +120,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -153,10 +153,6 @@
             "named": true
           },
           {
-            "type": "block",
-            "named": true
-          },
-          {
             "type": "effect_block",
             "named": true
           },
@@ -202,6 +198,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -234,10 +234,6 @@
         },
         {
           "type": "binop",
-          "named": true
-        },
-        {
-          "type": "block",
           "named": true
         },
         {
@@ -297,6 +293,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "type_decl",
           "named": true
         },
@@ -328,53 +328,37 @@
             "named": true
           }
         ]
+      },
+      "payload": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_apply",
+            "named": true
+          },
+          {
+            "type": "type_arrow",
+            "named": true
+          },
+          {
+            "type": "type_con",
+            "named": true
+          },
+          {
+            "type": "type_paren",
+            "named": true
+          },
+          {
+            "type": "type_tuple",
+            "named": true
+          },
+          {
+            "type": "type_var",
+            "named": true
+          }
+        ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "block",
-          "named": true
-        },
-        {
-          "type": "float",
-          "named": true
-        },
-        {
-          "type": "hole",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "list",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "paren",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "uident",
-          "named": true
-        },
-        {
-          "type": "unit",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -391,10 +375,6 @@
         },
         {
           "type": "binop",
-          "named": true
-        },
-        {
-          "type": "block",
           "named": true
         },
         {
@@ -446,6 +426,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "uident",
           "named": true
         },
@@ -479,10 +463,6 @@
         "required": true,
         "types": [
           {
-            "type": "block",
-            "named": true
-          },
-          {
             "type": "float",
             "named": true
           },
@@ -508,6 +488,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -539,10 +523,6 @@
             "named": true
           },
           {
-            "type": "block",
-            "named": true
-          },
-          {
             "type": "effect_block",
             "named": true
           },
@@ -588,6 +568,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -617,10 +601,6 @@
             "named": true
           },
           {
-            "type": "block",
-            "named": true
-          },
-          {
             "type": "effect_block",
             "named": true
           },
@@ -666,6 +646,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -695,10 +679,6 @@
             "named": true
           },
           {
-            "type": "block",
-            "named": true
-          },
-          {
             "type": "effect_block",
             "named": true
           },
@@ -744,6 +724,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -834,10 +818,6 @@
           "named": true
         },
         {
-          "type": "block",
-          "named": true
-        },
-        {
           "type": "effect_block",
           "named": true
         },
@@ -886,6 +866,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "uident",
           "named": true
         },
@@ -914,10 +898,6 @@
         },
         {
           "type": "binop",
-          "named": true
-        },
-        {
-          "type": "block",
           "named": true
         },
         {
@@ -973,6 +953,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "uident",
           "named": true
         },
@@ -997,6 +981,10 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "tuple_pattern",
             "named": true
           }
         ]
@@ -1079,6 +1067,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "uident",
           "named": true
         },
@@ -1107,10 +1099,6 @@
         },
         {
           "type": "binop",
-          "named": true
-        },
-        {
-          "type": "block",
           "named": true
         },
         {
@@ -1162,6 +1150,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "uident",
           "named": true
         },
@@ -1190,10 +1182,6 @@
           },
           {
             "type": "binop",
-            "named": true
-          },
-          {
-            "type": "block",
             "named": true
           },
           {
@@ -1242,6 +1230,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -1287,10 +1279,6 @@
             "named": true
           },
           {
-            "type": "block",
-            "named": true
-          },
-          {
             "type": "effect_block",
             "named": true
           },
@@ -1336,6 +1324,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -1365,10 +1357,6 @@
             "named": true
           },
           {
-            "type": "block",
-            "named": true
-          },
-          {
             "type": "effect_block",
             "named": true
           },
@@ -1414,6 +1402,10 @@
           },
           {
             "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
             "named": true
           },
           {
@@ -1453,6 +1445,22 @@
         {
           "type": "identifier",
           "named": true
+        },
+        {
+          "type": "pattern",
+          "named": true
+        },
+        {
+          "type": "tuple_pattern",
+          "named": true
+        },
+        {
+          "type": "unit",
+          "named": true
+        },
+        {
+          "type": "wildcard",
+          "named": true
         }
       ]
     }
@@ -1471,10 +1479,6 @@
         },
         {
           "type": "binop",
-          "named": true
-        },
-        {
-          "type": "block",
           "named": true
         },
         {
@@ -1526,6 +1530,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "uident",
           "named": true
         },
@@ -1565,6 +1573,10 @@
           "named": true
         },
         {
+          "type": "tuple_pattern",
+          "named": true
+        },
+        {
           "type": "uident",
           "named": true
         },
@@ -1590,10 +1602,6 @@
         },
         {
           "type": "binop",
-          "named": true
-        },
-        {
-          "type": "block",
           "named": true
         },
         {
@@ -1653,6 +1661,10 @@
           "named": true
         },
         {
+          "type": "tuple",
+          "named": true
+        },
+        {
           "type": "type_decl",
           "named": true
         },
@@ -1687,46 +1699,11 @@
     }
   },
   {
-    "type": "type_decl",
-    "named": true,
-    "fields": {
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "uident",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "constructor",
-          "named": true
-        },
-        {
-          "type": "pub",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "unit",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "unop",
+    "type": "tuple",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
@@ -1735,10 +1712,6 @@
         },
         {
           "type": "binop",
-          "named": true
-        },
-        {
-          "type": "block",
           "named": true
         },
         {
@@ -1787,6 +1760,334 @@
         },
         {
           "type": "string",
+          "named": true
+        },
+        {
+          "type": "tuple",
+          "named": true
+        },
+        {
+          "type": "uident",
+          "named": true
+        },
+        {
+          "type": "unit",
+          "named": true
+        },
+        {
+          "type": "unop",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "tuple_pattern",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "pattern",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_apply",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "type_apply",
+          "named": true
+        },
+        {
+          "type": "type_con",
+          "named": true
+        },
+        {
+          "type": "type_paren",
+          "named": true
+        },
+        {
+          "type": "type_tuple",
+          "named": true
+        },
+        {
+          "type": "type_var",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_arrow",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "type_apply",
+          "named": true
+        },
+        {
+          "type": "type_arrow",
+          "named": true
+        },
+        {
+          "type": "type_con",
+          "named": true
+        },
+        {
+          "type": "type_paren",
+          "named": true
+        },
+        {
+          "type": "type_tuple",
+          "named": true
+        },
+        {
+          "type": "type_var",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_con",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "uident",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_decl",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "uident",
+            "named": true
+          }
+        ]
+      },
+      "param": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "type_param",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "constructor",
+          "named": true
+        },
+        {
+          "type": "pub",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_param",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_paren",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type_apply",
+          "named": true
+        },
+        {
+          "type": "type_arrow",
+          "named": true
+        },
+        {
+          "type": "type_con",
+          "named": true
+        },
+        {
+          "type": "type_paren",
+          "named": true
+        },
+        {
+          "type": "type_tuple",
+          "named": true
+        },
+        {
+          "type": "type_var",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_tuple",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "type_apply",
+          "named": true
+        },
+        {
+          "type": "type_arrow",
+          "named": true
+        },
+        {
+          "type": "type_con",
+          "named": true
+        },
+        {
+          "type": "type_paren",
+          "named": true
+        },
+        {
+          "type": "type_tuple",
+          "named": true
+        },
+        {
+          "type": "type_var",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_var",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "unit",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "unop",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "application",
+          "named": true
+        },
+        {
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "effect_block",
+          "named": true
+        },
+        {
+          "type": "field",
+          "named": true
+        },
+        {
+          "type": "float",
+          "named": true
+        },
+        {
+          "type": "hole",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "if",
+          "named": true
+        },
+        {
+          "type": "lambda",
+          "named": true
+        },
+        {
+          "type": "list",
+          "named": true
+        },
+        {
+          "type": "match",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "paren",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tuple",
           "named": true
         },
         {
@@ -1948,6 +2249,10 @@
   {
     "type": "number",
     "named": true
+  },
+  {
+    "type": "of",
+    "named": false
   },
   {
     "type": "pub",
