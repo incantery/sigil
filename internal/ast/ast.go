@@ -1,5 +1,5 @@
 // Package ast defines the abstract syntax tree for the sigil core language,
-// matching core/grammar.md. UI and reactivity are not represented here: element,
+// matching docs/grammar.md. UI and reactivity are not represented here: element,
 // cell, Button, etc. are ordinary names applied via App.
 package ast
 

@@ -1,6 +1,6 @@
 // Package lex turns sigil core source into a token stream.
 //
-// It implements the offside rule from core/grammar.md: indentation is compiled
+// It implements the offside rule from docs/grammar.md: indentation is compiled
 // into NEWLINE / INDENT / DEDENT tokens. Inside brackets ( ) [ ] { } layout is
 // fully suspended — newlines become plain whitespace and only commas separate
 // elements.

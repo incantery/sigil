@@ -10,7 +10,7 @@ const repoRoot = "../.."
 
 // counterEntry is the path to the committed counter example.
 func counterEntry() string {
-	return filepath.Join(repoRoot, "core", "examples", "counter", "counter.sigil")
+	return filepath.Join(repoRoot, "examples", "counter", "counter.sigil")
 }
 
 // run executes the sigil command tree with args, capturing stdout and stderr.

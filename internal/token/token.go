@@ -1,6 +1,6 @@
 // Package token defines the lexical tokens of the sigil core language.
 //
-// The token set mirrors core/grammar.md. Layout tokens (NEWLINE, INDENT, DEDENT)
+// The token set mirrors docs/grammar.md. Layout tokens (NEWLINE, INDENT, DEDENT)
 // are synthesized by the lexer from indentation; the parser consumes them as
 // ordinary block delimiters.
 package token

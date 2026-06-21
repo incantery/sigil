@@ -1,4 +1,4 @@
-// Package parse builds an ast.Module from sigil core source, per core/grammar.md.
+// Package parse builds an ast.Module from sigil core source, per docs/grammar.md.
 package parse
 
 import (
