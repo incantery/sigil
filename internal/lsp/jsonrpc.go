@@ -81,8 +81,12 @@ func (c *Conn) write(v any) error {
 	if err := enc.Encode(v); err != nil {
 		return err
 	}
-	// json.Encoder.Encode appends a trailing newline; strip it for a clean body.
-	body := bytes.TrimRight(buf.Bytes(), "\n")
+	// json.Encoder.Encode appends exactly one trailing newline; drop just that
+	// one byte (TrimRight would also eat any legitimately-trailing newlines).
+	body := buf.Bytes()
+	if n := len(body); n > 0 && body[n-1] == '\n' {
+		body = body[:n-1]
+	}
 	c.wmu.Lock()
 	defer c.wmu.Unlock()
 	if _, err := fmt.Fprintf(c.w, "Content-Length: %d\r\n\r\n", len(body)); err != nil {

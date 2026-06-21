@@ -26,6 +26,7 @@ func TestHoverReturnsType(t *testing.T) {
 	// hover an empty region -> null result (no panic, no type).
 	send(cw, `{"jsonrpc":"2.0","id":3,"method":"textDocument/hover","params":{"textDocument":{"uri":"`+uri+`"},"position":{"line":40,"character":0}}}`)
 	waitFor(t, &out, `"id":3`)
+	waitFor(t, &out, `"result":null`)
 
 	send(cw, `{"jsonrpc":"2.0","method":"exit"}`)
 }
