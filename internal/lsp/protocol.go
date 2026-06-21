@@ -23,3 +23,31 @@ type ServerCapabilities struct {
 	TextDocumentSync       int  `json:"textDocumentSync"`
 	DocumentSymbolProvider bool `json:"documentSymbolProvider"`
 }
+
+type TextDocumentItem struct {
+	URI     string `json:"uri"`
+	Version int    `json:"version"`
+	Text    string `json:"text"`
+}
+
+type TextDocumentIdentifier struct {
+	URI string `json:"uri"`
+}
+
+type DidOpenParams struct {
+	TextDocument TextDocumentItem `json:"textDocument"`
+}
+
+type DidChangeParams struct {
+	TextDocument struct {
+		URI     string `json:"uri"`
+		Version int    `json:"version"`
+	} `json:"textDocument"`
+	ContentChanges []struct {
+		Text string `json:"text"`
+	} `json:"contentChanges"`
+}
+
+type DidCloseParams struct {
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+}

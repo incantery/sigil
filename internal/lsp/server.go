@@ -12,10 +12,11 @@ type Server struct {
 	conn        *Conn
 	root        string // workspace root = load Root (where std/ lives)
 	gotShutdown bool
+	docs        *docStore
 }
 
 func NewServer(r io.Reader, w io.Writer) *Server {
-	return &Server{conn: NewConn(r, w)}
+	return &Server{conn: NewConn(r, w), docs: newDocStore()}
 }
 
 // Run reads and dispatches messages until exit (or stream EOF).
@@ -53,6 +54,20 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 		_ = s.conn.Reply(msg.ID, nil)
 	case "exit":
 		return true
+	case "textDocument/didOpen":
+		var p DidOpenParams
+		_ = json.Unmarshal(msg.Params, &p)
+		s.docs.set(p.TextDocument.URI, p.TextDocument.Text)
+	case "textDocument/didChange":
+		var p DidChangeParams
+		_ = json.Unmarshal(msg.Params, &p)
+		if n := len(p.ContentChanges); n > 0 {
+			s.docs.set(p.TextDocument.URI, p.ContentChanges[n-1].Text) // full sync: last wins
+		}
+	case "textDocument/didClose":
+		var p DidCloseParams
+		_ = json.Unmarshal(msg.Params, &p)
+		s.docs.remove(p.TextDocument.URI)
 	default:
 		if !msg.IsNotification() {
 			_ = s.conn.ReplyError(msg.ID, CodeMethodNotFound, "method not found: "+msg.Method)
