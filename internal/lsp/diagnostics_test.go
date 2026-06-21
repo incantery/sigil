@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/incantery/sigil/internal/lex"
 	"github.com/incantery/sigil/internal/parse"
 	"github.com/incantery/sigil/internal/types"
 )
@@ -31,6 +32,20 @@ func TestDiagnosticsForTypeError(t *testing.T) {
 	ds := diagnosticsFor(err, "x\n")
 	if len(ds) != 1 || ds[0].Range.Start.Line != 0 || ds[0].Message != "type mismatch: Int vs String" {
 		t.Fatalf("unexpected type diagnostic: %+v", ds)
+	}
+}
+
+func TestDiagnosticsForLexError(t *testing.T) {
+	err := fmt.Errorf("/x.sigil: %w", &lex.Error{Line: 2, Col: 3, Msg: "unexpected character"})
+	ds := diagnosticsFor(err, "ok\nxyz\n")
+	if len(ds) != 1 {
+		t.Fatalf("want 1 diagnostic, got %d", len(ds))
+	}
+	if ds[0].Range.Start.Line != 1 || ds[0].Range.Start.Character != 2 {
+		t.Errorf("start = %d:%d, want 1:2 (0-based)", ds[0].Range.Start.Line, ds[0].Range.Start.Character)
+	}
+	if ds[0].Message != "unexpected character" {
+		t.Errorf("message = %q", ds[0].Message)
 	}
 }
 

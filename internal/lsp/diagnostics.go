@@ -34,7 +34,7 @@ func diagnosticsFor(err error, text string) []Diagnostic {
 	if !positioned {
 		// Import-resolution / read errors carry no position: pin to file top.
 		return []Diagnostic{{
-			Range:    Range{Start: Position{0, 0}, End: Position{0, 0}},
+			Range:    Range{Start: Position{0, 0}, End: Position{0, lineLength(text, 0)}},
 			Severity: SeverityError,
 			Source:   "sigil",
 			Message:  msg,
