@@ -1,0 +1,38 @@
+==================
+lambda and application
+==================
+
+let f =
+  fun x -> g x y
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (block
+      (lambda (parameter (identifier))
+        (application (application (identifier) (identifier)) (identifier))))))
+
+==================
+if then else
+==================
+
+let r = if a then b else c
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (if condition: (identifier) consequence: (identifier) alternative: (identifier))))
+
+==================
+literals: string float uident hole unit list
+==================
+
+let v = [Some, __cell, 3.14, "hi", ()]
+
+---
+
+(source_file
+  (let_decl name: (identifier)
+    (list (uident) (hole) (float) (string) (unit))))
