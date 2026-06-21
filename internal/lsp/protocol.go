@@ -30,6 +30,7 @@ type ServerCapabilities struct {
 	TextDocumentSync       int  `json:"textDocumentSync"`
 	DocumentSymbolProvider bool `json:"documentSymbolProvider"`
 	HoverProvider          bool `json:"hoverProvider"`
+	DefinitionProvider     bool `json:"definitionProvider"`
 }
 
 type TextDocumentItem struct {
@@ -112,4 +113,15 @@ type MarkupContent struct {
 type Hover struct {
 	Contents MarkupContent `json:"contents"`
 	Range    Range         `json:"range"`
+}
+
+type DefinitionParams struct {
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+	Position     Position               `json:"position"`
+}
+
+// Location is an LSP location (a 0-based range in a document).
+type Location struct {
+	URI   string `json:"uri"`
+	Range Range  `json:"range"`
 }
