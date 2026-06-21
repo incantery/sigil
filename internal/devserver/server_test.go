@@ -29,6 +29,10 @@ func TestShellServesAgentAndBundle(t *testing.T) {
 		t.Error("shell missing #app mount node")
 	}
 
+	if strings.Index(body, `<script src="/__sigil/agent.js"></script>`) >= strings.Index(body, `window.__built`) {
+		t.Error("agent script must appear before the inline bundle")
+	}
+
 	// Agent asset is served as JS.
 	agent := get(t, srv.URL+"/__sigil/agent.js")
 	if !strings.Contains(agent, "window.__sigilDev") {

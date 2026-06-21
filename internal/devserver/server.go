@@ -46,18 +46,25 @@ func (s *Server) Handler() http.Handler {
 		fmt.Fprint(w, AgentJS)
 	})
 	mux.Handle("/__sigil/events", s.hub)
-	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r) // don't recompile on /favicon.ico and other stray paths
+			return
+		}
 		js, err := s.build(s.entry, s.root)
 		if err != nil {
-			// Serve the shell with an empty bundle; the agent shows the overlay
-			// once the SSE error arrives. Still emit a readable note inline.
 			js = "/* build error: " + template.JSEscapeString(err.Error()) + " */"
 		}
 		w.Header().Set("Content-Type", "text/html")
-		_ = shellTmpl.Execute(w, struct{ Title, Bundle template.JS }{
-			Title:  template.JS(s.entry),
+		if err := shellTmpl.Execute(w, struct {
+			Title  string
+			Bundle template.JS
+		}{
+			Title:  s.entry,
 			Bundle: template.JS(js),
-		})
+		}); err != nil {
+			log.Printf("dev: shell render: %v", err)
+		}
 	})
 	return mux
 }
