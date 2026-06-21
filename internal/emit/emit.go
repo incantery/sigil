@@ -160,6 +160,45 @@ const __when = (cond) => (thunk) => {
 // signal graph, and the DOM host) that every compiled module is prefixed with.
 func Runtime() string { return prelude }
 
+// devPrelude is the production prelude with four intrinsics swapped for
+// HMR-instrumented versions that call into a global __sigilDev registry (set up
+// by the dev client agent, or by tests). It is derived from prelude by exact
+// string replacement so any future prelude edit propagates; the replacements are
+// guarded below.
+var devPrelude = buildDevPrelude()
+
+type preludeSwap struct{ from, to string }
+
+var devSwaps = []preludeSwap{
+	{
+		from: `const __cell = (init) => ({ v: init, subs: new Set() });`,
+		to:   `const __cell = (init) => { const __i = __sigilDev.counter++; const __v = __sigilDev.hydration.has(__i) ? __sigilDev.hydration.get(__i) : init; const __c = { v: __v, subs: new Set() }; __sigilDev.cells.set(__i, __c); return __c; };`,
+	},
+	{
+		from: `const __onPopState = (cb) => { window.addEventListener("popstate", () => cb()); return null; };`,
+		to:   `const __onPopState = (cb) => { const __h = () => cb(); window.addEventListener("popstate", __h); __sigilDev.disposers.push(() => window.removeEventListener("popstate", __h)); return null; };`,
+	},
+	{
+		from: `const __installStyles = (css) => { const s = document.createElement("style"); s.textContent = css; document.head.appendChild(s); };`,
+		to:   `const __installStyles = (css) => { let __s = document.getElementById("__sigil_styles"); if (!__s) { __s = document.createElement("style"); __s.id = "__sigil_styles"; document.head.appendChild(__s); } __s.textContent = css; };`,
+	},
+	{
+		from: "const __fetch = (url) => (cb) => {\n  fetch(url).then((r) => r.text().then((t) => cb(r.ok)(t)())).catch((e) => cb(false)(String(e))());\n  return null;\n};",
+		to:   "const __fetch = (url) => (cb) => {\n  const __g = __sigilDev.generation; const __live = () => __g === __sigilDev.generation;\n  fetch(url).then((r) => r.text().then((t) => { if (__live()) cb(r.ok)(t)(); })).catch((e) => { if (__live()) cb(false)(String(e))(); });\n  return null;\n};",
+	},
+}
+
+func buildDevPrelude() string {
+	p := prelude
+	for _, s := range devSwaps {
+		if strings.Count(p, s.from) != 1 {
+			panic("emit: dev prelude swap target not found exactly once: " + s.from)
+		}
+		p = strings.Replace(p, s.from, s.to, 1)
+	}
+	return p
+}
+
 // Compile parses, type-checks, and emits JavaScript for src. A type error aborts
 // before emission, so emitted code is always well-typed.
 func Compile(src string) (string, error) {
@@ -213,6 +252,15 @@ type LinkedModule struct {
 //
 // so module scopes are isolated and imports are explicit re-bindings.
 func Bundle(mods []LinkedModule, env *peval.Env) (string, error) {
+	return bundle(mods, env, prelude)
+}
+
+// BundleDev is Bundle with the HMR-instrumented dev prelude.
+func BundleDev(mods []LinkedModule, env *peval.Env) (string, error) {
+	return bundle(mods, env, devPrelude)
+}
+
+func bundle(mods []LinkedModule, env *peval.Env, pre string) (string, error) {
 	sheet := newCSSSheet()
 	var mb strings.Builder // module bodies (populate the sheet as a side effect)
 	for _, mod := range mods {
@@ -242,7 +290,7 @@ func Bundle(mods []LinkedModule, env *peval.Env) (string, error) {
 	}
 
 	var b strings.Builder
-	b.WriteString(prelude)
+	b.WriteString(pre)
 	// Install the extracted atomic stylesheet once, before any module mounts.
 	if !sheet.empty() {
 		fmt.Fprintf(&b, "__installStyles(%s);\n", strconv.Quote(sheet.css()))
