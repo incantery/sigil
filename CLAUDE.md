@@ -10,7 +10,7 @@ for the pitch and `docs/kernel-redesign.md` for the design.
   Packages (flat): `lex`, `token`, `ast`, `parse`, `types` (Hindley-Milner),
   `peval` (partial evaluator / compile-time CSS extraction), `emit` (JS emitter +
   runtime prelude), `load` (module loader + linker), `cli` (the `sigil` CLI:
-  `version`, `check`, `build`, `serve`, `dev`). The CLI is wrapped by the `cmd/sigil`
+  `version`, `check`, `build`, `serve`, `dev`, `lsp`). The CLI is wrapped by the `cmd/sigil`
   binary (`go run ./cmd/sigil` or `make build` → `bin/sigil`).
 - **`examples/`** — runnable `.sigil` apps (e.g. `examples/counter/counter.sigil`).
 - **`std/`** — the standard library, in Sigil (`.sigil`): reactive, html, ui, style,
@@ -107,17 +107,20 @@ place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
 3. M4: a backend op-auth model → real server enforcement + the router's
    "no auth op under a public route" cross-check (check B).
 4. Editor/tooling roadmap (4 sub-projects, each its own spec→plan→build cycle):
-   **#1 tree-sitter + TextMate highlighting — DONE** (`editor/`, merged). Remaining:
-   **#2** LSP foundation — diagnostics + document symbols (a `sigil lsp` server over
-   `internal/load`/`internal/types`; no new compiler machinery); **#3** type-aware —
-   hover + go-to-def + semantic tokens (needs NEW analysis in `internal/`: a
-   position→node index, a node→inferred-type pass, a definition resolver — the
-   checker today returns only module signatures, no per-node types); **#4**
-   completion. Also a formatter eventually. The old kernel's `pkg/lang/lsp` +
-   `pkg/lang/format` are in git history as reference (superseded architecture).
-   Follow-up idea from the #1 review: extend the keyword cross-check to assert every
-   keyword appears in BOTH `highlights.scm` and `sigil.tmLanguage.json` (catches
-   nvim/VS Code highlight drift automatically).
+   **#1 tree-sitter + TextMate highlighting — DONE** (`editor/`, merged).
+   **#2 LSP foundation — DONE** (`sigil lsp` stdio server over `internal/load`/
+   `internal/types`; live diagnostics via a `load` overlay over unsaved buffers;
+   one diagnostic per file; flat document symbols; hand-rolled JSON-RPC, no new deps;
+   see `editor/lsp.md` for Neovim wiring). Remaining:
+   **#3** type-aware — hover + go-to-def + semantic tokens (needs NEW analysis in
+   `internal/`: a position→node index, a node→inferred-type pass, a definition
+   resolver — the checker today returns only module signatures, no per-node types;
+   flat→hierarchical symbols also needs `Pos` added to `Variant`/`FieldType` AST
+   nodes); **#4** completion. Also a formatter eventually. The old kernel's
+   `pkg/lang/lsp` + `pkg/lang/format` are in git history as reference (superseded
+   architecture). Follow-up idea from the #1 review: extend the keyword cross-check
+   to assert every keyword appears in BOTH `highlights.scm` and
+   `sigil.tmLanguage.json` (catches nvim/VS Code highlight drift automatically).
 
 ## Gotchas (learned the hard way)
 
