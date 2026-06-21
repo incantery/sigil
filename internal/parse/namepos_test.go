@@ -37,3 +37,20 @@ func TestCtorPatPos(t *testing.T) {
 		t.Errorf("CtorPat Pos = %d:%d, want 1:26", cp.Pos.Line, cp.Pos.Col)
 	}
 }
+
+func TestNullaryCtorPatPos(t *testing.T) {
+	// "let f x = match x with | Some None -> 0" — the inner `None` is a nullary
+	// constructor pattern parsed via parsePatternAtom; it sits at 1:31.
+	// |24 ' '25 S26 o27 m28 e29 ' '30 N31
+	m, err := Module("let f x = match x with | Some None -> 0\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ld := m.Decls[0].(*ast.LetDecl)
+	mt := ld.Body.(*ast.Match)
+	some := mt.Arms[0].Pat.(ast.CtorPat)
+	none := some.Args[0].(ast.CtorPat)
+	if none.Pos.Line != 1 || none.Pos.Col != 31 {
+		t.Errorf("nullary CtorPat None pos = %d:%d, want 1:31", none.Pos.Line, none.Pos.Col)
+	}
+}
