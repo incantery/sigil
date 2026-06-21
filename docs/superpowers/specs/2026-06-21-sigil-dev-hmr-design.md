@@ -73,32 +73,50 @@ Lives in a small `internal/devserver` package, wired by `internal/cli/dev.go`.
 
 ### 3. Dev build mode (`emit` gains a `Dev bool` option)
 
-- In dev, each `__cell` call site emits a **second argument**: its structural
-  key — `moduleID · enclosingDeclName · Nth-cell-within-that-decl`. A structural
-  key (rather than `file:line:col`) survives markup/style/handler edits — the 90%
-  case — and only resets when `cell` declarations are themselves reordered or
-  inserted, where a reset is intuitive.
-- In dev, the prelude is the **dev-variant prelude** (instrumented `__cell`,
-  `__onPopState`, `__installStyles`, `__fetch`; see below).
-- Production (`Dev:false`) emits **exactly** what it does today: one-arg `__cell`,
-  plain prelude. A golden test guards byte-identical production output.
+- **Why keying is by call order, not source position.** Every user cell funnels
+  through one stdlib wrapper — `std/reactive`'s `cell` (and `computed`) — and
+  `__cell` is a plain `ast.App` of an identifier, not a dedicated node. So the
+  emitted program contains exactly **one** `__cell` call site. A per-call-site
+  structural key would therefore be identical for every cell in the app and
+  cannot distinguish them. The only available — and the natural — identity is the
+  **order** in which `__cell` runs during a mount.
+- In dev, the `Dev` flag's **sole** effect is to swap the production prelude for
+  the **dev-variant prelude** (instrumented `__cell`, `__onPopState`,
+  `__installStyles`, `__fetch`; see §4–5). There is **no** emit-site change: no
+  second `__cell` argument, no `App`-case special-casing. The dev `__cell`
+  assigns its own key from a per-mount counter at runtime.
+- This call-order key has the same practical behavior promised in brainstorming:
+  markup/style/handler edits create no cells, so cell order is unchanged and state
+  survives; state resets only when you add, remove, or reorder `cell`
+  declarations themselves (which shifts the indices of cells created after the
+  edit), where a reset is intuitive.
+- Production (`Dev:false`) emits **exactly** what it does today: plain prelude,
+  unchanged `__cell`. A golden test guards byte-identical production output.
 
 ### 4. State preservation
 
 - A stable global `window.__sigilDev` holds
-  `{ hydration: Map<key,value>, cells: Map<key,cell>, disposers: [] }`.
-  It lives outside the eval'd bundle scope so it persists across swaps.
-- Dev `__cell(init, key)`: if `hydration` has `key`, start from that saved value
-  instead of `init`; register the live cell in `cells` under `key`.
+  `{ hydration: Map<index,value>, cells: Map<index,cell>, counter: 0, disposers: [], generation: 0 }`.
+  It lives outside the eval'd bundle scope so it persists across swaps. `counter`
+  resets to 0 at the start of every mount; each dev `__cell` call takes the next
+  index.
+- Dev `__cell(init)`: let `i = counter++`; if `hydration` has `i`, start the cell
+  from that saved value instead of `init`; register the live cell in `cells`
+  under `i`.
+- `computed` cells are hydrated by the same call-order rule but **self-heal**: a
+  `computed`'s `watch` effect recomputes immediately on creation
+  (`std/reactive.sigil`), overwriting any stale hydrated value with a fresh
+  derivation. No special-casing needed.
 - **HMR sequence** (in the agent), on a `reload` message:
-  1. **snapshot** — `cells` → `{ key: cell.v }`.
-  2. **dispose** — run all `disposers` (§5).
-  3. empty `#app`; clear `cells`.
+  1. **snapshot** — `cells` → `{ i: cell.v }`.
+  2. **dispose** — run all `disposers` (§5); bump `generation`.
+  3. empty `#app`; clear `cells`; reset `counter = 0`.
   4. set `hydration = snapshot`.
-  5. `new Function(bundle)()` — new cells rehydrate from `hydration`.
+  5. `new Function(bundle)()` — new cells rehydrate from `hydration` by index.
   6. clear `hydration`.
-- Cells created in `__each` thunks share a colliding key and simply do not
-  rehydrate (v1 scope A). Documented in the dev README.
+- Cells created inside `__each` render thunks are keyed by interleaved call order,
+  so list-content changes shift their indices and they reset (v1 scope A).
+  Documented in the dev README.
 
 ### 5. Disposal model
 
@@ -123,8 +141,11 @@ leaks are **global** registrations, so the dev prelude tracks just those:
 
 ## Testing
 
-- **Go unit tests:** watcher debounce; SSE framing; dev-emit cell-keying; a
-  golden test asserting production emit is byte-for-byte unchanged.
+- **Go unit tests:** watcher debounce; SSE framing; `emit` with `Dev:true` swaps
+  in the dev prelude (and `Dev:false` is byte-for-byte unchanged — golden test).
+- **goja test:** the dev `__cell` hydration/call-order rule runs headlessly (set a
+  hydration map, create cells in order, assert the Nth adopts the Nth value),
+  matching the existing `goja` emit tests.
 - **chromedp e2e** (skips if Chrome absent, matching the existing suite): load
   `examples/counter` under `dev`, increment the counter, rewrite a `.sigil`
   file's markup on disk, then assert the DOM updated **and** the counter value
