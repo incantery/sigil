@@ -48,6 +48,7 @@ func startServer(t *testing.T) (clientWrite io.Writer, out *safeBuffer) {
 	out = &safeBuffer{}
 	srv := NewServer(cr, out)
 	go srv.Run()
+	t.Cleanup(func() { cw.Close() }) // unblock the server goroutine if a test fails before sending exit
 	return cw, out
 }
 
@@ -57,6 +58,7 @@ func TestInitializeReplyAndCapabilities(t *testing.T) {
 	// The initialize reply carries id 1 and advertises documentSymbolProvider.
 	waitFor(t, out, `"id":1`)
 	waitFor(t, out, "documentSymbolProvider")
+	waitFor(t, out, `"result"`)
 	io.WriteString(cw, frame(`{"jsonrpc":"2.0","method":"exit"}`))
 }
 

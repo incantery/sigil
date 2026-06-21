@@ -2,6 +2,7 @@ package lsp
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/url"
 )
@@ -25,6 +26,10 @@ func (s *Server) Run() error {
 			return nil // EOF or broken pipe: stop cleanly
 		}
 		if stop := s.dispatch(msg); stop {
+			if !s.gotShutdown {
+				// LSP: an exit without a prior shutdown is abnormal termination.
+				return fmt.Errorf("exit received without shutdown")
+			}
 			return nil
 		}
 	}
