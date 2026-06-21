@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -27,7 +28,7 @@ func Snapshot(root string) (map[string]int64, error) {
 	return out, err
 }
 
-// Changed reports whether any file was added, removed, or has a newer mtime.
+// Changed reports whether any file was added, removed, or has a different mtime.
 func Changed(prev, cur map[string]int64) bool {
 	if len(prev) != len(cur) {
 		return true
@@ -42,10 +43,13 @@ func Changed(prev, cur map[string]int64) bool {
 
 // Watch polls root every interval and calls onChange whenever the .sigil set
 // changes. A burst of edits between ticks coalesces into a single onChange. The
-// returned stop function ends polling.
+// returned stop function ends polling and blocks until the poll goroutine has
+// fully exited; it is safe to call more than once.
 func Watch(root string, interval time.Duration, onChange func()) (stop func()) {
 	done := make(chan struct{})
+	stopped := make(chan struct{})
 	go func() {
+		defer close(stopped)
 		prev, _ := Snapshot(root)
 		t := time.NewTicker(interval)
 		defer t.Stop()
@@ -65,5 +69,9 @@ func Watch(root string, interval time.Duration, onChange func()) (stop func()) {
 			}
 		}
 	}()
-	return func() { close(done) }
+	var once sync.Once
+	return func() {
+		once.Do(func() { close(done) })
+		<-stopped
+	}
 }
