@@ -64,7 +64,7 @@ func TestInitializeReplyAndCapabilities(t *testing.T) {
 
 func TestUnknownRequestGetsMethodNotFound(t *testing.T) {
 	cw, out := startServer(t)
-	io.WriteString(cw, frame(`{"jsonrpc":"2.0","id":9,"method":"textDocument/hover","params":{}}`))
+	io.WriteString(cw, frame(`{"jsonrpc":"2.0","id":9,"method":"textDocument/unknownMethod","params":{}}`))
 	waitFor(t, out, "-32601") // MethodNotFound for an unimplemented request
 	io.WriteString(cw, frame(`{"jsonrpc":"2.0","method":"exit"}`))
 }

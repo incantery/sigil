@@ -6,6 +6,7 @@ package lsp
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -74,16 +75,20 @@ func (c *Conn) Read() (*Message, error) {
 }
 
 func (c *Conn) write(v any) error {
-	body, err := json.Marshal(v)
-	if err != nil {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	if err := enc.Encode(v); err != nil {
 		return err
 	}
+	// json.Encoder.Encode appends a trailing newline; strip it for a clean body.
+	body := bytes.TrimRight(buf.Bytes(), "\n")
 	c.wmu.Lock()
 	defer c.wmu.Unlock()
 	if _, err := fmt.Fprintf(c.w, "Content-Length: %d\r\n\r\n", len(body)); err != nil {
 		return err
 	}
-	_, err = c.w.Write(body)
+	_, err := c.w.Write(body)
 	return err
 }
 

@@ -6,6 +6,9 @@ import (
 	"io"
 	"net/url"
 	"path/filepath"
+
+	"github.com/incantery/sigil/internal/analysis"
+	"github.com/incantery/sigil/internal/load"
 )
 
 // Server is a sigil LSP server speaking JSON-RPC over a Conn.
@@ -47,6 +50,7 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 		_ = s.conn.Reply(msg.ID, InitializeResult{Capabilities: ServerCapabilities{
 			TextDocumentSync:       TextDocumentSyncFull,
 			DocumentSymbolProvider: true,
+			HoverProvider:          true,
 		}})
 	case "initialized":
 		// no-op
@@ -82,6 +86,8 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 		// An unopened doc yields "" -> parses to an empty module -> empty symbol list (safe).
 		text, _ := s.docs.get(p.TextDocument.URI)
 		_ = s.conn.Reply(msg.ID, documentSymbols(text))
+	case "textDocument/hover":
+		s.handleHover(msg)
 	default:
 		if !msg.IsNotification() {
 			_ = s.conn.ReplyError(msg.ID, CodeMethodNotFound, "method not found: "+msg.Method)
@@ -108,6 +114,39 @@ func (s *Server) publishDiagnostics(uri string) {
 	_ = s.conn.Notify("textDocument/publishDiagnostics", PublishDiagnosticsParams{
 		URI:         uri,
 		Diagnostics: diagnosticsFor(err, text),
+	})
+}
+
+// handleHover handles a textDocument/hover request, loading the document with
+// type recording and calling analysis.Hover to find the type at the cursor.
+func (s *Server) handleHover(msg *Message) {
+	var p HoverParams
+	_ = json.Unmarshal(msg.Params, &p)
+	path := uriToPath(p.TextDocument.URI)
+	if abs, err := filepath.Abs(path); err == nil {
+		path = abs
+	}
+	root := s.root
+	if root == "" {
+		root = filepath.Dir(path)
+	}
+	prog, err := load.Load(path, load.Options{Root: root, Overlay: s.docs.overlay(), Record: true})
+	if err != nil {
+		_ = s.conn.Reply(msg.ID, nil) // broken file: null hover (diagnostics report the error)
+		return
+	}
+	// LSP positions are 0-based; AST is 1-based.
+	res, ok := analysis.Hover(prog, p.Position.Line+1, p.Position.Character+1)
+	if !ok {
+		_ = s.conn.Reply(msg.ID, nil)
+		return
+	}
+	_ = s.conn.Reply(msg.ID, Hover{
+		Contents: MarkupContent{Kind: "markdown", Value: res.Markdown},
+		Range: Range{
+			Start: Position{Line: res.Range.Start.Line - 1, Character: res.Range.Start.Col - 1},
+			End:   Position{Line: res.Range.End.Line - 1, Character: res.Range.End.Col - 1},
+		},
 	})
 }
 
