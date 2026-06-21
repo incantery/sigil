@@ -29,6 +29,7 @@ type InitializeResult struct {
 type ServerCapabilities struct {
 	TextDocumentSync       int  `json:"textDocumentSync"`
 	DocumentSymbolProvider bool `json:"documentSymbolProvider"`
+	HoverProvider          bool `json:"hoverProvider"`
 }
 
 type TextDocumentItem struct {
@@ -96,4 +97,19 @@ type DocumentSymbol struct {
 
 type DocumentSymbolParams struct {
 	TextDocument TextDocumentIdentifier `json:"textDocument"`
+}
+
+type HoverParams struct {
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+	Position     Position               `json:"position"`
+}
+
+type MarkupContent struct {
+	Kind  string `json:"kind"`  // "markdown"
+	Value string `json:"value"`
+}
+
+type Hover struct {
+	Contents MarkupContent `json:"contents"`
+	Range    Range         `json:"range"`
 }

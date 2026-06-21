@@ -9,8 +9,9 @@ for the pitch and `docs/kernel-redesign.md` for the design.
 - **`internal/`** — the compiler, part of the root module `github.com/incantery/sigil`.
   Packages (flat): `lex`, `token`, `ast`, `parse`, `types` (Hindley-Milner),
   `peval` (partial evaluator / compile-time CSS extraction), `emit` (JS emitter +
-  runtime prelude), `load` (module loader + linker), `cli` (the `sigil` CLI:
-  `version`, `check`, `build`, `serve`, `dev`, `lsp`). The CLI is wrapped by the `cmd/sigil`
+  runtime prelude), `load` (module loader + linker), `analysis` (position→node
+  index via structural extents + hover; consumes `types.TypeInfo`), `cli` (the
+  `sigil` CLI: `version`, `check`, `build`, `serve`, `dev`, `lsp`). The CLI is wrapped by the `cmd/sigil`
   binary (`go run ./cmd/sigil` or `make build` → `bin/sigil`).
 - **`examples/`** — runnable `.sigil` apps (e.g. `examples/counter/counter.sigil`).
 - **`std/`** — the standard library, in Sigil (`.sigil`): reactive, html, ui, style,
@@ -111,12 +112,14 @@ place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
    **#2 LSP foundation — DONE** (`sigil lsp` stdio server over `internal/load`/
    `internal/types`; live diagnostics via a `load` overlay over unsaved buffers;
    one diagnostic per file; flat document symbols; hand-rolled JSON-RPC, no new deps;
-   see `editor/lsp.md` for Neovim wiring). Remaining:
-   **#3** type-aware — hover + go-to-def + semantic tokens (needs NEW analysis in
-   `internal/`: a position→node index, a node→inferred-type pass, a definition
-   resolver — the checker today returns only module signatures, no per-node types;
-   flat→hierarchical symbols also needs `Pos` added to `Variant`/`FieldType` AST
-   nodes); **#4** completion. Also a formatter eventually. The old kernel's
+   see `editor/lsp.md` for Neovim wiring).
+   **#3 type-aware: slice 3a (analysis core + hover) — DONE** (per-node type
+   recorder in `internal/types` (`CheckModuleRecording`/`TypeInfo`);
+   `load.Options.Record` → `Program.EntryInfo`; new `internal/analysis` package:
+   position→node index via structural extents + hover returning `name : type` or
+   generalized scheme). Remaining slices: **3b go-to-definition** (needs the
+   definition resolver), **3c semantic tokens** (role classification); then
+   **#4** completion. Also a formatter eventually. The old kernel's
    `pkg/lang/lsp` + `pkg/lang/format` are in git history as reference (superseded
    architecture). Follow-up idea from the #1 review: extend the keyword cross-check
    to assert every keyword appears in BOTH `highlights.scm` and

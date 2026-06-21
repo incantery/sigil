@@ -39,6 +39,9 @@ type Options struct {
 	// file present here, it uses this content instead of the on-disk bytes. Used
 	// by the LSP to type-check unsaved editor buffers. nil = always read disk.
 	Overlay map[string]string
+	// Record, when set, captures the entry module's per-node TypeInfo into
+	// Program.EntryInfo (LSP analysis). Off by default — no effect on bundling.
+	Record bool
 }
 
 // Module is one node of a resolved, type-checked import graph.
@@ -62,6 +65,9 @@ type resolvedImport struct {
 type Program struct {
 	Modules []*Module
 	Entry   *Module
+	// EntryInfo is the entry module's per-node type record, populated only when
+	// Options.Record is set. nil otherwise.
+	EntryInfo *types.TypeInfo
 }
 
 // Load parses entryFile, resolves and type-checks its transitive imports, and
@@ -85,7 +91,19 @@ func Load(entryFile string, opts Options) (*Program, error) {
 			return nil, err
 		}
 	}
-	return &Program{Modules: l.order, Entry: entry}, nil
+	prog := &Program{Modules: l.order, Entry: entry}
+	if opts.Record {
+		deps, err := l.mergeDeps(entry)
+		if err != nil {
+			return nil, err
+		}
+		_, info, err := types.CheckModuleRecording(entry.AST, deps)
+		if err != nil {
+			return nil, err
+		}
+		prog.EntryInfo = info
+	}
+	return prog, nil
 }
 
 type loader struct {
