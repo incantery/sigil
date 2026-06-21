@@ -1,6 +1,13 @@
 package analysis
 
-import "github.com/incantery/sigil/internal/ast"
+import (
+	"strings"
+
+	"github.com/incantery/sigil/internal/ast"
+	"github.com/incantery/sigil/internal/lex"
+	"github.com/incantery/sigil/internal/parse"
+	"github.com/incantery/sigil/internal/token"
+)
 
 // Role is a semantic-token classification for an identifier. The numeric values
 // are also the legend indices for those roles (see SemanticTokens).
@@ -174,4 +181,116 @@ func SemanticRoles(m *ast.Module) map[ast.Pos]Role {
 		}
 	}
 	return roles
+}
+
+// Legend indices for non-role token types (roles 0..5 are their own indices).
+const (
+	legendKeyword  = 6
+	legendOperator = 7
+	legendNumber   = 8
+	legendString   = 9
+)
+
+// SemanticTokens returns the LSP semanticTokens/full `data` array for the source:
+// five ints per emitted token (deltaLine, deltaStartChar, length, tokenType,
+// modifiers=0). A parse or lex error yields an empty slice.
+func SemanticTokens(text string) []uint {
+	m, err := parse.Module(text)
+	if err != nil {
+		return []uint{}
+	}
+	toks, err := lex.Lex(text)
+	if err != nil {
+		return []uint{}
+	}
+	roles := SemanticRoles(m)
+	fns := collectFunctionNames(m)
+	lines := strings.Split(text, "\n")
+
+	data := []uint{}
+	prevLine, prevCol := 0, 0
+	for _, t := range toks {
+		typ, ok := semanticType(t, roles, fns)
+		if !ok {
+			continue
+		}
+		line := t.Line - 1 // 0-based
+		col := t.Col - 1
+		length := tokenLength(t, lines)
+		dLine := line - prevLine
+		dCol := col
+		if dLine == 0 {
+			dCol = col - prevCol
+		}
+		data = append(data, uint(dLine), uint(dCol), uint(length), uint(typ), 0)
+		prevLine, prevCol = line, col
+	}
+	return data
+}
+
+// semanticType maps a token to its legend index, or ok=false to skip it.
+func semanticType(t token.Token, roles map[ast.Pos]Role, fns map[string]bool) (int, bool) {
+	switch t.Kind {
+	case token.IDENT, token.UIDENT, token.HOLE:
+		if r, ok := roles[ast.Pos{Line: t.Line, Col: t.Col}]; ok {
+			return int(r), true
+		}
+		if t.Kind == token.UIDENT {
+			return int(RoleType), true
+		}
+		if fns[t.Lit] {
+			return int(RoleFunction), true
+		}
+		return int(RoleVariable), true
+	case token.INT, token.FLOAT:
+		return legendNumber, true
+	case token.STRING:
+		return legendString, true
+	}
+	if t.Kind >= token.LET && t.Kind <= token.EFFECT {
+		return legendKeyword, true
+	}
+	if (t.Kind >= token.PIPEFWD && t.Kind <= token.BANG) ||
+		t.Kind == token.EQ || t.Kind == token.ARROW || t.Kind == token.PIPE {
+		return legendOperator, true
+	}
+	return 0, false // layout, punctuation, EOF, UNDERSCORE
+}
+
+// tokenLength returns a token's source length in characters.
+func tokenLength(t token.Token, lines []string) int {
+	if t.Kind == token.STRING {
+		return stringLength(lines, t.Line, t.Col)
+	}
+	if t.Lit != "" {
+		return len([]rune(t.Lit))
+	}
+	return len([]rune(t.Kind.String())) // keywords/operators: canonical spelling
+}
+
+// stringLength measures a single-line string literal (sigil forbids raw newlines
+// in strings) from its opening quote at 1-based (line,col), counting both quotes
+// and honoring backslash escapes.
+func stringLength(lines []string, line, col int) int {
+	if line-1 < 0 || line-1 >= len(lines) {
+		return 2
+	}
+	rs := []rune(lines[line-1])
+	i := col - 1 // index of the opening quote
+	if i < 0 || i >= len(rs) || rs[i] != '"' {
+		return 2
+	}
+	n := 1 // opening quote
+	for j := i + 1; j < len(rs); j++ {
+		n++
+		if rs[j] == '\\' && j+1 < len(rs) {
+			j++
+			n++
+			continue
+		}
+		if rs[j] == '"' {
+			break // closing quote counted
+		}
+	}
+	return n
 }

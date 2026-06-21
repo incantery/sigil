@@ -62,3 +62,50 @@ func TestCollectFunctionNames(t *testing.T) {
 		t.Error("v (no params) should not be a function name")
 	}
 }
+
+func TestSemanticTokensEncoding(t *testing.T) {
+	// Two lines exercise single-line deltas and the cross-line reset.
+	//   line 1: "let x = 1"   LET kw@0:0 len3, x var@0:4 len1, = op@0:6 len1, 1 num@0:8 len1
+	//   line 2: "let y = x"   LET kw@1:0 len3, y var@1:4 len1, = op@1:6 len1, x var@1:8 len1
+	data := SemanticTokens("let x = 1\nlet y = x\n")
+	want := []uint{
+		0, 0, 3, 6, 0, // let     (keyword=6)
+		0, 4, 1, 4, 0, // x        (variable=4)
+		0, 2, 1, 7, 0, // =        (operator=7)
+		0, 2, 1, 8, 0, // 1        (number=8)
+		1, 0, 3, 6, 0, // let      (deltaLine=1, absolute col 0)
+		0, 4, 1, 4, 0, // y        (variable=4)
+		0, 2, 1, 7, 0, // =        (operator=7)
+		0, 2, 1, 4, 0, // x (use)  (variable=4)
+	}
+	if len(data) != len(want) {
+		t.Fatalf("len(data) = %d, want %d\n got: %v", len(data), len(want), data)
+	}
+	for i := range want {
+		if data[i] != want[i] {
+			t.Fatalf("data[%d] = %d, want %d\n got:  %v\n want: %v", i, data[i], want[i], data, want)
+		}
+	}
+}
+
+func TestSemanticTokensRolesAndKinds(t *testing.T) {
+	// type/enumMember/function/string coverage in one line each; just check the
+	// tokenType (4th of each 5-tuple) for the identifiers/strings of interest.
+	data := SemanticTokens("type C = Red\nlet greet n = \"hi\"\n")
+	// Collect (tokenType) values; we only assert presence of the right indices.
+	types := map[uint]bool{}
+	for i := 3; i < len(data); i += 5 {
+		types[data[i]] = true
+	}
+	for _, idx := range []uint{0 /*type C*/, 1 /*enumMember Red*/, 2 /*function greet*/, 9 /*string "hi"*/} {
+		if !types[idx] {
+			t.Errorf("expected a token of legend type %d in %v", idx, data)
+		}
+	}
+}
+
+func TestSemanticTokensParseErrorEmpty(t *testing.T) {
+	if data := SemanticTokens("let x = ("); len(data) != 0 {
+		t.Errorf("parse error should yield empty data, got %v", data)
+	}
+}
