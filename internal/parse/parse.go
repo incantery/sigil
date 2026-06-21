@@ -293,7 +293,7 @@ func (p *parser) parseRecordFieldTypes() ([]*ast.FieldType, error) {
 		if err != nil {
 			return nil, err
 		}
-		fields = append(fields, &ast.FieldType{Name: name.Lit, Type: t})
+		fields = append(fields, &ast.FieldType{Pos: pos(name), Name: name.Lit, Type: t})
 		if !p.accept(token.COMMA) {
 			break
 		}

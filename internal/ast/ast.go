@@ -63,6 +63,7 @@ type Variant struct {
 
 // FieldType is one field of a record type.
 type FieldType struct {
+	Pos  Pos
 	Name string
 	Type TypeExpr
 }
