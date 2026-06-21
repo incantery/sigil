@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/sigil/core/ast"
-	"github.com/incantery/sigil/core/parse"
+	"github.com/incantery/sigil/internal/ast"
+	"github.com/incantery/sigil/internal/parse"
 )
 
 // check parses and type-checks src, returning the name->type map.

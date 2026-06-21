@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/incantery/sigil/core/token"
+	"github.com/incantery/sigil/internal/token"
 )
 
 // Error is a lexical error with 1-based source position.

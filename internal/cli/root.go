@@ -1,6 +1,6 @@
 // Package cli implements the sigil command-line interface: a cobra command tree
 // over the core kernel (core/load + core/emit). Subcommands live in sibling
-// files; core/cmd/sigil is a thin binary wrapper around Execute.
+// files; cmd/sigil is a thin binary wrapper around Execute.
 package cli
 
 import (
@@ -10,7 +10,7 @@ import (
 )
 
 // Version is overridden at build time via
-// -ldflags "-X github.com/incantery/sigil/core/cli.Version=…".
+// -ldflags "-X github.com/incantery/sigil/internal/cli.Version=…".
 var Version = "0.0.1-dev"
 
 // ErrSilent signals that a subcommand has already printed its own error output

@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/incantery/sigil/core/load"
+	"github.com/incantery/sigil/internal/load"
 )
 
 func newCheckCmd() *cobra.Command {

@@ -3,8 +3,8 @@ package peval
 import (
 	"testing"
 
-	"github.com/incantery/sigil/core/ast"
-	"github.com/incantery/sigil/core/parse"
+	"github.com/incantery/sigil/internal/ast"
+	"github.com/incantery/sigil/internal/parse"
 )
 
 // envFrom builds a peval Env from module source.

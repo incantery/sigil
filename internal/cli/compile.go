@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/incantery/sigil/core/load"
+	"github.com/incantery/sigil/internal/load"
 )
 
 // shell is the minimal HTML page that hosts a sigil bundle.

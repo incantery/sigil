@@ -3,7 +3,7 @@
 // cell, Button, etc. are ordinary names applied via App.
 package ast
 
-import "github.com/incantery/sigil/core/token"
+import "github.com/incantery/sigil/internal/token"
 
 // Pos is a 1-based source position.
 type Pos struct {

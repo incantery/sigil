@@ -13,11 +13,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/incantery/sigil/core/ast"
-	"github.com/incantery/sigil/core/parse"
-	"github.com/incantery/sigil/core/peval"
-	"github.com/incantery/sigil/core/token"
-	"github.com/incantery/sigil/core/types"
+	"github.com/incantery/sigil/internal/ast"
+	"github.com/incantery/sigil/internal/parse"
+	"github.com/incantery/sigil/internal/peval"
+	"github.com/incantery/sigil/internal/token"
+	"github.com/incantery/sigil/internal/types"
 )
 
 // prelude is emitted ahead of user code.

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/incantery/sigil/core/cli"
+	"github.com/incantery/sigil/internal/cli"
 )
 
 func main() {

@@ -21,11 +21,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/sigil/core/ast"
-	"github.com/incantery/sigil/core/emit"
-	"github.com/incantery/sigil/core/parse"
-	"github.com/incantery/sigil/core/peval"
-	"github.com/incantery/sigil/core/types"
+	"github.com/incantery/sigil/internal/ast"
+	"github.com/incantery/sigil/internal/emit"
+	"github.com/incantery/sigil/internal/parse"
+	"github.com/incantery/sigil/internal/peval"
+	"github.com/incantery/sigil/internal/types"
 )
 
 // Options configures import-path resolution.

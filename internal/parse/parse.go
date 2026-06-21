@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/incantery/sigil/core/ast"
-	"github.com/incantery/sigil/core/lex"
-	"github.com/incantery/sigil/core/token"
+	"github.com/incantery/sigil/internal/ast"
+	"github.com/incantery/sigil/internal/lex"
+	"github.com/incantery/sigil/internal/token"
 )
 
 // Error is a parse error with source position.

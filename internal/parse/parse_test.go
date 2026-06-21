@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/incantery/sigil/core/ast"
+	"github.com/incantery/sigil/internal/ast"
 )
 
 func TestParseModule(t *testing.T) {

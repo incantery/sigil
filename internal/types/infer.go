@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/incantery/sigil/core/ast"
-	"github.com/incantery/sigil/core/token"
+	"github.com/incantery/sigil/internal/ast"
+	"github.com/incantery/sigil/internal/token"
 )
 
 // Checker performs type inference over a module.

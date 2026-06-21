@@ -14,7 +14,7 @@ package peval
 import (
 	"maps"
 
-	"github.com/incantery/sigil/core/ast"
+	"github.com/incantery/sigil/internal/ast"
 )
 
 // Env holds the top-level value/function definitions available for inlining,
