@@ -16,8 +16,19 @@ for the pitch and `docs/kernel-redesign.md` for the design.
 - **`std/`** — the standard library, in Sigil (`.sigil`): reactive, html, ui, style,
   router, http, result, list, string. Resolved by the loader against a `Root`
   dir; imports are Go-style strings, e.g. `import "std/ui" (card, button)`.
+- **`editor/`** — editor support (rebuilt for the current language; the *old*
+  `editor/` was deleted with the kernel). `tree-sitter-sigil/` is the tree-sitter
+  grammar (Neovim) — `grammar.js` + an offside-rule external scanner
+  (`src/scanner.c`), queries, committed generated `src/parser.c`; `vscode-sigil/`
+  is the VS Code extension (a TextMate grammar — VS Code has no native
+  tree-sitter); `nvim/ftdetect`. Make targets: `tree-sitter{,-test,-verify}`,
+  `nvim-install`, `vscode-ext`. **Gotcha:** `tree-sitter parse` caches the
+  compiled scanner at `~/.cache/tree-sitter/lib/sigil.dylib` keyed by the
+  grammar — after editing `src/scanner.c` you MUST `rm` that file or you test a
+  stale scanner. The drift guard `make tree-sitter-verify` parses every `std/` +
+  `examples/` file and fails on ERROR nodes; trust it over synthetic corpus tests.
 
-The old "sigil" kernel (`pkg/`, `editor/`, `gauntlet/`, and the observability/Tilt
+The old "sigil" kernel (`pkg/`, `gauntlet/`, and the observability/Tilt
 scaffolding) has been **deleted** — it survives only in git history. The language
 is `internal/` + `cmd/sigil` + `std/`.
 
@@ -84,9 +95,18 @@ so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
    inputs (bind value back — needs property-vs-attribute handling).
 3. M4: a backend op-auth model → real server enforcement + the router's
    "no auth op under a public route" cross-check (check B).
-4. Editor/tooling: an LSP and formatter (the old kernel had both —
-   `pkg/lang/lsp`, `pkg/lang/format` — in git history as reference, though built
-   on the superseded architecture).
+4. Editor/tooling roadmap (4 sub-projects, each its own spec→plan→build cycle):
+   **#1 tree-sitter + TextMate highlighting — DONE** (`editor/`, merged). Remaining:
+   **#2** LSP foundation — diagnostics + document symbols (a `sigil lsp` server over
+   `internal/load`/`internal/types`; no new compiler machinery); **#3** type-aware —
+   hover + go-to-def + semantic tokens (needs NEW analysis in `internal/`: a
+   position→node index, a node→inferred-type pass, a definition resolver — the
+   checker today returns only module signatures, no per-node types); **#4**
+   completion. Also a formatter eventually. The old kernel's `pkg/lang/lsp` +
+   `pkg/lang/format` are in git history as reference (superseded architecture).
+   Follow-up idea from the #1 review: extend the keyword cross-check to assert every
+   keyword appears in BOTH `highlights.scm` and `sigil.tmLanguage.json` (catches
+   nvim/VS Code highlight drift automatically).
 
 ## Gotchas (learned the hard way)
 
