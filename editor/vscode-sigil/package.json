@@ -1,0 +1,21 @@
+{
+  "name": "vscode-sigil",
+  "displayName": "Sigil",
+  "description": "Syntax highlighting for the Sigil language",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.75.0" },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [{
+      "id": "sigil",
+      "aliases": ["Sigil", "sigil"],
+      "extensions": [".sigil"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "sigil",
+      "scopeName": "source.sigil",
+      "path": "./syntaxes/sigil.tmLanguage.json"
+    }]
+  }
+}

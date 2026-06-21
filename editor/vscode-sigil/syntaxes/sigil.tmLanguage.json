@@ -1,0 +1,53 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Sigil",
+  "scopeName": "source.sigil",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#string" },
+    { "include": "#keyword" },
+    { "include": "#type" },
+    { "include": "#hole" },
+    { "include": "#number" },
+    { "include": "#operator" }
+  ],
+  "repository": {
+    "comment": {
+      "match": "//.*$",
+      "name": "comment.line.double-slash.sigil"
+    },
+    "keyword": {
+      "match": "\\b(let|rec|pub|import|as|type|fun|if|then|else|match|with|of|effect)\\b",
+      "name": "keyword.control.sigil"
+    },
+    "type": {
+      "match": "\\b[A-Z][A-Za-z0-9_]*\\b",
+      "name": "entity.name.type.sigil"
+    },
+    "hole": {
+      "match": "\\b__[A-Za-z_][A-Za-z0-9_']*\\b",
+      "name": "support.function.builtin.sigil"
+    },
+    "number": {
+      "match": "\\b\\d+(\\.\\d+)?\\b",
+      "name": "constant.numeric.sigil"
+    },
+    "operator": {
+      "match": "(\\|>|\\|\\||&&|==|!=|<=|>=|<|>|\\+\\+|->|[+\\-*/=])",
+      "name": "keyword.operator.sigil"
+    },
+    "string": {
+      "begin": "\"",
+      "end": "\"",
+      "name": "string.quoted.double.sigil",
+      "patterns": [
+        {
+          "begin": "\\$\\{",
+          "end": "\\}",
+          "name": "meta.embedded.sigil",
+          "patterns": [{ "include": "$self" }]
+        }
+      ]
+    }
+  }
+}
