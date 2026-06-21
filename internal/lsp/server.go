@@ -76,6 +76,11 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 		_ = json.Unmarshal(msg.Params, &p)
 		s.docs.remove(p.TextDocument.URI)
 		_ = s.conn.Notify("textDocument/publishDiagnostics", PublishDiagnosticsParams{URI: p.TextDocument.URI, Diagnostics: []Diagnostic{}})
+	case "textDocument/documentSymbol":
+		var p DocumentSymbolParams
+		_ = json.Unmarshal(msg.Params, &p)
+		text, _ := s.docs.get(p.TextDocument.URI)
+		_ = s.conn.Reply(msg.ID, documentSymbols(text))
 	default:
 		if !msg.IsNotification() {
 			_ = s.conn.ReplyError(msg.ID, CodeMethodNotFound, "method not found: "+msg.Method)

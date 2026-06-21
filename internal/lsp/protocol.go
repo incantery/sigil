@@ -5,6 +5,13 @@ package lsp
 
 const TextDocumentSyncFull = 1
 
+const (
+	SymbolKindEnum     = 10
+	SymbolKindFunction = 12
+	SymbolKindVariable = 13
+	SymbolKindStruct   = 23
+)
+
 type InitializeParams struct {
 	RootURI          string            `json:"rootUri"`
 	WorkspaceFolders []WorkspaceFolder `json:"workspaceFolders"`
@@ -77,5 +84,16 @@ type PublishDiagnosticsParams struct {
 }
 
 type DidSaveParams struct {
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+}
+
+type DocumentSymbol struct {
+	Name           string `json:"name"`
+	Kind           int    `json:"kind"`
+	Range          Range  `json:"range"`
+	SelectionRange Range  `json:"selectionRange"`
+}
+
+type DocumentSymbolParams struct {
 	TextDocument TextDocumentIdentifier `json:"textDocument"`
 }
