@@ -10,7 +10,7 @@ for the pitch and `docs/kernel-redesign.md` for the design.
   Packages (flat): `lex`, `token`, `ast`, `parse`, `types` (Hindley-Milner),
   `peval` (partial evaluator / compile-time CSS extraction), `emit` (JS emitter +
   runtime prelude), `load` (module loader + linker), `cli` (the `sigil` CLI:
-  `version`, `check`, `build`, `serve`). The CLI is wrapped by the `cmd/sigil`
+  `version`, `check`, `build`, `serve`, `dev`). The CLI is wrapped by the `cmd/sigil`
   binary (`go run ./cmd/sigil` or `make build` → `bin/sigil`).
 - **`examples/`** — runnable `.sigil` apps (e.g. `examples/counter/counter.sigil`).
 - **`std/`** — the standard library, in Sigil (`.sigil`): reactive, html, ui, style,
@@ -37,9 +37,16 @@ is `internal/` + `cmd/sigil` + `std/`.
 ```sh
 go build ./...                                            # whole repo must stay green
 go test ./...                                             # language suite (incl. headless-Chrome e2e)
-go run ./cmd/sigil serve examples/counter/counter.sigil   # serves on :8099
+go run ./cmd/sigil serve examples/counter/counter.sigil   # serves on :8099 (build-once, production)
+go run ./cmd/sigil dev examples/counter/counter.sigil     # HMR dev server on :8099
 make build                                                # → bin/sigil
 ```
+
+`serve` builds the bundle once at startup and serves static bytes — use it for
+production. `dev` watches every `.sigil` file and performs state-preserving
+in-place hot module replacement over SSE — use it during development. See
+`docs/dev-server.md` for details on the serve/dev split and state-preservation
+semantics.
 
 Browser tests use chromedp and **skip** if Chrome is absent. The dep
 `github.com/dop251/goja` runs emitted JS hermetically in non-browser tests.
@@ -86,9 +93,13 @@ guarded by `internal/load` `TestCounterExample`.
 
 ## What's next (rough priority)
 
-The old kernel is gone and the `sigil` CLI (`check`/`build`/`serve`) is in place,
-so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
+The old kernel is gone and the `sigil` CLI (`check`/`build`/`serve`/`dev`) is in
+place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
 
+0. **`sigil dev` HMR dev server — DONE** (`sigil dev` watches `.sigil` files and
+   does state-preserving in-place hot module replacement over SSE; `sigil serve` is
+   now build-once/production). v1 caveat: per-row local state created inside an
+   `each` render thunk resets on reload; keyed `each` is the follow-up.
 1. More guarded boundaries: `localStorage` (persistence), time, random — same
    total-decoder pattern, mostly synchronous.
 2. `std/list` round-out (foldl/reverse/zip); `std/each` keyed-by-fn; controlled
