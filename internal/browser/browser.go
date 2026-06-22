@@ -68,7 +68,7 @@ func New() (*Session, error) {
 
 	// 2. headless Chrome.
 	allocCtx, allocCancel := chromedp.NewExecAllocator(context.Background(),
-		append(chromedp.DefaultExecAllocatorOptions[:], chromedp.Headless)...)
+		chromedp.DefaultExecAllocatorOptions[:]...)
 	ctx, ctxCancel := chromedp.NewContext(allocCtx)
 	s.allocCancel, s.ctxCancel, s.ctx = allocCancel, ctxCancel, ctx
 
@@ -101,8 +101,15 @@ func (s *Session) handleWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.mu.Lock()
+	var oldConn net.Conn
+	if s.conn != nil {
+		oldConn = s.conn
+	}
 	s.conn = conn
 	s.mu.Unlock()
+	if oldConn != nil {
+		oldConn.Close() //nolint:errcheck
+	}
 	for {
 		data, err := wsutil.ReadClientText(conn)
 		if err != nil {
@@ -112,11 +119,13 @@ func (s *Session) handleWS(w http.ResponseWriter, r *http.Request) {
 		var probe map[string]json.RawMessage
 		if json.Unmarshal(data, &probe) == nil {
 			if _, ok := probe["hello"]; ok {
+				s.mu.Lock()
 				select {
 				case <-s.ready:
 				default:
 					close(s.ready)
 				}
+				s.mu.Unlock()
 				continue
 			}
 		}
@@ -157,6 +166,9 @@ func (s *Session) send(it intent) (reply, error) {
 		}
 		return rep, nil
 	case <-time.After(15 * time.Second):
+		s.mu.Lock()
+		delete(s.pending, it.ID)
+		s.mu.Unlock()
 		return reply{}, fmt.Errorf("intent %s timed out", it.Op)
 	}
 }
@@ -165,13 +177,14 @@ func (s *Session) send(it intent) (reply, error) {
 func (s *Session) Navigate(url string) error {
 	s.mu.Lock()
 	s.ready = make(chan struct{}) // reset readiness for the new document
+	ready := s.ready
 	s.conn = nil
 	s.mu.Unlock()
 	if err := chromedp.Run(s.ctx, chromedp.Navigate(url)); err != nil {
 		return err
 	}
 	select {
-	case <-s.ready:
+	case <-ready:
 		return nil
 	case <-time.After(15 * time.Second):
 		return fmt.Errorf("agent did not connect after navigating to %s", url)
