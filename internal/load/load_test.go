@@ -141,6 +141,29 @@ func TestUnresolvedImport(t *testing.T) {
 	}
 }
 
+func TestBundleTestEmitsRunner(t *testing.T) {
+	files := map[string]string{
+		"main": "test \"trivial\" {\n  expect { pass = true, label = \"x\", got = \"1\", expected = \"1\" }\n}",
+	}
+	dir := t.TempDir()
+	for name, src := range files {
+		if err := os.WriteFile(filepath.Join(dir, name+".sigil"), []byte(src), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	prog, err := Load(filepath.Join(dir, "main.sigil"), Options{Root: dir})
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+	js, err := prog.BundleTest()
+	if err != nil {
+		t.Fatalf("bundle-test: %v", err)
+	}
+	if !strings.Contains(js, "__runTests") || !strings.Contains(js, "__test(") {
+		t.Errorf("bundle missing test runner hooks:\n%s", js)
+	}
+}
+
 // TestPrefixStripping checks that an in-repo module path prefix maps to a nested
 // local file under Root.
 func TestPrefixStripping(t *testing.T) {

@@ -252,10 +252,11 @@ func (l *loader) mergeDeps(m *Module) (*types.Exports, error) {
 // Bundle links the type-checked program into one JS program. A program-wide
 // partial-evaluator environment (every module's top-level definitions) is built
 // so the emitter can fold static styles across module boundaries.
-func (p *Program) Bundle() (string, error)    { return p.bundle(false) }
-func (p *Program) BundleDev() (string, error) { return p.bundle(true) }
+func (p *Program) Bundle() (string, error)     { return p.bundleWith(emit.Bundle) }
+func (p *Program) BundleDev() (string, error)  { return p.bundleWith(emit.BundleDev) }
+func (p *Program) BundleTest() (string, error) { return p.bundleWith(emit.BundleTest) }
 
-func (p *Program) bundle(dev bool) (string, error) {
+func (p *Program) bundleWith(emitFn func([]emit.LinkedModule, *peval.Env) (string, error)) (string, error) {
 	linked := make([]emit.LinkedModule, len(p.Modules))
 	env := peval.NewEnv()
 	for i, m := range p.Modules {
@@ -267,10 +268,7 @@ func (p *Program) bundle(dev bool) (string, error) {
 			Exports: exportNames(m),
 		}
 	}
-	if dev {
-		return emit.BundleDev(linked, env)
-	}
-	return emit.Bundle(linked, env)
+	return emitFn(linked, env)
 }
 
 // importBindings lists, per dependency, the names to re-bind into m's scope:
