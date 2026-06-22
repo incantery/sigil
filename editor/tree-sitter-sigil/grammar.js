@@ -1,5 +1,5 @@
 // KEYWORDS — kept in sync with internal/token (TestGrammarKeywordsMatch).
-const KEYWORDS = ["as","effect","else","fun","if","import","let","match","of","pub","rec","then","type","with"];
+const KEYWORDS = ["as","effect","else","expect","fun","if","import","let","match","of","pub","rec","test","then","type","with"];
 
 function commaSep1(rule) { return seq(rule, repeat(seq(',', rule))); }
 

@@ -70,8 +70,42 @@ type FieldType struct {
 	Type TypeExpr
 }
 
+// TestDecl is a top-level `test "name" { stmts }` declaration. Its body is an
+// effect context; statements are TestLet / TestExpect / TestRun. Dropped from
+// non-test builds.
+type TestDecl struct {
+	Pos     Pos
+	NamePos Pos
+	Name    string
+	Body    []TestStmt
+}
+
+// TestStmt is one statement inside a test block.
+type TestStmt interface{ testStmtNode() }
+
+// TestLet binds a name for subsequent statements: `let n = expr`.
+type TestLet struct {
+	Pos   Pos
+	Name  string
+	Value Expr
+}
+
+// TestExpect asserts a Match value: `expect expr`.
+type TestExpect struct {
+	Pos Pos
+	X   Expr
+}
+
+// TestRun is a bare effectful statement inside a test block.
+type TestRun struct{ X Expr }
+
+func (*TestLet) testStmtNode()    {}
+func (*TestExpect) testStmtNode() {}
+func (*TestRun) testStmtNode()    {}
+
 func (*LetDecl) declNode()  {}
 func (*TypeDecl) declNode() {}
+func (*TestDecl) declNode() {}
 
 // --- type expressions ---
 

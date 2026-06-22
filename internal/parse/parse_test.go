@@ -154,6 +154,40 @@ func TestParseInterpolation(t *testing.T) {
 	}
 }
 
+func TestParseTestDecl(t *testing.T) {
+	src := `test "reverse swaps ends" {
+  let xs = [1, 2];
+  __set c 1;
+  expect (eq xs [2, 1])
+}`
+	m, err := Module(src)
+	if err != nil {
+		t.Fatalf("parse error: %v", err)
+	}
+	if len(m.Decls) != 1 {
+		t.Fatalf("got %d decls, want 1", len(m.Decls))
+	}
+	td, ok := m.Decls[0].(*ast.TestDecl)
+	if !ok {
+		t.Fatalf("decl is %T, want *ast.TestDecl", m.Decls[0])
+	}
+	if td.Name != "reverse swaps ends" {
+		t.Errorf("name = %q, want %q", td.Name, "reverse swaps ends")
+	}
+	if len(td.Body) != 3 {
+		t.Fatalf("got %d stmts, want 3", len(td.Body))
+	}
+	if _, ok := td.Body[0].(*ast.TestLet); !ok {
+		t.Errorf("stmt 0 is %T, want *ast.TestLet", td.Body[0])
+	}
+	if _, ok := td.Body[1].(*ast.TestRun); !ok {
+		t.Errorf("stmt 1 is %T, want *ast.TestRun", td.Body[1])
+	}
+	if _, ok := td.Body[2].(*ast.TestExpect); !ok {
+		t.Errorf("stmt 2 is %T, want *ast.TestExpect", td.Body[2])
+	}
+}
+
 // TestEchoProgram parses the canonical Echo example end to end.
 func TestEchoProgram(t *testing.T) {
 	src := `import "github.com/incantery/sigil/std/ui" (card, stack, button, text, title)
