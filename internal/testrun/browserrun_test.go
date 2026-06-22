@@ -2,7 +2,6 @@ package testrun
 
 import (
 	"path/filepath"
-	"strings"
 	"testing"
 )
 
@@ -41,5 +40,4 @@ test "reads dom" {
 	if allExpectsPass(r2[0].Expects) {
 		t.Error("expected the eq to fail when domText differs")
 	}
-	_ = strings.TrimSpace
 }

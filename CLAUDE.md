@@ -41,7 +41,8 @@ go test ./...                                             # language suite (incl
 go run ./cmd/sigil serve examples/counter/counter.sigil   # serves on :8099 (build-once, production)
 go run ./cmd/sigil dev examples/counter/counter.sigil     # HMR dev server on :8099
 make build                                                # → bin/sigil
-go run ./cmd/sigil test tests --root .                    # run *_test.sigil in goja
+go run ./cmd/sigil test tests --root . --skip-dir browser # run goja *_test.sigil suite
+make test-browser                                         # browser tests (requires served app + Chrome)
 ```
 
 `serve` builds the bundle once at startup and serves static bytes — use it for
@@ -50,8 +51,11 @@ in-place hot module replacement over SSE — use it during development. See
 `docs/dev-server.md` for details on the serve/dev split and state-preservation
 semantics.
 
-Browser tests use chromedp and **skip** if Chrome is absent. The dep
-`github.com/dop251/goja` runs emitted JS hermetically in non-browser tests.
+Tests that import `std/browser` are automatically routed to headless Chrome;
+all others run in goja. Browser tests **skip cleanly** when Chrome is absent
+so CI without Chrome stays green. See `docs/testing.md` for full details.
+
+The dep `github.com/dop251/goja` runs emitted JS hermetically in non-browser tests.
 
 ## The kernel (≈24 intrinsics — keep it from growing)
 
@@ -145,10 +149,14 @@ place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
    cross-check to assert every keyword appears in BOTH `highlights.scm` and
    `sigil.tmLanguage.json` (catches nvim/VS Code highlight drift automatically).
 
-5. Test framework — Slice A (goja tier) DONE: `test`/`expect` syntax, `std/test`
-   matchers, test-only prelude, `sigil test` runner. Tests live in `tests/`
-   (`*_test.sigil`); see docs/testing.md. Slice B next: static DOM-reachability
-   classifier + chromedp driver to route DOM tests to Chrome.
+5. **Sigil Browser SP1 (driving spine) — DONE** (`std/browser` DSL: `navigate`,
+   `click`, `fill`, `waitVisible`, `domText`; `internal/browser` CDP+ws driver;
+   dependency-closure classifier; classify-and-route in `internal/testrun`;
+   dogfood Go test + `make test-browser`; Chrome-absent skip; failure artifacts
+   under `.sigil-test/last/`). See spec:
+   `docs/superpowers/specs/2026-06-22-sigil-browser-sp1-design.md` and
+   `docs/testing.md`. **SP2 next:** AI run bundle (per-step sync capture,
+   per-test routing, auto-escalation re-run).
 
 ## Gotchas (learned the hard way)
 

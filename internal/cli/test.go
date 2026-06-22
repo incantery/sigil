@@ -8,6 +8,7 @@ import (
 
 func newTestCmd() *cobra.Command {
 	var root string
+	var skipDirs []string
 	cmd := &cobra.Command{
 		Use:   "test [PATH]",
 		Short: "Compile and run *_test.sigil files in goja",
@@ -17,7 +18,13 @@ func newTestCmd() *cobra.Command {
 			if len(args) == 1 {
 				path = args[0]
 			}
-			ok, err := testrun.Run(cmd.OutOrStdout(), path, root)
+			var ok bool
+			var err error
+			if len(skipDirs) > 0 {
+				ok, err = testrun.RunSkipDirs(cmd.OutOrStdout(), path, root, skipDirs)
+			} else {
+				ok, err = testrun.Run(cmd.OutOrStdout(), path, root)
+			}
 			if err != nil {
 				return err
 			}
@@ -28,5 +35,6 @@ func newTestCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&root, "root", ".", "module root directory (where std/ lives)")
+	cmd.Flags().StringArrayVar(&skipDirs, "skip-dir", nil, "subdirectory names to skip (may be repeated)")
 	return cmd
 }
