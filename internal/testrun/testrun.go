@@ -71,7 +71,11 @@ func runFile(file, root string) ([]TestResult, error) {
 		return nil, err
 	}
 	var results []TestResult
-	if err := json.Unmarshal([]byte(v.Export().(string)), &results); err != nil {
+	s, ok := v.Export().(string)
+	if !ok {
+		return nil, fmt.Errorf("__runTests() did not return a string (got %T)", v.Export())
+	}
+	if err := json.Unmarshal([]byte(s), &results); err != nil {
 		return nil, err
 	}
 	return results, nil
