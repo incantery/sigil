@@ -60,4 +60,6 @@ highlight extent mis-measured (a rare cosmetic edge). See `docs/superpowers/spec
 
 Completion v1 limitations: member/after-`.` completion, bare-import name
 expansion (e.g., `import "std/ui"` — `card` completion won't auto-expand to the
-full import), and completion detail (type signatures for candidates).
+full import), completion detail (type signatures for candidates), and local
+completion is function-scoped rather than position-precise (a binder declared
+later in the same function may be offered).

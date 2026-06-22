@@ -23,6 +23,7 @@ func TestCompletion(t *testing.T) {
 	send(cw, `{"jsonrpc":"2.0","id":2,"method":"textDocument/completion","params":{"textDocument":{"uri":"`+uri+`"},"position":{"line":1,"character":12}}}`)
 	// The reply lists the local `n`, the top-level fn `inc`, the import `card`,
 	// and a keyword. Assert a few labels appear in the items.
+	waitFor(t, &out, `"label":"n"`)
 	waitFor(t, &out, `"label":"inc"`)
 	waitFor(t, &out, `"label":"card"`)
 	waitFor(t, &out, `"label":"match"`)

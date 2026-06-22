@@ -234,6 +234,8 @@ func completionItemKind(k analysis.CompletionKind) int {
 		return 20 // EnumMember
 	case analysis.CompKeyword:
 		return 14 // Keyword
+	case analysis.CompVariable:
+		return 6 // Variable
 	default:
 		return 6 // Variable
 	}
