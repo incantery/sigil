@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/dop251/goja"
+	"github.com/incantery/sigil/internal/browser"
 	"github.com/incantery/sigil/internal/load"
 )
 
@@ -90,14 +91,52 @@ func Run(w io.Writer, path, root string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	total, passed, failed := 0, 0, 0
+	total, passed, failed, skipped := 0, 0, 0, 0
 	allOK := true
+
+	// Lazily create one browser Session, shared across browser files.
+	var sess *browser.Session
+	var browserUnavailable bool
+	getSession := func() *browser.Session {
+		if sess == nil && !browserUnavailable {
+			s, e := browser.New()
+			if e != nil {
+				browserUnavailable = true
+				return nil
+			}
+			sess = s
+		}
+		return sess
+	}
+	defer func() {
+		if sess != nil {
+			sess.Close()
+		}
+	}()
+	artifactDir := filepath.Join(".sigil-test", "last")
+
 	for _, file := range files {
 		fmt.Fprintln(w, file)
-		results, err := runFile(file, root)
-		if err != nil {
+
+		prog, lerr := load.Load(file, load.Options{Root: root})
+		browserFile := lerr == nil && isBrowserProgram(prog)
+
+		var results []TestResult
+		var rerr error
+		if browserFile {
+			s := getSession()
+			if s == nil {
+				skipped++
+				fmt.Fprintf(w, "  ⤼ skipped (no Chrome): browser test\n")
+				continue
+			}
+			results, rerr = runFileBrowser(file, root, s, artifactDir)
+		} else {
+			results, rerr = runFile(file, root)
+		}
+		if rerr != nil {
 			allOK = false
-			fmt.Fprintf(w, "  ✗ failed to compile/run: %v\n", err)
+			fmt.Fprintf(w, "  ✗ failed to compile/run: %v\n", rerr)
 			continue
 		}
 		for _, r := range results {
@@ -113,7 +152,7 @@ func Run(w io.Writer, path, root string) (bool, error) {
 			if r.Error != "" {
 				hint := ""
 				if looksBrowser(r.Error) {
-					hint = " (looks like a browser test — Slice B will route these to Chrome)"
+					hint = " (looks like a browser test — needs std/browser)"
 				}
 				fmt.Fprintf(w, "      error: %s%s\n", r.Error, hint)
 			}
@@ -124,7 +163,7 @@ func Run(w io.Writer, path, root string) (bool, error) {
 			}
 		}
 	}
-	fmt.Fprintf(w, "\n%d files, %d tests, %d passed, %d failed\n", len(files), total, passed, failed)
+	fmt.Fprintf(w, "\n%d files, %d tests, %d passed, %d failed, %d skipped\n", len(files), total, passed, failed, skipped)
 	return allOK, nil
 }
 
