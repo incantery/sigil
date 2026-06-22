@@ -132,11 +132,16 @@ place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
    classifier + delta encoder in `internal/analysis/semantic.go`; parser gained
    name positions on `let`/`type` decls and constructor-pattern positions;
    `textDocument/semanticTokens/full` handler in LSP). The **type-aware trio**
-   (hover, go-to-def, semantic tokens) is now complete. Remaining editor work:
-   **#4 completion**. Also a formatter eventually. The old kernel's
-   `pkg/lang/lsp` + `pkg/lang/format` are in git history as reference (superseded
-   architecture). Follow-up idea from the #1 review: extend the keyword cross-check
-   to assert every keyword appears in BOTH `highlights.scm` and
+   (hover, go-to-def, semantic tokens) is now complete.
+   **#4 completion — DONE** (parse-only candidate assembly in
+   `internal/analysis/completion.go` — locals, top-level declarations, imports,
+   keywords + `textDocument/completion` LSP handler). The **editor roadmap is now
+   complete** (#1 highlighting, #2 LSP foundation, #3 type-aware, #4 completion).
+   Deferred follow-ups: member/after-`.` completion, bare-import name expansion,
+   and completion detail (type signatures). Also a formatter eventually. The old
+   kernel's `pkg/lang/lsp` + `pkg/lang/format` are in git history as reference
+   (superseded architecture). Follow-up idea from the #1 review: extend the keyword
+   cross-check to assert every keyword appears in BOTH `highlights.scm` and
    `sigil.tmLanguage.json` (catches nvim/VS Code highlight drift automatically).
 
 ## Gotchas (learned the hard way)

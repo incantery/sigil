@@ -25,6 +25,10 @@ protocol is hand-rolled (no external LSP dependency).
   `property`), so the editor can distinguish a type from a constructor and a
   function from a local — disambiguation the grammar alone can't do. Keywords,
   operators, numbers, and strings are covered too (`semanticTokens/full`).
+- **Completion** — prefix completion offering in-scope locals/parameters,
+  top-level declarations (functions, values, types, constructors),
+  selectively-imported names, and keywords, each with an item kind. Parse-only,
+  so it works mid-edit as long as the buffer parses (a partial identifier does).
 
 ## Neovim
 
@@ -45,11 +49,15 @@ vim.api.nvim_create_autocmd("FileType", {
 `import "std/ui"` resolve. (`sigil` must be on `PATH` — `make build` then add
 `bin/` to PATH, or use an absolute `cmd`.)
 
-## Not yet (→ #4)
+## Not yet
 
-Completion, multi-error reporting, incremental sync, and range-and-delta token
+Multi-error reporting, incremental sync, and range-and-delta token
 requests. Also note: an error inside an *imported* file is currently reported against the
 open file at the imported error's line/col (precise cross-file attribution lands
 with future improvements). In practice the open file is usually the one with the error, so this
 rarely bites. Interpolated strings whose `${...}` hole contains a nested `"` may have their
 highlight extent mis-measured (a rare cosmetic edge). See `docs/superpowers/specs/2026-06-21-sigil-lsp-foundation-design.md`.
+
+Completion v1 limitations: member/after-`.` completion, bare-import name
+expansion (e.g., `import "std/ui"` — `card` completion won't auto-expand to the
+full import), and completion detail (type signatures for candidates).
