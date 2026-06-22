@@ -486,7 +486,13 @@ func (e *emitter) lambda(params []ast.Param, body ast.Expr) (string, error) {
 		return "", err
 	}
 	if len(stmts) == 0 {
-		return fmt.Sprintf("(%s) => %s", name, inner), nil
+		// A record literal starting with '{' is ambiguous with a JS block; wrap in
+		// parens so the engine sees it as an expression.
+		body := inner
+		if strings.HasPrefix(inner, "{") {
+			body = "(" + inner + ")"
+		}
+		return fmt.Sprintf("(%s) => %s", name, body), nil
 	}
 	return fmt.Sprintf("(%s) => { %s return %s; }", name, strings.Join(stmts, " "), inner), nil
 }

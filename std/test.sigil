@@ -1,0 +1,26 @@
+// std/test — assertion matchers for sigil's test runner.
+//
+// Each matcher returns a Match record { pass, label, got, expected }. The test
+// runner's `expect` consumes a Match and records pass/fail with a message built
+// from `got` / `expected`. `${x}` interpolation stringifies any value, and `==`
+// is structural, so `eq` works for any type.
+//
+// Match shape: { pass: Bool, label: String, got: String, expected: String }
+
+pub let eq actual expected =
+  { pass = actual == expected, label = "eq", got = "${actual}", expected = "${expected}" }
+
+pub let neq actual expected =
+  { pass = actual != expected, label = "neq", got = "${actual}", expected = "not ${expected}" }
+
+pub let isTrue b =
+  { pass = b, label = "isTrue", got = "${b}", expected = "true" }
+
+pub let isFalse b =
+  { pass = b == false, label = "isFalse", got = "${b}", expected = "false" }
+
+pub let gt actual bound =
+  { pass = actual > bound, label = "gt", got = "${actual}", expected = "> ${bound}" }
+
+pub let lt actual bound =
+  { pass = actual < bound, label = "lt", got = "${actual}", expected = "< ${bound}" }

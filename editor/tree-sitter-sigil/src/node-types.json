@@ -40,6 +40,10 @@
           "named": true
         },
         {
+          "type": "record_lit",
+          "named": true
+        },
+        {
           "type": "string",
           "named": true
         },
@@ -119,6 +123,10 @@
             "named": true
           },
           {
+            "type": "record_lit",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           },
@@ -194,6 +202,10 @@
           },
           {
             "type": "paren",
+            "named": true
+          },
+          {
+            "type": "record_lit",
             "named": true
           },
           {
@@ -286,6 +298,10 @@
         },
         {
           "type": "paren",
+          "named": true
+        },
+        {
+          "type": "record_lit",
           "named": true
         },
         {
@@ -422,6 +438,10 @@
           "named": true
         },
         {
+          "type": "record_lit",
+          "named": true
+        },
+        {
           "type": "string",
           "named": true
         },
@@ -487,6 +507,10 @@
             "named": true
           },
           {
+            "type": "record_lit",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           },
@@ -500,6 +524,104 @@
           },
           {
             "type": "unit",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "field_val",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "application",
+            "named": true
+          },
+          {
+            "type": "binop",
+            "named": true
+          },
+          {
+            "type": "effect_block",
+            "named": true
+          },
+          {
+            "type": "field",
+            "named": true
+          },
+          {
+            "type": "float",
+            "named": true
+          },
+          {
+            "type": "hole",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "if",
+            "named": true
+          },
+          {
+            "type": "lambda",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "match",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "paren",
+            "named": true
+          },
+          {
+            "type": "record_lit",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tuple",
+            "named": true
+          },
+          {
+            "type": "uident",
+            "named": true
+          },
+          {
+            "type": "unit",
+            "named": true
+          },
+          {
+            "type": "unop",
             "named": true
           }
         ]
@@ -564,6 +686,10 @@
           },
           {
             "type": "paren",
+            "named": true
+          },
+          {
+            "type": "record_lit",
             "named": true
           },
           {
@@ -645,6 +771,10 @@
             "named": true
           },
           {
+            "type": "record_lit",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           },
@@ -720,6 +850,10 @@
           },
           {
             "type": "paren",
+            "named": true
+          },
+          {
+            "type": "record_lit",
             "named": true
           },
           {
@@ -862,6 +996,10 @@
           "named": true
         },
         {
+          "type": "record_lit",
+          "named": true
+        },
+        {
           "type": "string",
           "named": true
         },
@@ -946,6 +1084,10 @@
         },
         {
           "type": "paren",
+          "named": true
+        },
+        {
+          "type": "record_lit",
           "named": true
         },
         {
@@ -1063,6 +1205,10 @@
           "named": true
         },
         {
+          "type": "record_lit",
+          "named": true
+        },
+        {
           "type": "string",
           "named": true
         },
@@ -1146,6 +1292,10 @@
           "named": true
         },
         {
+          "type": "record_lit",
+          "named": true
+        },
+        {
           "type": "string",
           "named": true
         },
@@ -1226,6 +1376,10 @@
           },
           {
             "type": "paren",
+            "named": true
+          },
+          {
+            "type": "record_lit",
             "named": true
           },
           {
@@ -1323,6 +1477,10 @@
             "named": true
           },
           {
+            "type": "record_lit",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           },
@@ -1398,6 +1556,10 @@
           },
           {
             "type": "paren",
+            "named": true
+          },
+          {
+            "type": "record_lit",
             "named": true
           },
           {
@@ -1526,6 +1688,10 @@
           "named": true
         },
         {
+          "type": "record_lit",
+          "named": true
+        },
+        {
           "type": "string",
           "named": true
         },
@@ -1582,6 +1748,21 @@
         },
         {
           "type": "wildcard",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "record_lit",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "field_val",
           "named": true
         }
       ]
@@ -1654,6 +1835,10 @@
         },
         {
           "type": "paren",
+          "named": true
+        },
+        {
+          "type": "record_lit",
           "named": true
         },
         {
@@ -1756,6 +1941,10 @@
         },
         {
           "type": "paren",
+          "named": true
+        },
+        {
+          "type": "record_lit",
           "named": true
         },
         {
@@ -2080,6 +2269,10 @@
         },
         {
           "type": "paren",
+          "named": true
+        },
+        {
+          "type": "record_lit",
           "named": true
         },
         {
