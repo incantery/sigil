@@ -15,6 +15,12 @@ var effectOps = map[string]bool{
 	"__fetch":      true,
 	"__pushPath":   true,
 	"__onPopState": true,
+	// Browser driver actions (Sigil Browser SP1). Gated as effects;
+	// __domText is a read and is intentionally omitted.
+	"__navigate":    true,
+	"__click":       true,
+	"__fill":        true,
+	"__waitVisible": true,
 }
 
 // checkEffects enforces the effect-context discipline: a reference to an effect

@@ -28,6 +28,17 @@ func TestTestDeclAcceptsMatchRecord(t *testing.T) {
 	}
 }
 
+func TestBrowserIntrinsicsTyped(t *testing.T) {
+	// __domText is a read returning String; __navigate is String -> Unit (effect).
+	src := `test "b" {
+  __navigate "http://x";
+  expect { pass = __domText "#h" == "hi", label = "eq", got = "got", expected = "exp" }
+}`
+	if err := checkSrc(t, src); err != nil {
+		t.Fatalf("expected browser intrinsics to type-check, got %v", err)
+	}
+}
+
 func TestTestDeclRejectsNonMatch(t *testing.T) {
 	src := `test "bad" {
   expect 5

@@ -1,0 +1,12 @@
+// std/browser — drive a real browser from a sigil test (Sigil Browser SP1).
+// These wrap test-time-only boundary intrinsics bound by the browser runner.
+
+pub let navigate url = (effect { __navigate url }) ()
+
+pub let click sel = (effect { __click sel }) ()
+
+pub let fill sel text = (effect { __fill sel text }) ()
+
+pub let waitVisible sel = (effect { __waitVisible sel }) ()
+
+pub let domText sel = __domText sel
