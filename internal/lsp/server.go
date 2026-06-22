@@ -56,6 +56,7 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 				Legend: SemanticTokensLegend{TokenTypes: SemanticTokenTypes, TokenModifiers: []string{}},
 				Full:   true,
 			},
+			CompletionProvider: &CompletionOptions{},
 		}})
 	case "initialized":
 		// no-op
@@ -97,6 +98,8 @@ func (s *Server) dispatch(msg *Message) (stop bool) {
 		s.handleDefinition(msg)
 	case "textDocument/semanticTokens/full":
 		s.handleSemanticTokens(msg)
+	case "textDocument/completion":
+		s.handleCompletion(msg)
 	default:
 		if !msg.IsNotification() {
 			_ = s.conn.ReplyError(msg.ID, CodeMethodNotFound, "method not found: "+msg.Method)
@@ -218,4 +221,32 @@ func uriToPath(uri string) string {
 		return uri
 	}
 	return u.Path
+}
+
+// completionItemKind maps an analysis CompletionKind to an LSP CompletionItemKind.
+func completionItemKind(k analysis.CompletionKind) int {
+	switch k {
+	case analysis.CompFunction:
+		return 3 // Function
+	case analysis.CompType:
+		return 7 // Class
+	case analysis.CompConstructor:
+		return 20 // EnumMember
+	case analysis.CompKeyword:
+		return 14 // Keyword
+	default:
+		return 6 // Variable
+	}
+}
+
+func (s *Server) handleCompletion(msg *Message) {
+	var p CompletionParams
+	_ = json.Unmarshal(msg.Params, &p)
+	text, _ := s.docs.get(p.TextDocument.URI)
+	cands := analysis.Completions(text, p.Position.Line+1, p.Position.Character+1)
+	items := make([]CompletionItem, 0, len(cands))
+	for _, c := range cands {
+		items = append(items, CompletionItem{Label: c.Label, Kind: completionItemKind(c.Kind)})
+	}
+	_ = s.conn.Reply(msg.ID, CompletionList{IsIncomplete: false, Items: items})
 }
