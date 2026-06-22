@@ -21,6 +21,9 @@ func (c *Checker) checkTest(td *ast.TestDecl, parent *env) error {
 	for _, s := range td.Body {
 		switch s := s.(type) {
 		case *ast.TestLet:
+			// TestLet binds non-recursively: unlike inferDecl/inferLet, the name is set
+			// only AFTER its value is inferred, so a test `let` cannot refer to itself
+			// (there is no `rec` form in a test body).
 			c.enterLevel()
 			t, err := c.infer(s.Value, scope)
 			if err != nil {
