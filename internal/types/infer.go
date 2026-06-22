@@ -140,6 +140,11 @@ func checkIntoRec(m *ast.Module, deps *Exports, rec map[ast.Expr]Type) (*Checker
 				return nil, nil, err
 			}
 		}
+		if td, ok := d.(*ast.TestDecl); ok {
+			if err := c.checkTest(td, root); err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 
 	// Effect-context discipline: effect operations only inside effect { } blocks.
