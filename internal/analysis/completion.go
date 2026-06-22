@@ -117,6 +117,9 @@ func enclosingLocals(m *ast.Module, cursor ast.Pos) []Candidate {
 	for _, b := range paramBinders(encl.Params) {
 		emit(b.name, CompVariable)
 	}
+	// NOTE: this collects every binder in the enclosing decl's body, including
+	// ones declared after the cursor. Completion is deliberately function-scoped,
+	// not position-precise (the editor prefix-filters; over-offering is harmless).
 	var walk func(e ast.Expr)
 	walk = func(e ast.Expr) {
 		switch e := e.(type) {

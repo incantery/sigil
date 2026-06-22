@@ -13,7 +13,7 @@ func compMap(cs []Candidate) map[string]CompletionKind {
 }
 
 func TestCompletions(t *testing.T) {
-	src := "import \"std/ui\" (card, button)\n" +
+	src := "import \"std/ui\" (card, button, Card)\n" +
 		"pub let app = 1\n" +
 		"type Color = Red | Green\n" +
 		"let inc n =\n" +
@@ -32,6 +32,7 @@ func TestCompletions(t *testing.T) {
 		"Green":  CompConstructor, // variant
 		"card":   CompFunction,    // import (lowercase)
 		"button": CompFunction,    // import (lowercase)
+		"Card":   CompType,        // import (uppercase) -> Type
 		"match":  CompKeyword,     // keyword
 		"let":    CompKeyword,     // keyword
 	}
