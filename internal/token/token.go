@@ -30,7 +30,7 @@ const (
 	HOLE       // intrinsic: __cell, __effect
 	UNDERSCORE // _
 
-	// Keywords. NOTE: this block must stay contiguous (LET..EFFECT) —
+	// Keywords. NOTE: this block must stay contiguous (LET..EXPECT) —
 	// internal/analysis/semantic.go classifies keywords by range.
 	LET
 	REC
@@ -46,6 +46,8 @@ const (
 	WITH
 	OF
 	EFFECT
+	TEST
+	EXPECT
 
 	// Punctuation.
 	LPAREN
@@ -116,6 +118,8 @@ var keywords = map[string]Kind{
 	"with":   WITH,
 	"of":     OF,
 	"effect": EFFECT,
+	"test":   TEST,
+	"expect": EXPECT,
 }
 
 // Keywords returns the language's reserved words, sorted. Editor tooling
@@ -152,7 +156,7 @@ var kindNames = map[Kind]string{
 	HOLE: "HOLE", UNDERSCORE: "UNDERSCORE",
 	LET: "let", REC: "rec", PUB: "pub", IMPORT: "import", AS: "as", TYPE: "type",
 	FUN: "fun", IF: "if", THEN: "then", ELSE: "else", MATCH: "match", WITH: "with", OF: "of",
-	EFFECT: "effect",
+	EFFECT: "effect", TEST: "test", EXPECT: "expect",
 	LPAREN: "(", RPAREN: ")", LBRACK: "[", RBRACK: "]", LBRACE: "{", RBRACE: "}",
 	COMMA: ",", EQ: "=", ARROW: "->", PIPE: "|", DOT: ".", COLON: ":", SEMI: ";",
 	PIPEFWD: "|>", OROR: "||", ANDAND: "&&", EQEQ: "==", NEQ: "!=", LT: "<", GT: ">",

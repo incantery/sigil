@@ -199,6 +199,24 @@ func buildDevPrelude() string {
 	return p
 }
 
+// testRuntime defines the globals that `test`/`expect` lower into. It is
+// appended to the production prelude to form testPrelude. These are test-only
+// JS helpers — not kernel intrinsics.
+const testRuntime = `
+const __tests = [];
+let __cur = null;
+const __test = (name, thunk) => { __tests.push({ name: name, thunk: thunk }); };
+const __expect = (m) => { __cur.push({ pass: m.pass, label: m.label, got: m.got, expected: m.expected }); };
+const __runTests = () => __tests.map((t) => {
+  __cur = [];
+  let error = null;
+  try { t.thunk(); } catch (e) { error = String(e); }
+  return { name: t.name, expects: __cur, error: error };
+});
+`
+
+var testPrelude = prelude + testRuntime
+
 // Compile parses, type-checks, and emits JavaScript for src. A type error aborts
 // before emission, so emitted code is always well-typed.
 func Compile(src string) (string, error) {
@@ -252,15 +270,21 @@ type LinkedModule struct {
 //
 // so module scopes are isolated and imports are explicit re-bindings.
 func Bundle(mods []LinkedModule, env *peval.Env) (string, error) {
-	return bundle(mods, env, prelude)
+	return bundle(mods, env, prelude, false)
 }
 
 // BundleDev is Bundle with the HMR-instrumented dev prelude.
 func BundleDev(mods []LinkedModule, env *peval.Env) (string, error) {
-	return bundle(mods, env, devPrelude)
+	return bundle(mods, env, devPrelude, false)
 }
 
-func bundle(mods []LinkedModule, env *peval.Env, pre string) (string, error) {
+// BundleTest is Bundle with the test prelude; test declarations are emitted as
+// __test registrations and run by __runTests().
+func BundleTest(mods []LinkedModule, env *peval.Env) (string, error) {
+	return bundle(mods, env, testPrelude, true)
+}
+
+func bundle(mods []LinkedModule, env *peval.Env, pre string, test bool) (string, error) {
 	sheet := newCSSSheet()
 	var mb strings.Builder // module bodies (populate the sheet as a side effect)
 	for _, mod := range mods {
@@ -270,7 +294,7 @@ func bundle(mods []LinkedModule, env *peval.Env, pre string) (string, error) {
 				fmt.Fprintf(&mb, "const %s = __m_%s.%s;\n", mangle(n), imp.FromID, mangle(n))
 			}
 		}
-		e := &emitter{sheet: sheet, penv: env}
+		e := &emitter{sheet: sheet, penv: env, test: test}
 		for _, d := range mod.AST.Decls {
 			s, err := e.decl(d)
 			if err != nil {
@@ -303,6 +327,7 @@ type emitter struct {
 	tmp   int
 	sheet *cssSheet  // accumulates extracted atomic CSS rules (nil = no extraction)
 	penv  *peval.Env // partial-evaluator env for style folding (nil = no extraction)
+	test  bool       // emit test declarations (testDecl) instead of dropping them
 }
 
 // cssSheet collects the atomic CSS rules extracted from static styles. Identical
@@ -376,8 +401,53 @@ func (e *emitter) decl(d ast.Decl) (string, error) {
 			return "", err
 		}
 		return fmt.Sprintf("const %s = %s;", mangle(d.Name), val), nil
+	case *ast.TestDecl:
+		return e.testDecl(d)
 	default:
 		return "", fmt.Errorf("cannot emit %T", d)
+	}
+}
+
+// testDecl emits a __test registration, or "" in a non-test build (so test
+// declarations are dropped from build/serve/dev bundles).
+func (e *emitter) testDecl(d *ast.TestDecl) (string, error) {
+	if !e.test {
+		return "", nil
+	}
+	var b strings.Builder
+	for _, s := range d.Body {
+		js, err := e.testStmt(s)
+		if err != nil {
+			return "", err
+		}
+		b.WriteString(js)
+		b.WriteByte(' ')
+	}
+	return fmt.Sprintf("__test(%s, () => { %s});", strconv.Quote(d.Name), b.String()), nil
+}
+
+func (e *emitter) testStmt(s ast.TestStmt) (string, error) {
+	switch s := s.(type) {
+	case *ast.TestLet:
+		v, err := e.expr(s.Value)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("const %s = %s;", mangle(s.Name), v), nil
+	case *ast.TestExpect:
+		x, err := e.expr(s.X)
+		if err != nil {
+			return "", err
+		}
+		return fmt.Sprintf("__expect(%s);", x), nil
+	case *ast.TestRun:
+		x, err := e.expr(s.X)
+		if err != nil {
+			return "", err
+		}
+		return x + ";", nil
+	default:
+		return "", fmt.Errorf("cannot emit test statement %T", s)
 	}
 }
 
@@ -416,7 +486,13 @@ func (e *emitter) lambda(params []ast.Param, body ast.Expr) (string, error) {
 		return "", err
 	}
 	if len(stmts) == 0 {
-		return fmt.Sprintf("(%s) => %s", name, inner), nil
+		// A record literal starting with '{' is ambiguous with a JS block; wrap in
+		// parens so the engine sees it as an expression.
+		body := inner
+		if strings.HasPrefix(inner, "{") {
+			body = "(" + inner + ")"
+		}
+		return fmt.Sprintf("(%s) => %s", name, body), nil
 	}
 	return fmt.Sprintf("(%s) => { %s return %s; }", name, strings.Join(stmts, " "), inner), nil
 }

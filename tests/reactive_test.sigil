@@ -1,0 +1,8 @@
+import "std/test" (eq)
+
+test "cell set updates get" {
+  let c = __cell 0;
+  __set c 1;
+  __set c 2;
+  expect (eq (__get c) 2)
+}

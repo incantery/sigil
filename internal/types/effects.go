@@ -22,16 +22,35 @@ var effectOps = map[string]bool{
 // block. Building an effect block is pure; the runtime runs it later.
 func checkEffects(m *ast.Module) error {
 	for _, d := range m.Decls {
-		ld, ok := d.(*ast.LetDecl)
-		if !ok {
-			continue
+		switch d := d.(type) {
+		case *ast.LetDecl:
+			if err := walkEffect(d.Body, 0); err != nil {
+				return err
+			}
+			if err := walkParamDefaults(d.Params); err != nil {
+				return err
+			}
+		case *ast.TestDecl:
+			for _, s := range d.Body {
+				if err := walkTestStmt(s); err != nil {
+					return err
+				}
+			}
 		}
-		if err := walkEffect(ld.Body, 0); err != nil {
-			return err
-		}
-		if err := walkParamDefaults(ld.Params); err != nil {
-			return err
-		}
+	}
+	return nil
+}
+
+// walkTestStmt checks a test statement at effect-depth 1: a test body is an
+// effect context, so effect ops (__set, __effect, ...) are legal inside it.
+func walkTestStmt(s ast.TestStmt) error {
+	switch s := s.(type) {
+	case *ast.TestLet:
+		return walkEffect(s.Value, 1)
+	case *ast.TestExpect:
+		return walkEffect(s.X, 1)
+	case *ast.TestRun:
+		return walkEffect(s.X, 1)
 	}
 	return nil
 }

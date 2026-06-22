@@ -15,7 +15,7 @@ ifeq ($(INSTALL_DIR),)
 INSTALL_DIR := $(shell go env GOPATH)/bin
 endif
 
-.PHONY: build install run test vet fmt tidy clean help \
+.PHONY: build install run test test-sigil vet fmt tidy clean help \
         tree-sitter tree-sitter-test tree-sitter-verify nvim-install vscode-ext
 
 TS_DIR := editor/tree-sitter-sigil
@@ -36,6 +36,9 @@ run: ## Run sigil without installing (e.g. make run -- serve examples/counter/co
 
 test: ## Run all Go tests
 	@go test ./...
+
+test-sigil: build ## Run *_test.sigil suite via the sigil test runner
+	./bin/sigil test tests --root .
 
 vet: ## Run go vet
 	@go vet ./...

@@ -175,6 +175,8 @@ func (p *parser) parseDecl() (ast.Decl, error) {
 		return p.parseLetDecl(pub)
 	case token.TYPE:
 		return p.parseTypeDecl(pub)
+	case token.TEST:
+		return p.parseTestDecl()
 	default:
 		return nil, p.errf("expected declaration, got %s", p.cur())
 	}
@@ -684,6 +686,71 @@ func (p *parser) parseEffect() (ast.Expr, error) {
 		return nil, err
 	}
 	return eff, nil
+}
+
+// parseTestDecl parses `test "name" { stmt; stmt; ... }`. Like effect { },
+// layout is suspended inside the braces, so statements are ';'-separated with an
+// optional trailing ';'.
+func (p *parser) parseTestDecl() (ast.Decl, error) {
+	start := p.advance() // test
+	nameTok, err := p.expect(token.STRING)
+	if err != nil {
+		return nil, err
+	}
+	name, err := strLitValue(nameTok)
+	if err != nil {
+		return nil, err
+	}
+	td := &ast.TestDecl{Pos: pos(start), NamePos: pos(nameTok), Name: name}
+	if _, err := p.expect(token.LBRACE); err != nil {
+		return nil, err
+	}
+	for !p.at(token.RBRACE) {
+		s, err := p.parseTestStmt()
+		if err != nil {
+			return nil, err
+		}
+		td.Body = append(td.Body, s)
+		if !p.accept(token.SEMI) {
+			break
+		}
+	}
+	if _, err := p.expect(token.RBRACE); err != nil {
+		return nil, err
+	}
+	return td, nil
+}
+
+func (p *parser) parseTestStmt() (ast.TestStmt, error) {
+	switch {
+	case p.at(token.EXPECT):
+		start := p.advance() // expect
+		x, err := p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+		return &ast.TestExpect{Pos: pos(start), X: x}, nil
+	case p.at(token.LET):
+		start := p.advance() // let
+		nameTok, err := p.expect(token.IDENT)
+		if err != nil {
+			return nil, err
+		}
+		if _, err := p.expect(token.EQ); err != nil {
+			return nil, err
+		}
+		v, err := p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+		return &ast.TestLet{Pos: pos(start), Name: nameTok.Lit, Value: v}, nil
+	default:
+		x, err := p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+		return &ast.TestRun{X: x}, nil
+	}
 }
 
 func (p *parser) parseLambda() (ast.Expr, error) {

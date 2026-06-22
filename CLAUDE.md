@@ -41,6 +41,7 @@ go test ./...                                             # language suite (incl
 go run ./cmd/sigil serve examples/counter/counter.sigil   # serves on :8099 (build-once, production)
 go run ./cmd/sigil dev examples/counter/counter.sigil     # HMR dev server on :8099
 make build                                                # → bin/sigil
+go run ./cmd/sigil test tests --root .                    # run *_test.sigil in goja
 ```
 
 `serve` builds the bundle once at startup and serves static bytes — use it for
@@ -143,6 +144,11 @@ place, so the tree is now `internal/` + `cmd/sigil` + `std/`. Next:
    (superseded architecture). Follow-up idea from the #1 review: extend the keyword
    cross-check to assert every keyword appears in BOTH `highlights.scm` and
    `sigil.tmLanguage.json` (catches nvim/VS Code highlight drift automatically).
+
+5. Test framework — Slice A (goja tier) DONE: `test`/`expect` syntax, `std/test`
+   matchers, test-only prelude, `sigil test` runner. Tests live in `tests/`
+   (`*_test.sigil`); see docs/testing.md. Slice B next: static DOM-reachability
+   classifier + chromedp driver to route DOM tests to Chrome.
 
 ## Gotchas (learned the hard way)
 

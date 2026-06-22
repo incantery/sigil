@@ -1,0 +1,18 @@
+import "std/test" (eq, gt, isTrue, isFalse)
+
+test "int arithmetic" {
+  expect (eq (1 + 2 * 3) 7)
+}
+
+test "structural list equality" {
+  expect (eq [1, 2, 3] [1, 2, 3])
+}
+
+test "booleans" {
+  expect (isTrue true);
+  expect (isFalse false)
+}
+
+test "ordering" {
+  expect (gt 5 3)
+}

@@ -3,7 +3,10 @@ package load
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/dop251/goja"
 )
 
 // repoRoot is the module root that holds std/ (two levels up from internal/load).
@@ -76,4 +79,45 @@ func eqSlice(got any, want []any) bool {
 		}
 	}
 	return true
+}
+
+func TestStdTestMatchersRun(t *testing.T) {
+	entry := `import "std/test" (eq, gt, isTrue, isFalse)
+test "matchers" {
+  expect (eq (1 + 2) 3);
+  expect (gt 5 3);
+  expect (isTrue true);
+  expect (isFalse false);
+  expect (eq [1, 2] [1, 2])
+}
+test "fails" {
+  expect (eq 1 2)
+}`
+	dir := t.TempDir()
+	file := filepath.Join(dir, "matchers_test.sigil")
+	if err := os.WriteFile(file, []byte(entry), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	prog, err := Load(file, Options{Root: repoRoot})
+	if err != nil {
+		t.Fatalf("load: %v", err)
+	}
+	js, err := prog.BundleTest()
+	if err != nil {
+		t.Fatalf("bundle-test: %v", err)
+	}
+	vm := goja.New()
+	v, err := vm.RunString(js + "\n;JSON.stringify(__runTests())")
+	if err != nil {
+		t.Fatalf("run: %v", err)
+	}
+	out := v.Export().(string)
+	// "matchers" test: all five expects pass. "fails" test: the single expect
+	// reports expected 2, got 1.
+	if !strings.Contains(out, `"name":"matchers"`) {
+		t.Errorf("missing matchers test in %s", out)
+	}
+	if !strings.Contains(out, `"got":"1"`) || !strings.Contains(out, `"expected":"2"`) {
+		t.Errorf("failing eq should report got 1 / expected 2: %s", out)
+	}
 }

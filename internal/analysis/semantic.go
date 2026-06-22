@@ -247,7 +247,7 @@ func semanticType(t token.Token, roles map[ast.Pos]Role, fns map[string]bool) (i
 	case token.STRING:
 		return legendString, true
 	}
-	if t.Kind >= token.LET && t.Kind <= token.EFFECT {
+	if t.Kind >= token.LET && t.Kind <= token.EXPECT {
 		return legendKeyword, true
 	}
 	if (t.Kind >= token.PIPEFWD && t.Kind <= token.BANG) ||

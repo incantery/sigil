@@ -1,5 +1,5 @@
 // KEYWORDS — kept in sync with internal/token (TestGrammarKeywordsMatch).
-const KEYWORDS = ["as","effect","else","fun","if","import","let","match","of","pub","rec","then","type","with"];
+const KEYWORDS = ["as","effect","else","expect","fun","if","import","let","match","of","pub","rec","test","then","type","with"];
 
 function commaSep1(rule) { return seq(rule, repeat(seq(',', rule))); }
 
@@ -116,11 +116,13 @@ module.exports = grammar({
 
     _atom: $ => choice(
       $.identifier, $.uident, $.hole, $.float, $.number, $.string,
-      $.unit, $.list, $.paren, $.tuple),
+      $.unit, $.list, $.paren, $.tuple, $.record_lit),
     paren: $ => seq('(', $._expression, ')'),
     tuple: $ => seq('(', $._expression, repeat1(seq(',', $._expression)), ')'),
     unit: $ => seq('(', ')'),
     list: $ => seq('[', optional(commaSep1($._expression)), ']'),
+    record_lit: $ => seq('{', optional(commaSep1($.field_val)), '}'),
+    field_val: $ => seq(field('name', $.identifier), '=', field('value', $._expression)),
 
     block: $ => seq($._indent, repeat(seq($._statement, $._newline)), $._dedent),
 
