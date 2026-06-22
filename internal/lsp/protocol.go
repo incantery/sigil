@@ -53,12 +53,32 @@ type SemanticTokens struct {
 	Data []uint `json:"data"`
 }
 
+type CompletionOptions struct {
+	TriggerCharacters []string `json:"triggerCharacters,omitempty"`
+}
+
+type CompletionParams struct {
+	TextDocument TextDocumentIdentifier `json:"textDocument"`
+	Position     Position               `json:"position"`
+}
+
+type CompletionItem struct {
+	Label string `json:"label"`
+	Kind  int    `json:"kind"`
+}
+
+type CompletionList struct {
+	IsIncomplete bool             `json:"isIncomplete"`
+	Items        []CompletionItem `json:"items"`
+}
+
 type ServerCapabilities struct {
 	TextDocumentSync       int                    `json:"textDocumentSync"`
 	DocumentSymbolProvider bool                   `json:"documentSymbolProvider"`
 	HoverProvider          bool                   `json:"hoverProvider"`
 	DefinitionProvider     bool                   `json:"definitionProvider"`
 	SemanticTokensProvider *SemanticTokensOptions `json:"semanticTokensProvider,omitempty"`
+	CompletionProvider     *CompletionOptions     `json:"completionProvider,omitempty"`
 }
 
 type TextDocumentItem struct {
