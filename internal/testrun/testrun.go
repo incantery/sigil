@@ -1,7 +1,7 @@
 // Package testrun discovers *_test.sigil files, compiles each against the
-// standard library, and routes them: pure tests run in goja; files that use
-// std/browser intrinsics are classified and routed to headless Chrome (skipping
-// cleanly when Chrome is absent).
+// standard library, and routes them: pure tests run in goja; browser tests
+// (files whose dependency closure touches std/browser intrinsics) are routed
+// to headless Chrome and skipped cleanly when Chrome is absent.
 package testrun
 
 import (
@@ -36,11 +36,6 @@ type TestResult struct {
 
 // discover returns the *_test.sigil files under path. path may be a file.
 func discover(path string) ([]string, error) {
-	return discoverSkip(path, nil)
-}
-
-// discoverSkip is like discover but skips any subdirectory whose name is in skip.
-func discoverSkip(path string, skip map[string]bool) ([]string, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return nil, err
@@ -52,9 +47,6 @@ func discoverSkip(path string, skip map[string]bool) ([]string, error) {
 	err = filepath.WalkDir(path, func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
-		}
-		if d.IsDir() && skip[d.Name()] {
-			return filepath.SkipDir
 		}
 		if !d.IsDir() && strings.HasSuffix(p, "_test.sigil") {
 			files = append(files, p)
@@ -96,21 +88,7 @@ func runFile(file, root string) ([]TestResult, error) {
 // that cannot be walked) return an error; per-file compile/run failures are
 // reported inline and make ok=false.
 func Run(w io.Writer, path, root string) (bool, error) {
-	return runWith(w, path, root, nil)
-}
-
-// RunSkipDirs is like Run but skips any subdirectory whose name is in skipDirs.
-// Use it to exclude directories like "browser" that require a live app server.
-func RunSkipDirs(w io.Writer, path, root string, skipDirs []string) (bool, error) {
-	skip := make(map[string]bool, len(skipDirs))
-	for _, d := range skipDirs {
-		skip[d] = true
-	}
-	return runWith(w, path, root, skip)
-}
-
-func runWith(w io.Writer, path, root string, skip map[string]bool) (bool, error) {
-	files, err := discoverSkip(path, skip)
+	files, err := discover(path)
 	if err != nil {
 		return false, err
 	}

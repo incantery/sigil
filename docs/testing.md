@@ -3,8 +3,7 @@
 `sigil test [PATH]` discovers `*_test.sigil` files (default `PATH` is `.`),
 compiles each against the standard library, and runs it. Tests that import
 `std/browser` are automatically routed to headless Chrome; all others run in
-goja. Pass `--skip-dir browser` to exclude browser tests (e.g. when no server
-is running): `sigil test tests --root . --skip-dir browser`.
+goja. The canonical command is `sigil test tests --root .`.
 
 ## Writing a test
 
@@ -30,9 +29,10 @@ test "reverse swaps ends" {
 - `let n = expr;` — binds a value for the rest of the test.
 
 Non-browser test files live under `tests/` (kept out of `std/`+`examples/` so
-the tree-sitter drift guard stays green). Browser test files live under
-`tests/browser/`. Run the non-browser suite with `make test-sigil` or
-`go run ./cmd/sigil test tests --root . --skip-dir browser`. The Go suite also
+the tree-sitter drift guard stays green). Browser test files that require a live
+app server live under `testdata/browser/` (outside the auto-discovered `tests/`
+tree). Run the full suite with `make test-sigil` or
+`go run ./cmd/sigil test tests --root .`. The Go suite also
 runs it via `internal/testrun` `TestDogfood`.
 
 ## How it works
@@ -85,14 +85,15 @@ goja-tier tests in the same run are unaffected. CI without Chrome stays green.
 ```sh
 # Against a served app (manual):
 go run ./cmd/sigil serve examples/counter/counter.sigil &   # :8099
-go run ./cmd/sigil test tests/browser --root .              # or: make test-browser
+go run ./cmd/sigil test testdata/browser --root .           # or: make test-browser
 
 # As part of go test (dogfood fixture, self-contained):
 go test ./internal/testrun/ -run TestDogfoodBrowser -v
 ```
 
-Browser tests live under `tests/browser/`. `make test-sigil` passes
-`--skip-dir browser` so only goja tests run; `make test-browser` scans
-`tests/browser/` and requires a served app (see comment in
-`tests/browser/counter_test.sigil`). `make tree-sitter-verify` is unaffected
-(it only scans `std/` and `examples/`).
+Server-dependent browser tests live under `testdata/browser/` (outside the
+auto-discovered `tests/` tree, so `sigil test tests --root .` never picks them
+up). `make test-sigil` runs `sigil test tests --root .` with no extra flags;
+`make test-browser` scans `testdata/browser/` and requires a served app (see
+comment in `testdata/browser/counter_test.sigil`). `make tree-sitter-verify`
+is unaffected (it only scans `std/` and `examples/`).

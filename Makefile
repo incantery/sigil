@@ -37,11 +37,11 @@ run: ## Run sigil without installing (e.g. make run -- serve examples/counter/co
 test: ## Run all Go tests
 	@go test ./...
 
-test-sigil: build ## Run *_test.sigil suite via the sigil test runner (non-browser)
-	./bin/sigil test tests --root . --skip-dir browser
+test-sigil: build ## Run *_test.sigil suite via the sigil test runner
+	./bin/sigil test tests --root .
 
 test-browser: build ## Run browser *_test.sigil (requires a served app + Chrome)
-	./bin/sigil test tests/browser --root .
+	./bin/sigil test testdata/browser --root .
 
 vet: ## Run go vet
 	@go vet ./...

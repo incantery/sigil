@@ -41,8 +41,8 @@ go test ./...                                             # language suite (incl
 go run ./cmd/sigil serve examples/counter/counter.sigil   # serves on :8099 (build-once, production)
 go run ./cmd/sigil dev examples/counter/counter.sigil     # HMR dev server on :8099
 make build                                                # → bin/sigil
-go run ./cmd/sigil test tests --root . --skip-dir browser # run goja *_test.sigil suite
-make test-browser                                         # browser tests (requires served app + Chrome)
+go run ./cmd/sigil test tests --root .                    # run *_test.sigil suite
+make test-browser                                         # browser tests (testdata/browser, requires served app + Chrome)
 ```
 
 `serve` builds the bundle once at startup and serves static bytes — use it for
