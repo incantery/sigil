@@ -3,7 +3,7 @@ import "std/test" (eq)
 
 // Run against a served app, e.g.:
 //   sigil serve examples/counter/counter.sigil &   // :8099
-//   sigil test tests/browser --root .
+//   sigil test testdata/browser --root .
 test "counter renders heading" {
   navigate "http://localhost:8099";
   waitVisible "#count";
