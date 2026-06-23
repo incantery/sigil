@@ -22,3 +22,9 @@ __pycache__/
 
 # VS Code extension build artifacts
 *.vsix
+
+# Superpowers SDD scratch (briefs, reports, diffs, ledger)
+.superpowers/
+
+# Browser test run artifacts
+.sigil-test/

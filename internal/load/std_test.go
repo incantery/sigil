@@ -9,6 +9,26 @@ import (
 	"github.com/dop251/goja"
 )
 
+func TestStdBrowserLoads(t *testing.T) {
+	entry := `import "std/browser" (navigate, click, fill, waitVisible, domText)
+import "std/test" (eq)
+test "drives" {
+  navigate "http://localhost:1";
+  click "#a";
+  fill "#b" "x";
+  waitVisible "#c";
+  expect (eq (domText "#d") "hi")
+}`
+	dir := t.TempDir()
+	file := filepath.Join(dir, "b_test.sigil")
+	if err := os.WriteFile(file, []byte(entry), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Load(file, Options{Root: repoRoot}); err != nil {
+		t.Fatalf("load std/browser test: %v", err)
+	}
+}
+
 // repoRoot is the module root that holds std/ (two levels up from internal/load).
 const repoRoot = "../.."
 

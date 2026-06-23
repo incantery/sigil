@@ -334,6 +334,15 @@ func (c *Checker) installIntrinsics(e *env) {
 	// derived expressions drive them directly.
 	e.set("__each", poly(arrows(arrows(tUnit, tList(g(0))), arrows(g(0), tNode), tNode))) // (unit -> List a) -> (a -> Node) -> Node
 	e.set("__when", mono(arrows(arrows(tUnit, tBool), arrows(tUnit, tNode), tNode)))      // (unit -> Bool) -> (unit -> Node) -> Node
+
+	// Browser driver (Sigil Browser SP1). Bound only by the browser runner;
+	// not present in the JS prelude. Actions are effects (see effects.go);
+	// __domText is a read.
+	e.set("__navigate", mono(arrows(tString, tUnit)))            // String -> Unit
+	e.set("__click", mono(arrows(tString, tUnit)))               // String -> Unit
+	e.set("__fill", mono(arrows(tString, tString, tUnit)))       // String -> String -> Unit
+	e.set("__waitVisible", mono(arrows(tString, tUnit)))         // String -> Unit
+	e.set("__domText", mono(arrows(tString, tString)))           // String -> String (read)
 }
 
 // --- fresh variables, levels, generalization ---
